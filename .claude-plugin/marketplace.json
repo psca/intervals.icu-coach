@@ -1,0 +1,22 @@
+{
+  "name": "intervals-icu-coach",
+  "owner": {
+    "name": "Anthony",
+    "email": ""
+  },
+  "metadata": {
+    "description": "Triathlon coaching skill powered by intervals.icu data",
+    "version": "1.0.0"
+  },
+  "plugins": [
+    {
+      "name": "triathlon-training",
+      "description": "Triathlon coaching skill that analyses intervals.icu training data per discipline (swim/bike/run). Provides CTL/ATL/TSB trends, aerobic decoupling assessment, overtraining signals, race readiness, and session breakdowns. Requires the intervals.icu MCP server configured with your API key and athlete ID.",
+      "source": "./",
+      "strict": false,
+      "skills": [
+        "./.claude/skills/triathlon-training"
+      ]
+    }
+  ]
+}
