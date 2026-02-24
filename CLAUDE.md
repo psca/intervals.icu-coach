@@ -38,7 +38,7 @@ The packed `.mcpb` is pre-built at `intervals-mcp-1.0.0.mcpb`. Double-click to i
 
 ## Architecture
 
-**Skill files** (auto-loaded by Claude Code from `.claude/skills/triathlon-training/`):
+**Skill files** (`skills/triathlon-training/` — loaded via marketplace or manually):
 
 | File | Role |
 |------|------|

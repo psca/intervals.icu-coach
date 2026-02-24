@@ -1,5 +1,5 @@
 # Claude Code local config (permissions, enabled MCP servers)
-.claude/settings.local.json
+.claude/
 
 # Desktop extension build artifacts (build with: npx @anthropic-ai/mcpb pack ./desktop-extension)
 *.mcpb

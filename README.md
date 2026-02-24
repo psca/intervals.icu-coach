@@ -4,12 +4,23 @@ A Claude skill that acts as a triathlon coach, pulling live data from intervals.
 
 ## Quick Start
 
+### Claude Desktop (Desktop Extension)
+
+1. Pack the extension:
+   ```bash
+   npx @anthropic-ai/mcpb pack ./desktop-extension
+   ```
+2. Double-click the generated `.mcpb` file.
+3. Enter your intervals.icu API Key and Athlete ID in the install dialog.
+
 ### Claude Code (CLI)
 
 1. **Add the MCP server** (one-time):
    ```bash
-   claude mcp add --env INTERVALS_API_KEY=<your-key> --env INTERVALS_ATHLETE_ID=<i12345> \
-     intervals-mcp uvx \
+   claude mcp add intervals \
+     --env API_KEY=<your-key> \
+     --env ATHLETE_ID=<i12345> \
+     -- uvx \
      --from git+https://github.com/mvilanova/intervals-mcp-server.git \
      python -m intervals_mcp_server.server
    ```
@@ -21,7 +32,7 @@ A Claude skill that acts as a triathlon coach, pulling live data from intervals.
    # .mcp.json is already in this repo — Claude Code picks it up automatically
    ```
 
-3. **Load the skill** — Claude Code reads `.claude/skills/triathlon-training/` automatically.
+3. **Install the skill** via the Claude skills marketplace, or load the files from `skills/triathlon-training/` manually.
 
 4. **Start coaching:**
    ```
@@ -30,16 +41,9 @@ A Claude skill that acts as a triathlon coach, pulling live data from intervals.
    How's my swim fitness trending?
    ```
 
-### Claude Desktop (Desktop Extension)
-
-1. Pack the extension:
-   ```bash
-   npx @anthropic-ai/mcpb pack ./desktop-extension
-   ```
-2. Double-click the generated `.mcpb` file.
-3. Enter your intervals.icu API Key and Athlete ID in the install dialog.
-
 ## Skill Files
+
+All skill files live in `skills/triathlon-training/`:
 
 | File | Purpose |
 |------|---------|
@@ -58,18 +62,18 @@ Find them at **intervals.icu → Settings → API**:
 
 ```
 intervals.icu-coach/
-├── .claude/
-│   └── skills/
-│       └── triathlon-training/
-│           ├── SKILL.md
-│           ├── METRICS_REFERENCE.md
-│           ├── COACH_PERSONA.md
-│           └── DISCIPLINE_ANALYSIS.md
+├── .claude-plugin/
+│   └── marketplace.json   ← skill marketplace config
+├── skills/
+│   └── triathlon-training/
+│       ├── SKILL.md
+│       ├── METRICS_REFERENCE.md
+│       ├── COACH_PERSONA.md
+│       └── DISCIPLINE_ANALYSIS.md
 ├── desktop-extension/
 │   ├── manifest.json
-│   └── icon.png
-├── .mcp.json          ← team/project MCP config
-├── README.md
-└── [original .md files kept for reference]
+│   ├── icon.png
+│   └── server/run.py
+├── .mcp.json              ← team/project MCP config
+└── README.md
 ```
-# intervals.icu-coach
