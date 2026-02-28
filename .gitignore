@@ -1,5 +1,10 @@
+# MacOS
+.DS_Store
+
 # Claude Code local config (permissions, enabled MCP servers)
 .claude/
 
 # Desktop extension build artifacts (build with: npx @anthropic-ai/mcpb pack ./desktop-extension)
 *.mcpb
+
+openapi-spec.json
