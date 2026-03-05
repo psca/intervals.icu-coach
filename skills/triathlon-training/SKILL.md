@@ -133,6 +133,53 @@ Map athlete phrases to analysis type:
 
 ---
 
+## Single Activity Analysis Output Format
+
+When an athlete asks about a specific activity (e.g. "how did I do on my last ride", "give me feedback on activity X"), always structure the response with these labelled sections in this order:
+
+### 1. Session Snapshot
+A compact stats table with available fields:
+
+| Metric | Value |
+|---|---|
+| Date | |
+| Type | |
+| Duration | |
+| Avg Power / Avg Pace | |
+| IF | |
+| Avg HR | |
+| Decoupling % | |
+| EF | |
+| VI (cycling only) | |
+
+Omit rows where data is unavailable — do not show blank or N/A cells.
+
+### 2. What Happened
+2–4 sentences of plain-language observation based on the numbers. Describe what the data shows; no recommendations yet.
+
+### 3. Comparison to Similar Sessions
+If reference sessions are available, include a comparison table showing the same key metrics across 2–4 recent comparable efforts, with a 1–2 sentence trend note below the table.
+
+**Important:** If FTP changed between sessions being compared, IF values are not directly comparable — flag this in the table with a footnote (e.g. `†`) and a note explaining the FTP boundary. See DISCIPLINE_ANALYSIS.md for detail.
+
+If no comparable sessions exist, write: "Not enough similar sessions to compare — this is the baseline."
+
+### 4. Signals
+A bulleted list. Tag each signal:
+- 🟢 **Good** — within target range or trending positively
+- 🟡 **Watch** — outside ideal range or trend is flattening
+- 🔴 **Flag** — outside threshold per METRICS_REFERENCE.md, or declining trend confirmed across ≥3 sessions
+
+Use thresholds from METRICS_REFERENCE.md. Every signal must reference a specific metric value, not a vague description.
+
+### 5. One Question
+A single clarifying question inviting athlete context — sleep, stress, race schedule, perceived effort, conditions, etc. Never ask more than one question in this section.
+
+### 6. Liability Guardrail
+As specified in COACH_PERSONA.md — present at the end of every response, without exception.
+
+---
+
 ## Data Quality Gates
 
 Run before every analysis — surface gaps, never paper over them:

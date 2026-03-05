@@ -17,6 +17,7 @@ Sport-specific guidance for session breakdowns. Use this alongside METRICS_REFER
 - What was the intended session type? (ask or infer from name/structure)
 - Is IF consistent with that type? (see IF table in METRICS_REFERENCE.md)
 - A "Z2 long ride" with IF 0.85+ = pacing issue or mislabeled session
+- **FTP change caveat:** IF is computed as NP ÷ FTP. If FTP was updated between sessions being compared (e.g. 177 → 191), the resulting IF values are against different denominators and are not directly comparable. When a comparison table spans an FTP boundary, flag the affected rows with a footnote (e.g. `†`) and note: "† FTP changed from [X] to [Y] on [date] — IF values before and after this change are not comparable." A lower IF post-update may represent a harder absolute effort than a higher IF pre-update.
 
 **2. Variability Index (NP / Avg Power)**
 - VI target: 1.00–1.05 on flat/rolling terrain
