@@ -74,5 +74,65 @@ class TestGetForwarding(unittest.TestCase):
         handler.send_response.assert_called_with(404)
 
 
+class TestBodyForwarding(unittest.TestCase):
+    def _make_handler(self, method, path, body_bytes):
+        handler = srv.ProxyHandler.__new__(srv.ProxyHandler)
+        handler.command = method
+        handler.path = path
+        handler.headers = {
+            "Content-Type": "application/json",
+            "Content-Length": str(len(body_bytes)),
+        }
+        handler.rfile = MagicMock()
+        handler.rfile.read.return_value = body_bytes
+        handler.wfile = MagicMock()
+        handler.send_response = MagicMock()
+        handler.send_header = MagicMock()
+        handler.end_headers = MagicMock()
+        return handler
+
+    @patch("urllib.request.urlopen")
+    def test_post_forwards_body(self, mock_urlopen):
+        body = b'{"name": "Test Workout"}'
+        mock_resp = MagicMock()
+        mock_resp.status = 201
+        mock_resp.read.return_value = b'{"id": "e456"}'
+        mock_resp.headers.get.return_value = "application/json"
+        mock_resp.__enter__ = lambda s: s
+        mock_resp.__exit__ = MagicMock(return_value=False)
+        mock_urlopen.return_value = mock_resp
+
+        handler = self._make_handler("POST", "/api/v1/athlete/i123/events", body)
+        handler.do_POST()
+
+        call_args = mock_urlopen.call_args[0][0]
+        self.assertEqual(call_args.data, body)
+        self.assertEqual(call_args.get_method(), "POST")
+        handler.send_response.assert_called_with(201)
+
+    @patch("urllib.request.urlopen")
+    def test_delete_sends_no_body(self, mock_urlopen):
+        mock_resp = MagicMock()
+        mock_resp.status = 204
+        mock_resp.read.return_value = b""
+        mock_resp.headers.get.return_value = "application/json"
+        mock_resp.__enter__ = lambda s: s
+        mock_resp.__exit__ = MagicMock(return_value=False)
+        mock_urlopen.return_value = mock_resp
+
+        handler = srv.ProxyHandler.__new__(srv.ProxyHandler)
+        handler.command = "DELETE"
+        handler.path = "/api/v1/athlete/i123/events/e456"
+        handler.headers = {}
+        handler.wfile = MagicMock()
+        handler.send_response = MagicMock()
+        handler.send_header = MagicMock()
+        handler.end_headers = MagicMock()
+        handler.do_DELETE()
+
+        call_args = mock_urlopen.call_args[0][0]
+        self.assertIsNone(call_args.data)
+
+
 if __name__ == "__main__":
     unittest.main()
