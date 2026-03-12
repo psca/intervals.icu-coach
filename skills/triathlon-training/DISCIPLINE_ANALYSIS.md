@@ -7,11 +7,28 @@ Sport-specific guidance for session breakdowns. Use this alongside METRICS_REFER
 ## Cycling Session Analysis
 
 ### Tools to Call
-1. `get_activity_details` — NP, IF, average power, average HR, duration, distance
-2. `get_activity_intervals` — if structured workout (intervals present)
-3. `get_activity_streams` — only if computing aerobic decoupling manually (high token cost; check if decoupling is already in details response first)
+1. `WebFetch GET /api/v1/activity/{id}` — NP, IF, average power, average HR, duration, distance
+2. `WebFetch GET /api/v1/activity/{id}/weather-summary` — weather context; see Weather Context block below
+3. `WebFetch GET /api/v1/activity/{id}/intervals` — if structured workout (intervals present)
+4. `WebFetch GET /api/v1/activity/{id}/streams` — only if computing aerobic decoupling manually (high token cost; check if decoupling is already in details response first)
 
 ### Analysis Sequence
+
+**0. Fetch weather context**
+
+Call `WebFetch http://localhost:8080/api/v1/activity/{id}/weather-summary`
+
+- If non-200 or empty response → skip weather, note "weather unavailable" and proceed to step 1.
+- If OK → extract:
+  - `description` — plain-language summary (e.g. "Partly cloudy")
+  - `average_feels_like` — perceived temperature (accounts for humidity + wind)
+  - `average_wind_speed`, `prevailing_wind_deg` → convert to cardinal (0°=N, 90°=E, 180°=S, 270°=W)
+  - `headwind_percent`, `tailwind_percent` — route-aware wind impact
+  - `max_rain`, `max_showers` — precipitation flag
+
+Lead output with: "{description} — {feels_like}°C feels-like, {wind} km/h {dir} ({headwind}% headwind / {tailwind}% tailwind)"
+
+**Use weather context in steps 1–5**: contextualize VI and IF against headwind before flagging; adjust decoupling thresholds for feels-like temp. See METRICS_REFERENCE.md `## Weather Context Thresholds`.
 
 **1. Assess session quality via NP + IF**
 - What was the intended session type? (ask or infer from name/structure)
