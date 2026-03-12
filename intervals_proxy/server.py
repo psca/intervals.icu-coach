@@ -58,3 +58,13 @@ class ProxyHandler(http.server.BaseHTTPRequestHandler):
 
     def log_message(self, format, *args):
         pass
+
+
+def main():
+    with http.server.HTTPServer(("localhost", PORT), ProxyHandler) as server:
+        print(f"intervals-proxy listening on http://localhost:{PORT}")
+        server.serve_forever()
+
+
+if __name__ == "__main__":
+    main()
