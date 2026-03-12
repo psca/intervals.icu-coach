@@ -7,4 +7,5 @@
 # Desktop extension build artifacts (build with: npx @anthropic-ai/mcpb pack ./desktop-extension)
 *.mcpb
 
-openapi-spec.json.worktrees/
+openapi-spec.json
+.worktrees/
