@@ -170,3 +170,42 @@ Best predictors of race performance (where to focus analysis):
 | 140.6 (Full) | Running aerobic base | Cycling efficiency |
 
 Use this to weight which discipline's metrics to emphasize in race readiness analysis.
+
+---
+
+## Weather Context Thresholds
+
+Apply these when weather data is available from `GET /api/v1/activity/{id}/weather-summary`. Conditions explain anomalies — don't flag readings as problems if conditions account for them.
+
+**Primary heat signal: `average_feels_like`** — use this instead of raw temperature. It already accounts for humidity and wind, making it a single number for "how hard is the body working to thermoregulate."
+
+### Feels-Like Temperature
+
+| Range | Effect | Coaching action |
+|---|---|---|
+| >28°C | Cardiac drift elevated; decoupling inflated | Adjust decoupling flag threshold by +2–3%; note heat *before* flagging |
+| 20–28°C | Moderate; normal thresholds apply | Standard interpretation |
+| <5°C | HR suppression common; EF may be artificially high | Flag EF comparisons as less reliable; compare only to other cold-weather efforts |
+
+Running-specific: flag decoupling at `average_feels_like > 25°C` (lower threshold than cycling due to higher heat sensitivity).
+
+### Wind (Route-Aware)
+
+| Condition | Effect | Coaching action |
+|---|---|---|
+| `headwind_percent > 40%` | Significant aerodynamic load on exposed route | Contextualize elevated power, IF, and VI — not a pacing problem |
+| `tailwind_percent > 60%` | Power/pace may be understated vs. typical efforts | Note when comparing EF or IF to prior sessions |
+| `average_wind_speed > 25 km/h` | Even with mixed direction, total wind load is high | Note in output regardless of headwind/tailwind split |
+
+`prevailing_wind_deg` → convert to cardinal for athlete-facing output (0°=N, 90°=E, 180°=S, 270°=W).
+
+### Precipitation
+
+| Condition | Effect | Coaching action |
+|---|---|---|
+| `max_rain > 0` or `max_showers > 0` | Conservative pacing, lower HR, potential VI anomalies | Actively mention; do not flag these anomalies as fitness issues |
+| `max_snow > 0` | Dramatically affects pace and HR reliability | Flag explicitly; most metrics non-comparable to non-winter efforts |
+
+### Application Rule
+
+Weather thresholds are contextualizers, not overrides. If feels-like explains 3% of a 14% decoupling reading, the remaining 11% still warrants investigation. Always apply standard thresholds first, then adjust with weather context.
