@@ -76,7 +76,7 @@ Check this into git so teammates don't need to run the command above. Each perso
 Follow these steps for every analysis request:
 
 ### Step 1: Data Quality Check
-Fetch the last 30 days of activities (`get_activities`, limit=50) and verify:
+Fetch the last 30 days of activities (`WebFetch GET /api/v1/athlete/{ATHLETE_ID}/activities?oldest=...&newest=...`) and verify:
 - At least 14 days of activity history present
 - Each referenced discipline has ≥3 activities in the last 30 days
 - CTL/ATL/TSB fields present in activity responses
@@ -84,7 +84,7 @@ Fetch the last 30 days of activities (`get_activities`, limit=50) and verify:
 If data is insufficient, tell the athlete explicitly what's missing before proceeding. Do not infer or fabricate metrics.
 
 ### Step 2: Wellness Fetch
-Call `get_wellness_data` for the last 14 days. Note if HRV or resting HR data is absent — if missing, use TSB + aerobic decoupling as proxies and flag the gap.
+Call `WebFetch GET /api/v1/athlete/{ATHLETE_ID}/wellness?oldest=...&newest=...` for the last 14 days. Note if HRV or resting HR data is absent — if missing, use TSB + aerobic decoupling as proxies and flag the gap.
 
 ### Step 3: Compute Key Signals Per Discipline
 Never aggregate swim/bike/run into a single training load number. A triathlete can be highly fit on the bike but undertrained on the run — aggregation masks this. Compute signals separately for each discipline present.
@@ -97,22 +97,25 @@ Use COACH_PERSONA.md style. Start with observation, translate numbers, flag patt
 
 ---
 
-## MCP Tool Map
+## API Tool Map
 
-| Use Case | Tool | Notes |
+All calls go through the local proxy at `http://localhost:8080`. Substitute `{ATHLETE_ID}` with the athlete's ID (e.g. `i388529`) and `{ACTIVITY_ID}` with the specific activity ID.
+
+| Use Case | Endpoint | Notes |
 |---|---|---|
-| HRV trend, resting HR, sleep | `get_wellness_data` | Fetch last 14–30 days |
-| Load history, CTL/ATL/TSB signals | `get_activities` | Fetch last 30–90 days, limit=50+ |
-| Single session breakdown | `get_activity_details` | Use activity ID from `get_activities` |
-| Interval hit/miss analysis | `get_activity_intervals` | For structured workouts only |
-| Power/HR time-series | `get_activity_streams` | ⚠️ High token cost — use only when aerobic decoupling or VI analysis requires second-by-second data |
-| Create / update planned workout | `add_or_update_event` | ⚠️ Write operation — run WORKOUT_PLANNING.md pre-flight checks first |
-| Delete planned workout | `delete_event` | Permanent — confirm with athlete before calling |
-| Fetch a specific event | `get_event_by_id` | Use to clone an existing workout's structure |
+| Load history, CTL/ATL/TSB | `GET /api/v1/athlete/{ATHLETE_ID}/activities` | Add `?oldest=YYYY-MM-DD&newest=YYYY-MM-DD` |
+| Wellness / HRV / resting HR | `GET /api/v1/athlete/{ATHLETE_ID}/wellness` | Add `?oldest=YYYY-MM-DD&newest=YYYY-MM-DD` |
+| Single activity detail | `GET /api/v1/activity/{ACTIVITY_ID}` | — |
+| Activity intervals | `GET /api/v1/activity/{ACTIVITY_ID}/intervals` | — |
+| Activity weather | `GET /api/v1/activity/{ACTIVITY_ID}/weather-summary` | Single-activity only; skip if non-200 |
+| Power/HR streams | `GET /api/v1/activity/{ACTIVITY_ID}/streams` | ⚠️ High token cost — only for decoupling/VI |
+| Create planned event | `POST /api/v1/athlete/{ATHLETE_ID}/events` | ⚠️ Write operation — run WORKOUT_PLANNING.md pre-flight checks first |
+| Update planned event | `PUT /api/v1/athlete/{ATHLETE_ID}/events/{eventId}` | ⚠️ Write operation |
+| Delete planned event | `DELETE /api/v1/athlete/{ATHLETE_ID}/events/{eventId}` | ⚠️ Permanent — confirm with athlete before calling |
 
-**Tool call order for fitness status:** `get_activities` → `get_wellness_data` → `get_activity_details` (for most recent session of each discipline)
+**Tool call order for fitness status:** `WebFetch GET /activities` → `WebFetch GET /wellness` → `WebFetch GET /activity/{id}` (for most recent session of each discipline)
 
-**Tool call order for activity analysis:** `get_activity_details` → `get_activity_intervals` (if structured) → `get_activity_streams` (only if decoupling analysis needed)
+**Tool call order for activity analysis:** `WebFetch GET /activity/{id}` → `WebFetch GET /activity/{id}/weather-summary` (cycling/running only) → `WebFetch GET /activity/{id}/intervals` (if structured) → `WebFetch GET /activity/{id}/streams` (only if decoupling analysis needed)
 
 ---
 
@@ -120,16 +123,17 @@ Use COACH_PERSONA.md style. Start with observation, translate numbers, flag patt
 
 Map athlete phrases to analysis type:
 
-| Athlete says | Analysis type | Primary tools |
+| Athlete says | Analysis type | Primary endpoints |
 |---|---|---|
-| "fitness status", "how am I doing", "training load" | 30-day PMC summary per discipline | `get_activities`, `get_wellness_data` |
-| "analyze my last [run/ride/swim]" | Single activity breakdown | `get_activity_details`, `get_activity_intervals` |
-| "am I overtrained", "should I rest", "recovery check" | Overtraining cascade (see METRICS_REFERENCE.md) | `get_wellness_data`, `get_activities` |
-| "race readiness", "ready for [race distance]" | TSB + per-discipline CTL vs. targets | `get_activities`, `get_wellness_data` |
-| "list my activities" | Recent activity log | `get_activities` |
-| "schedule a workout", "add a session", "plan [run/ride/swim]" | Create planned event | `add_or_update_event` — see WORKOUT_PLANNING.md |
-| "copy last week's workouts", "repeat this session" | Clone existing event | `get_event_by_id` → `add_or_update_event` |
-| "delete that workout", "remove [date] session" | Delete planned event | `get_events` to confirm ID → `delete_event` |
+| "fitness status", "how am I doing", "training load" | 30-day PMC summary per discipline | `GET /activities`, `GET /wellness` |
+| "analyze my last [run/ride/swim]" | Single activity breakdown | `GET /activity/{id}`, `GET /activity/{id}/weather-summary`, `GET /activity/{id}/intervals` |
+| "am I overtrained", "should I rest", "recovery check" | Overtraining cascade (see METRICS_REFERENCE.md) | `GET /wellness`, `GET /activities` |
+| "race readiness", "ready for [race distance]" | TSB + per-discipline CTL vs. targets | `GET /activities`, `GET /wellness` |
+| "list my activities" | Recent activity log | `GET /activities` |
+| "schedule a workout", "add a session", "plan [run/ride/swim]" | Create planned event | `POST /events` — see WORKOUT_PLANNING.md |
+| "copy last week's workouts", "repeat this session" | Clone existing event | `GET /events/{id}` → `POST /events` |
+| "delete that workout", "remove [date] session" | Delete planned event | `GET /events` to confirm ID → `DELETE /events/{id}` |
+| "how did the heat affect my run", "did the wind affect my power" | Weather-enriched activity breakdown | `GET /activity/{id}`, `GET /activity/{id}/weather-summary` |
 
 ---
 
