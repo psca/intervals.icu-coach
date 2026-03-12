@@ -67,11 +67,30 @@ Lead output with: "{description} — {feels_like}°C feels-like, {wind} km/h {di
 ## Running Session Analysis
 
 ### Tools to Call
-1. `get_activity_details` — pace, average HR, cadence, elevation, distance, duration
-2. `get_activity_intervals` — if structured (track workout, tempo intervals)
-3. `get_activity_streams` — for decoupling analysis if not in details response
+1. `WebFetch GET /api/v1/activity/{id}` — pace, average HR, cadence, elevation, distance, duration
+2. `WebFetch GET /api/v1/activity/{id}/weather-summary` — weather context; see Weather Context block below
+3. `WebFetch GET /api/v1/activity/{id}/intervals` — if structured (track workout, tempo intervals)
+4. `WebFetch GET /api/v1/activity/{id}/streams` — for decoupling analysis if not in details response
 
 ### Analysis Sequence
+
+**0. Fetch weather context**
+
+Call `WebFetch http://localhost:8080/api/v1/activity/{id}/weather-summary`
+
+- If non-200 or empty response → skip weather, note "weather unavailable" and proceed to step 1.
+- If OK → extract:
+  - `description` — plain-language summary
+  - `average_feels_like` — primary heat signal (more relevant than raw temp for running)
+  - `average_wind_speed`, `prevailing_wind_deg` → convert to cardinal (0°=N, 90°=E, 180°=S, 270°=W)
+  - `headwind_percent`, `tailwind_percent`
+  - `max_rain`, `max_showers`
+
+Lead output with: "{description} — {feels_like}°C feels-like, {wind} km/h {dir}"
+
+**Running is more heat-sensitive than cycling.** `average_feels_like > 25°C` warrants decoupling threshold adjustment even without high humidity — the feels-like value already accounts for both. See METRICS_REFERENCE.md `## Weather Context Thresholds`.
+
+**Use weather context in steps 1–5**: apply heat adjustment before flagging decoupling or EF anomalies.
 
 **1. Normalized Graded Pace (NGP) + Average HR → EF**
 - EF = NGP / Avg HR (higher = more efficient)
@@ -94,7 +113,7 @@ Lead output with: "{description} — {feels_like}°C feels-like, {wind} km/h {di
 - Declining EF = flag — possible causes: accumulated fatigue, heat, illness, overtraining
 
 **5. Interval Analysis (structured workouts)**
-- Use `get_activity_intervals` for track/tempo sessions
+- Use `WebFetch GET /api/v1/activity/{id}/intervals` for track/tempo sessions
 - Flag intervals where HR exceeded target zone significantly (pacing errors)
 - Rest interval HR recovery rate: faster recovery = better fitness
 - Compare interval times to prior similar sessions
