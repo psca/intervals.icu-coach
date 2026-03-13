@@ -14,7 +14,7 @@ claude mcp add intervals \
   --env API_KEY=your_api_key_here \
   --env ATHLETE_ID=your_athlete_id_here \
   -- uvx \
-  --from git+https://github.com/mvilanova/intervals-mcp-server.git \
+  --from git+https://github.com/psca/intervals-mcp-server.git \
   python -m intervals_mcp_server.server
 ```
 
@@ -25,6 +25,12 @@ export INTERVALS_ATHLETE_ID=<i12345>  # format: i followed by number
 ```
 
 Note: `.mcp.json` references `${INTERVALS_API_KEY}` and `${INTERVALS_ATHLETE_ID}` — the env var names differ from what `.mcp.json` passes as `API_KEY` / `ATHLETE_ID` to the server.
+
+## MCP Server Fork
+
+Uses `psca/intervals-mcp-server` (fork of mvilanova's). Key additions:
+- `get_activity_stream_sampled` — GPS + bearing at 30-min intervals, no truncation, correct lat/lng separation
+- Fixed `get_activity_streams` to return longitude (`data2` field was previously dropped)
 
 ## Desktop Extension
 
@@ -46,6 +52,13 @@ The packed `.mcpb` is pre-built at `intervals-mcp-1.0.0.mcpb`. Double-click to i
 | `METRICS_REFERENCE.md` | All thresholds: CTL ramp rates, TSB by race distance, decoupling %, VI, IF, EF, SWOLF |
 | `COACH_PERSONA.md` | Output style and liability guardrail |
 | `DISCIPLINE_ANALYSIS.md` | Per-sport analysis sequences with exact MCP tool call order |
+| `scripts/weather.py` | Weather context script — bundled with skill, called for every outdoor bike/run |
+
+**Weather script** (`scripts/weather.py` and `tools/weather.py` — keep in sync):
+- Zero dependencies (stdlib only)
+- Input: stdin JSON `{date, hour, lats, lngs, bearings}`
+- Calls Open-Meteo at each 30-min waypoint for spatially-accurate wind/temp data
+- Output: description, feels-like, wind speed/direction, headwind %, temp bar
 
 **Desktop extension** (`desktop-extension/`):
 - `manifest.json` — manifest_version `"0.3"`, requires `author` field, `sensitive` (not `secret`) for API key
@@ -55,5 +68,6 @@ The packed `.mcpb` is pre-built at `intervals-mcp-1.0.0.mcpb`. Double-click to i
 ## Key Constraints
 
 - **Never aggregate swim/bike/run** into a single training load figure — this is a hard invariant enforced throughout the skill
+- Use `get_activity_stream_sampled` (not `get_activity_streams`) for weather — the standard streams tool truncates to first/last 5 values and previously dropped longitude
 - `get_activity_streams` is high token cost — only call it when aerobic decoupling or VI analysis explicitly requires second-by-second data
 - MCP tool call order matters: `get_activities` → `get_wellness_data` → `get_activity_details` for fitness status; `get_activity_details` → `get_activity_intervals` → `get_activity_streams` for single activity analysis
