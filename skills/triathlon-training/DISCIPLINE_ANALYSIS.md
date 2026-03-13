@@ -7,16 +7,19 @@ Sport-specific guidance for session breakdowns. Use this alongside METRICS_REFER
 ## Cycling Session Analysis
 
 ### Tools to Call
-1. `WebFetch GET /api/v1/activity/{id}` — NP, IF, average power, average HR, duration, distance
-2. `WebFetch GET /api/v1/activity/{id}/weather-summary` — weather context; see Weather Context block below
-3. `WebFetch GET /api/v1/activity/{id}/intervals` — if structured workout (intervals present)
-4. `WebFetch GET /api/v1/activity/{id}/streams` — only if computing aerobic decoupling manually (high token cost; check if decoupling is already in details response first)
+1. `Bash curl /api/v1/activity/{id}` — NP, IF, average power, average HR, duration, distance
+2. `Bash curl /api/v1/activity/{id}/weather-summary` — weather context; see Weather Context block below
+3. `Bash curl /api/v1/activity/{id}/intervals` — if structured workout (intervals present)
+4. `Bash curl /api/v1/activity/{id}/streams` — only if computing aerobic decoupling manually (high token cost; check if decoupling is already in details response first)
 
 ### Analysis Sequence
 
 **0. Fetch weather context**
 
-Call `WebFetch http://localhost:8080/api/v1/activity/{id}/weather-summary`
+```bash
+curl -s -H "Authorization: Basic $(printf 'API_KEY:%s' "$INTERVALS_API_KEY" | base64)" \
+  "https://intervals.icu/api/v1/activity/{id}/weather-summary"
+```
 
 - If non-200 or empty response → skip weather, note "weather unavailable" and proceed to step 1.
 - If OK → extract:
@@ -67,16 +70,19 @@ Lead output with: "{description} — {feels_like}°C feels-like, {wind} km/h {di
 ## Running Session Analysis
 
 ### Tools to Call
-1. `WebFetch GET /api/v1/activity/{id}` — pace, average HR, cadence, elevation, distance, duration
-2. `WebFetch GET /api/v1/activity/{id}/weather-summary` — weather context; see Weather Context block below
-3. `WebFetch GET /api/v1/activity/{id}/intervals` — if structured (track workout, tempo intervals)
-4. `WebFetch GET /api/v1/activity/{id}/streams` — for decoupling analysis if not in details response
+1. `Bash curl /api/v1/activity/{id}` — pace, average HR, cadence, elevation, distance, duration
+2. `Bash curl /api/v1/activity/{id}/weather-summary` — weather context; see Weather Context block below
+3. `Bash curl /api/v1/activity/{id}/intervals` — if structured (track workout, tempo intervals)
+4. `Bash curl /api/v1/activity/{id}/streams` — for decoupling analysis if not in details response
 
 ### Analysis Sequence
 
 **0. Fetch weather context**
 
-Call `WebFetch http://localhost:8080/api/v1/activity/{id}/weather-summary`
+```bash
+curl -s -H "Authorization: Basic $(printf 'API_KEY:%s' "$INTERVALS_API_KEY" | base64)" \
+  "https://intervals.icu/api/v1/activity/{id}/weather-summary"
+```
 
 - If non-200 or empty response → skip weather, note "weather unavailable" and proceed to step 1.
 - If OK → extract:

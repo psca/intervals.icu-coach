@@ -76,7 +76,12 @@ Check this into git so teammates don't need to run the command above. Each perso
 Follow these steps for every analysis request:
 
 ### Step 1: Data Quality Check
-Fetch the last 30 days of activities (`WebFetch GET /api/v1/athlete/{ATHLETE_ID}/activities?oldest=...&newest=...`) and verify:
+Fetch the last 30 days of activities using Bash:
+```bash
+curl -s -H "Authorization: Basic $(printf 'API_KEY:%s' "$INTERVALS_API_KEY" | base64)" \
+  "https://intervals.icu/api/v1/athlete/{ATHLETE_ID}/activities?oldest=YYYY-MM-DD&newest=YYYY-MM-DD"
+```
+Verify:
 - At least 14 days of activity history present
 - Each referenced discipline has ≥3 activities in the last 30 days
 - CTL/ATL/TSB fields present in activity responses
@@ -84,7 +89,11 @@ Fetch the last 30 days of activities (`WebFetch GET /api/v1/athlete/{ATHLETE_ID}
 If data is insufficient, tell the athlete explicitly what's missing before proceeding. Do not infer or fabricate metrics.
 
 ### Step 2: Wellness Fetch
-Call `WebFetch GET /api/v1/athlete/{ATHLETE_ID}/wellness?oldest=...&newest=...` for the last 14 days. Note if HRV or resting HR data is absent — if missing, use TSB + aerobic decoupling as proxies and flag the gap.
+```bash
+curl -s -H "Authorization: Basic $(printf 'API_KEY:%s' "$INTERVALS_API_KEY" | base64)" \
+  "https://intervals.icu/api/v1/athlete/{ATHLETE_ID}/wellness?oldest=YYYY-MM-DD&newest=YYYY-MM-DD"
+```
+Note if HRV or resting HR data is absent — if missing, use TSB + aerobic decoupling as proxies and flag the gap.
 
 ### Step 3: Compute Key Signals Per Discipline
 Never aggregate swim/bike/run into a single training load number. A triathlete can be highly fit on the bike but undertrained on the run — aggregation masks this. Compute signals separately for each discipline present.
@@ -99,23 +108,28 @@ Use COACH_PERSONA.md style. Start with observation, translate numbers, flag patt
 
 ## API Tool Map
 
-All calls go through the local proxy at `http://localhost:8080`. Substitute `{ATHLETE_ID}` with the athlete's ID (e.g. `i388529`) and `{ACTIVITY_ID}` with the specific activity ID.
+All calls use `Bash` with curl. Auth is constructed from `$INTERVALS_API_KEY` env var. Substitute `{ATHLETE_ID}` (e.g. `i388529`) and `{ACTIVITY_ID}` as needed.
 
-| Use Case | Endpoint | Notes |
+```bash
+# Auth header — reuse this pattern for every call
+-H "Authorization: Basic $(printf 'API_KEY:%s' "$INTERVALS_API_KEY" | base64)"
+```
+
+| Use Case | Path | Notes |
 |---|---|---|
-| Load history, CTL/ATL/TSB | `GET /api/v1/athlete/{ATHLETE_ID}/activities` | Add `?oldest=YYYY-MM-DD&newest=YYYY-MM-DD` |
-| Wellness / HRV / resting HR | `GET /api/v1/athlete/{ATHLETE_ID}/wellness` | Add `?oldest=YYYY-MM-DD&newest=YYYY-MM-DD` |
-| Single activity detail | `GET /api/v1/activity/{ACTIVITY_ID}` | — |
-| Activity intervals | `GET /api/v1/activity/{ACTIVITY_ID}/intervals` | — |
-| Activity weather | `GET /api/v1/activity/{ACTIVITY_ID}/weather-summary` | Single-activity only; skip if non-200 |
-| Power/HR streams | `GET /api/v1/activity/{ACTIVITY_ID}/streams` | ⚠️ High token cost — only for decoupling/VI |
-| Create planned event | `POST /api/v1/athlete/{ATHLETE_ID}/events` | ⚠️ Write operation — run WORKOUT_PLANNING.md pre-flight checks first |
-| Update planned event | `PUT /api/v1/athlete/{ATHLETE_ID}/events/{eventId}` | ⚠️ Write operation |
-| Delete planned event | `DELETE /api/v1/athlete/{ATHLETE_ID}/events/{eventId}` | ⚠️ Permanent — confirm with athlete before calling |
+| Load history, CTL/ATL/TSB | `/api/v1/athlete/{ATHLETE_ID}/activities` | Add `?oldest=YYYY-MM-DD&newest=YYYY-MM-DD` |
+| Wellness / HRV / resting HR | `/api/v1/athlete/{ATHLETE_ID}/wellness` | Add `?oldest=YYYY-MM-DD&newest=YYYY-MM-DD` |
+| Single activity detail | `/api/v1/activity/{ACTIVITY_ID}` | — |
+| Activity intervals | `/api/v1/activity/{ACTIVITY_ID}/intervals` | — |
+| Activity weather | `/api/v1/activity/{ACTIVITY_ID}/weather-summary` | Single-activity only; skip if non-200 or all-null |
+| Power/HR streams | `/api/v1/activity/{ACTIVITY_ID}/streams` | ⚠️ High token cost — only for decoupling/VI |
+| Create planned event | `/api/v1/athlete/{ATHLETE_ID}/events` | ⚠️ Write — POST, run WORKOUT_PLANNING.md pre-flight checks first |
+| Update planned event | `/api/v1/athlete/{ATHLETE_ID}/events/{eventId}` | ⚠️ Write — PUT |
+| Delete planned event | `/api/v1/athlete/{ATHLETE_ID}/events/{eventId}` | ⚠️ Permanent — DELETE, confirm with athlete first |
 
-**Tool call order for fitness status:** `WebFetch GET /activities` → `WebFetch GET /wellness` → `WebFetch GET /activity/{id}` (for most recent session of each discipline)
+**Tool call order for fitness status:** `Bash curl /activities` → `Bash curl /wellness` → `Bash curl /activity/{id}` (most recent session per discipline)
 
-**Tool call order for activity analysis:** `WebFetch GET /activity/{id}` → `WebFetch GET /activity/{id}/weather-summary` (cycling/running only) → `WebFetch GET /activity/{id}/intervals` (if structured) → `WebFetch GET /activity/{id}/streams` (only if decoupling analysis needed)
+**Tool call order for activity analysis:** `Bash curl /activity/{id}` → `Bash curl /activity/{id}/weather-summary` (cycling/running only) → `Bash curl /activity/{id}/intervals` (if structured) → `Bash curl /activity/{id}/streams` (only if decoupling analysis needed)
 
 ---
 
