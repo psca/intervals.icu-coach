@@ -3,7 +3,7 @@
   "name": "intervals-mcp",
   "version": "1.0.0",
   "display_name": "intervals.icu — Triathlon Training",
-  "description": "Connects Claude to your intervals.icu training data. Required for the Triathlon Training Insights skill. Powered by intervals-mcp-server by mvilanova (https://github.com/mvilanova/intervals-mcp-server).",
+  "description": "Connects Claude to your intervals.icu training data. Required for the Triathlon Training Insights skill. Powered by intervals-mcp-server (https://github.com/psca/intervals-mcp-server).",
   "icon": "icon.png",
   "author": {
     "name": "intervals.icu Triathlon Coach"
@@ -32,7 +32,7 @@
       "command": "uvx",
       "args": [
         "--from",
-        "git+https://github.com/mvilanova/intervals-mcp-server.git",
+        "git+https://github.com/psca/intervals-mcp-server.git",
         "python",
         "-m",
         "intervals_mcp_server.server"

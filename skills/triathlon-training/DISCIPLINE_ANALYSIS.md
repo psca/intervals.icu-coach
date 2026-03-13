@@ -8,7 +8,7 @@ Sport-specific guidance for session breakdowns. Use this alongside METRICS_REFER
 
 ### Tools to Call
 1. `get_activity_details` — NP, IF, average power, average HR, duration, distance
-2. `get_activity_streams(stream_types="latlng,bearing")` — **always call this for weather** (separate from decoupling streams)
+2. `get_activity_stream_sampled(stream_types="latlng,bearing")` — **always call this for weather** (returns pre-sampled waypoints, no truncation)
 3. `get_activity_intervals` — if structured workout (intervals present)
 4. `get_activity_streams` with default types — only if computing aerobic decoupling manually (high token cost; check if decoupling is already in details response first)
 
@@ -20,13 +20,14 @@ Sport-specific guidance for session breakdowns. Use this alongside METRICS_REFER
 Step 1: get_activity_details(activity_id)
         → extract start_date_local → date="2026-03-11", hour=9
 
-Step 2: get_activity_streams(activity_id, stream_types="latlng,bearing")
-        → latlng stream: data=lats (floats), data2=lngs (floats)
-        → bearing stream: data=bearings (integers, degrees 0-359, may contain None)
-        NOTE: These streams are NOT in the default stream set — you MUST request them explicitly.
+Step 2: get_activity_stream_sampled(activity_id, stream_types="latlng,bearing")
+        → returns: {"latlng": {"lats": [...], "lngs": [...]}, "bearing": {"data": [...]},
+                    "interval_seconds": 1800, "total_points": N, "sampled_points": M}
+        NOTE: Use this tool, NOT get_activity_streams — it returns full sampled arrays with no truncation.
               Do NOT skip this call based on activity details — GPS lives here, not there.
 
 Step 3 (Claude Code): Run weather script
+        Extract from step 2: lats=latlng.lats, lngs=latlng.lngs, bearings=bearing.data
         Bash: echo '{"date": "...", "hour": H, "lats": [...], "lngs": [...], "bearings": [...]}' | python3 skills/triathlon-training/scripts/weather.py
 
 Step 3 (Claude Desktop / no Bash): Fetch Open-Meteo directly via WebFetch
@@ -37,7 +38,7 @@ Step 3 (Claude Desktop / no Bash): Fetch Open-Meteo directly via WebFetch
         Headwind logic: abs(((travel_bearing - wind_from_deg + 180) % 360) - 180) < 90 → headwind
 ```
 
-- Only skip weather if `get_activity_streams` returns no latlng data (e.g. treadmill, indoor trainer).
+- Only skip weather if `get_activity_stream_sampled` returns no latlng data (e.g. treadmill, indoor trainer).
 - Do NOT assume weather is unavailable from the activity details response alone.
 - Extract from output:
   - `description` — plain-language summary (e.g. "Partly cloudy")
@@ -100,13 +101,14 @@ Lead output with: "{description} — {feels_like}°C feels-like, {wind} km/h {ca
 Step 1: get_activity_details(activity_id)
         → extract start_date_local → date="2026-03-11", hour=9
 
-Step 2: get_activity_streams(activity_id, stream_types="latlng,bearing")
-        → latlng stream: data=lats (floats), data2=lngs (floats)
-        → bearing stream: data=bearings (integers, degrees 0-359, may contain None)
-        NOTE: These streams are NOT in the default stream set — you MUST request them explicitly.
+Step 2: get_activity_stream_sampled(activity_id, stream_types="latlng,bearing")
+        → returns: {"latlng": {"lats": [...], "lngs": [...]}, "bearing": {"data": [...]},
+                    "interval_seconds": 1800, "total_points": N, "sampled_points": M}
+        NOTE: Use this tool, NOT get_activity_streams — it returns full sampled arrays with no truncation.
               Do NOT skip this call based on activity details — GPS lives here, not there.
 
 Step 3 (Claude Code): Run weather script
+        Extract from step 2: lats=latlng.lats, lngs=latlng.lngs, bearings=bearing.data
         Bash: echo '{"date": "...", "hour": H, "lats": [...], "lngs": [...], "bearings": [...]}' | python3 skills/triathlon-training/scripts/weather.py
 
 Step 3 (Claude Desktop / no Bash): Fetch Open-Meteo directly via WebFetch
@@ -117,7 +119,7 @@ Step 3 (Claude Desktop / no Bash): Fetch Open-Meteo directly via WebFetch
         Headwind logic: abs(((travel_bearing - wind_from_deg + 180) % 360) - 180) < 90 → headwind
 ```
 
-- Only skip weather if `get_activity_streams` returns no latlng data (e.g. treadmill, track with no GPS).
+- Only skip weather if `get_activity_stream_sampled` returns no latlng data (e.g. treadmill, track with no GPS).
 - Do NOT assume weather is unavailable from the activity details response alone.
 - Extract from output:
   - `description` — plain-language summary
