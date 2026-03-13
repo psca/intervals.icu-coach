@@ -115,21 +115,23 @@ All calls use `Bash` with curl. Auth is constructed from `$INTERVALS_API_KEY` en
 -H "Authorization: Basic $(printf 'API_KEY:%s' "$INTERVALS_API_KEY" | base64)"
 ```
 
-| Use Case | Path | Notes |
+| Use Case | How | Notes |
 |---|---|---|
-| Load history, CTL/ATL/TSB | `/api/v1/athlete/{ATHLETE_ID}/activities` | Add `?oldest=YYYY-MM-DD&newest=YYYY-MM-DD` |
-| Wellness / HRV / resting HR | `/api/v1/athlete/{ATHLETE_ID}/wellness` | Add `?oldest=YYYY-MM-DD&newest=YYYY-MM-DD` |
-| Single activity detail | `/api/v1/activity/{ACTIVITY_ID}` | — |
-| Activity intervals | `/api/v1/activity/{ACTIVITY_ID}/intervals` | — |
-| Activity weather | `/api/v1/activity/{ACTIVITY_ID}/weather-summary` | Single-activity only; skip if non-200 or all-null |
-| Power/HR streams | `/api/v1/activity/{ACTIVITY_ID}/streams` | ⚠️ High token cost — only for decoupling/VI |
-| Create planned event | `/api/v1/athlete/{ATHLETE_ID}/events` | ⚠️ Write — POST, run WORKOUT_PLANNING.md pre-flight checks first |
-| Update planned event | `/api/v1/athlete/{ATHLETE_ID}/events/{eventId}` | ⚠️ Write — PUT |
-| Delete planned event | `/api/v1/athlete/{ATHLETE_ID}/events/{eventId}` | ⚠️ Permanent — DELETE, confirm with athlete first |
+| Load history, CTL/ATL/TSB | `Bash curl /api/v1/athlete/{ATHLETE_ID}/activities` | Add `?oldest=YYYY-MM-DD&newest=YYYY-MM-DD` |
+| Wellness / HRV / resting HR | `Bash curl /api/v1/athlete/{ATHLETE_ID}/wellness` | Add `?oldest=YYYY-MM-DD&newest=YYYY-MM-DD` |
+| Single activity detail | `Bash curl /api/v1/activity/{ACTIVITY_ID}` | — |
+| Activity intervals | `Bash curl /api/v1/activity/{ACTIVITY_ID}/intervals` | — |
+| Activity weather | `Bash python3 tools/weather.py {ACTIVITY_ID}` | Computes headwind/tailwind from GPS + Open-Meteo; skip if no GPS |
+| Power/HR streams | `Bash curl /api/v1/activity/{ACTIVITY_ID}/streams` | ⚠️ High token cost — only for decoupling/VI |
+| Create planned event | `Bash curl -X POST /api/v1/athlete/{ATHLETE_ID}/events` | ⚠️ Write — run WORKOUT_PLANNING.md pre-flight checks first |
+| Update planned event | `Bash curl -X PUT /api/v1/athlete/{ATHLETE_ID}/events/{eventId}` | ⚠️ Write |
+| Delete planned event | `Bash curl -X DELETE /api/v1/athlete/{ATHLETE_ID}/events/{eventId}` | ⚠️ Permanent — confirm with athlete first |
+
+**For any endpoint not listed above:** consult `openapi-spec.json` in the repo root for the full intervals.icu API surface.
 
 **Tool call order for fitness status:** `Bash curl /activities` → `Bash curl /wellness` → `Bash curl /activity/{id}` (most recent session per discipline)
 
-**Tool call order for activity analysis:** `Bash curl /activity/{id}` → `Bash curl /activity/{id}/weather-summary` (cycling/running only) → `Bash curl /activity/{id}/intervals` (if structured) → `Bash curl /activity/{id}/streams` (only if decoupling analysis needed)
+**Tool call order for activity analysis:** `Bash curl /activity/{id}` → `Bash python3 tools/weather.py {id}` (cycling/running only) → `Bash curl /activity/{id}/intervals` (if structured) → `Bash curl /activity/{id}/streams` (only if decoupling analysis needed)
 
 ---
 

@@ -17,19 +17,18 @@ Sport-specific guidance for session breakdowns. Use this alongside METRICS_REFER
 **0. Fetch weather context**
 
 ```bash
-curl -s -H "Authorization: Basic $(printf 'API_KEY:%s' "$INTERVALS_API_KEY" | base64)" \
-  "https://intervals.icu/api/v1/activity/{id}/weather-summary"
+python3 tools/weather.py {id}
 ```
 
-- If non-200 or empty response → skip weather, note "weather unavailable" and proceed to step 1.
+- If error or no GPS → skip weather, note "weather unavailable" and proceed to step 1.
 - If OK → extract:
   - `description` — plain-language summary (e.g. "Partly cloudy")
   - `average_feels_like` — perceived temperature (accounts for humidity + wind)
-  - `average_wind_speed`, `prevailing_wind_deg` → convert to cardinal (0°=N, 90°=E, 180°=S, 270°=W)
-  - `headwind_percent`, `tailwind_percent` — route-aware wind impact
-  - `max_rain`, `max_showers` — precipitation flag
+  - `average_wind_speed`, `prevailing_wind_cardinal` — wind speed and direction
+  - `headwind_percent`, `tailwind_percent` — route-aware wind impact computed from GPS
+  - `max_rain`, `max_snow` — precipitation flag
 
-Lead output with: "{description} — {feels_like}°C feels-like, {wind} km/h {dir} ({headwind}% headwind / {tailwind}% tailwind)"
+Lead output with: "{description} — {feels_like}°C feels-like, {wind} km/h {cardinal} ({headwind}% headwind / {tailwind}% tailwind)"
 
 **Use weather context in steps 1–5**: contextualize VI and IF against headwind before flagging; adjust decoupling thresholds for feels-like temp. See METRICS_REFERENCE.md `## Weather Context Thresholds`.
 
@@ -80,19 +79,18 @@ Lead output with: "{description} — {feels_like}°C feels-like, {wind} km/h {di
 **0. Fetch weather context**
 
 ```bash
-curl -s -H "Authorization: Basic $(printf 'API_KEY:%s' "$INTERVALS_API_KEY" | base64)" \
-  "https://intervals.icu/api/v1/activity/{id}/weather-summary"
+python3 tools/weather.py {id}
 ```
 
-- If non-200 or empty response → skip weather, note "weather unavailable" and proceed to step 1.
+- If error or no GPS → skip weather, note "weather unavailable" and proceed to step 1.
 - If OK → extract:
   - `description` — plain-language summary
   - `average_feels_like` — primary heat signal (more relevant than raw temp for running)
-  - `average_wind_speed`, `prevailing_wind_deg` → convert to cardinal (0°=N, 90°=E, 180°=S, 270°=W)
+  - `average_wind_speed`, `prevailing_wind_cardinal` — wind speed and direction
   - `headwind_percent`, `tailwind_percent`
-  - `max_rain`, `max_showers`
+  - `max_rain`, `max_snow`
 
-Lead output with: "{description} — {feels_like}°C feels-like, {wind} km/h {dir}"
+Lead output with: "{description} — {feels_like}°C feels-like, {wind} km/h {cardinal}"
 
 **Running is more heat-sensitive than cycling.** `average_feels_like > 25°C` warrants decoupling threshold adjustment even without high humidity — the feels-like value already accounts for both. See METRICS_REFERENCE.md `## Weather Context Thresholds`.
 
