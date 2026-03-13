@@ -15,3 +15,6 @@ openapi-spec.json
 __pycache__/
 *.pyc
 .pytest_cache/
+
+# Weather chart outputs
+tools/weather_*.png

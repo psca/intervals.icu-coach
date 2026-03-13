@@ -23,8 +23,8 @@ Output JSON (stdout):
 
 import json
 import math
+import os
 import sys
-import tempfile
 import urllib.request
 from datetime import date as date_cls
 
@@ -231,9 +231,20 @@ def plot_wind_rose(bearing_weather_pairs, waypoints, date_str, start_hour):
     fig.text(0.5, 0.05, "  ·  ".join(summary_parts), ha="center", fontsize=9, color="#555")
 
     plt.tight_layout(rect=[0, 0.09, 1, 0.94])
-    out = tempfile.mktemp(suffix=f"_weather_{date_str}_{start_hour:02d}h.png")
+
+    # Save to tools/ alongside this script so it's always findable
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    out = os.path.join(script_dir, f"weather_{date_str}_{start_hour:02d}h.png")
     plt.savefig(out, dpi=150, bbox_inches="tight", facecolor="white")
     plt.close(fig)
+
+    # Auto-open on macOS
+    try:
+        import subprocess
+        subprocess.Popen(["open", out])
+    except Exception:
+        pass
+
     return out
 
 
