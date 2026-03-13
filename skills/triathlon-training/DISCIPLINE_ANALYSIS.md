@@ -8,30 +8,37 @@ Sport-specific guidance for session breakdowns. Use this alongside METRICS_REFER
 
 ### Tools to Call
 1. `get_activity_details` — NP, IF, average power, average HR, duration, distance
-2. `get_activity_intervals` — if structured workout (intervals present)
-3. `get_activity_streams` — only if computing aerobic decoupling manually (high token cost; check if decoupling is already in details response first)
+2. `get_activity_streams(stream_types="latlng,bearing")` — **always call this for weather** (separate from decoupling streams)
+3. `get_activity_intervals` — if structured workout (intervals present)
+4. `get_activity_streams` with default types — only if computing aerobic decoupling manually (high token cost; check if decoupling is already in details response first)
 
 ### Analysis Sequence
 
-**0. Fetch weather context**
+**0. Fetch weather context — MANDATORY, do not skip**
 
-```python
-# 1. Get activity start time
-details = get_activity_details(activity_id)
-# → extract start_date_local (e.g. "2026-03-11T09:03:26") → date="2026-03-11", hour=9
+```
+Step 1: get_activity_details(activity_id)
+        → extract start_date_local → date="2026-03-11", hour=9
 
-# 2. Get GPS + bearing streams — must request explicitly, not in defaults
-streams = get_activity_streams(activity_id, stream_types="latlng,bearing")
-# → latlng stream: data=lats (floats), data2=lngs (floats)
-# → bearing stream: data=bearings (integers, degrees 0-359, may contain None)
+Step 2: get_activity_streams(activity_id, stream_types="latlng,bearing")
+        → latlng stream: data=lats (floats), data2=lngs (floats)
+        → bearing stream: data=bearings (integers, degrees 0-359, may contain None)
+        NOTE: These streams are NOT in the default stream set — you MUST request them explicitly.
+              Do NOT skip this call based on activity details — GPS lives here, not there.
 
-# 3. Pipe to weather script
-Bash: echo '{"date": "YYYY-MM-DD", "hour": HH, "lats": [...], "lngs": [...], "bearings": [...]}' | python3 tools/weather.py
+Step 3 (Claude Code): Run weather script
+        Bash: echo '{"date": "...", "hour": H, "lats": [...], "lngs": [...], "bearings": [...]}' | python3 tools/weather.py
+
+Step 3 (Claude Desktop / no Bash): Fetch Open-Meteo directly via WebFetch
+        Sample every 30 min of GPS track. For each waypoint:
+        URL (recent ≤5 days): https://api.open-meteo.com/v1/forecast?latitude={lat}&longitude={lng}&hourly=temperature_2m,apparent_temperature,windspeed_10m,winddirection_10m,precipitation,snowfall,cloudcover,weathercode&past_days=5&forecast_days=1&timezone=auto&wind_speed_unit=kmh
+        URL (older): https://archive-api.open-meteo.com/v1/archive?latitude={lat}&longitude={lng}&start_date={date}&end_date={date}&hourly=temperature_2m,apparent_temperature,windspeed_10m,winddirection_10m,precipitation,snowfall,cloudcover,weathercode&timezone=auto&wind_speed_unit=kmh
+        Extract the hourly slot matching the waypoint hour. Average across waypoints.
+        Headwind logic: abs(((travel_bearing - wind_from_deg + 180) % 360) - 180) < 90 → headwind
 ```
 
-- If latlng or bearing stream unavailable → skip weather, note "weather unavailable" and proceed to step 1.
-- Script samples Open-Meteo every 30 min along the route for spatially-accurate wind data.
-- If `plot_path` in output → Read the file to display the wind rose chart.
+- Only skip weather if `get_activity_streams` returns no latlng data (e.g. treadmill, indoor trainer).
+- Do NOT assume weather is unavailable from the activity details response alone.
 - Extract from output:
   - `description` — plain-language summary (e.g. "Partly cloudy")
   - `average_feels_like` — perceived temperature (accounts for humidity + wind)
@@ -81,29 +88,37 @@ Lead output with: "{description} — {feels_like}°C feels-like, {wind} km/h {ca
 
 ### Tools to Call
 1. `get_activity_details` — pace, average HR, cadence, elevation, distance, duration
-2. `get_activity_intervals` — if structured (track workout, tempo intervals)
-3. `get_activity_streams` — for decoupling analysis if not in details response
+2. `get_activity_streams(stream_types="latlng,bearing")` — **always call this for weather**
+3. `get_activity_intervals` — if structured (track workout, tempo intervals)
+4. `get_activity_streams` with default types — for decoupling analysis if not in details response
 
 ### Analysis Sequence
 
-**0. Fetch weather context**
+**0. Fetch weather context — MANDATORY, do not skip**
 
-```python
-# 1. Get activity start time
-details = get_activity_details(activity_id)
-# → extract start_date_local (e.g. "2026-03-11T09:03:26") → date="2026-03-11", hour=9
+```
+Step 1: get_activity_details(activity_id)
+        → extract start_date_local → date="2026-03-11", hour=9
 
-# 2. Get GPS + bearing streams — must request explicitly, not in defaults
-streams = get_activity_streams(activity_id, stream_types="latlng,bearing")
-# → latlng stream: data=lats (floats), data2=lngs (floats)
-# → bearing stream: data=bearings (integers, degrees 0-359, may contain None)
+Step 2: get_activity_streams(activity_id, stream_types="latlng,bearing")
+        → latlng stream: data=lats (floats), data2=lngs (floats)
+        → bearing stream: data=bearings (integers, degrees 0-359, may contain None)
+        NOTE: These streams are NOT in the default stream set — you MUST request them explicitly.
+              Do NOT skip this call based on activity details — GPS lives here, not there.
 
-# 3. Pipe to weather script
-Bash: echo '{"date": "YYYY-MM-DD", "hour": HH, "lats": [...], "lngs": [...], "bearings": [...]}' | python3 tools/weather.py
+Step 3 (Claude Code): Run weather script
+        Bash: echo '{"date": "...", "hour": H, "lats": [...], "lngs": [...], "bearings": [...]}' | python3 tools/weather.py
+
+Step 3 (Claude Desktop / no Bash): Fetch Open-Meteo directly via WebFetch
+        Sample every 30 min of GPS track. For each waypoint:
+        URL (recent ≤5 days): https://api.open-meteo.com/v1/forecast?latitude={lat}&longitude={lng}&hourly=temperature_2m,apparent_temperature,windspeed_10m,winddirection_10m,precipitation,snowfall,cloudcover,weathercode&past_days=5&forecast_days=1&timezone=auto&wind_speed_unit=kmh
+        URL (older): https://archive-api.open-meteo.com/v1/archive?latitude={lat}&longitude={lng}&start_date={date}&end_date={date}&hourly=temperature_2m,apparent_temperature,windspeed_10m,winddirection_10m,precipitation,snowfall,cloudcover,weathercode&timezone=auto&wind_speed_unit=kmh
+        Extract the hourly slot matching the waypoint hour. Average across waypoints.
+        Headwind logic: abs(((travel_bearing - wind_from_deg + 180) % 360) - 180) < 90 → headwind
 ```
 
-- If latlng or bearing stream unavailable → skip weather, note "weather unavailable" and proceed to step 1.
-- If `plot_path` in output → Read the file to display the wind rose chart.
+- Only skip weather if `get_activity_streams` returns no latlng data (e.g. treadmill, track with no GPS).
+- Do NOT assume weather is unavailable from the activity details response alone.
 - Extract from output:
   - `description` — plain-language summary
   - `average_feels_like` — primary heat signal (more relevant than raw temp for running)
