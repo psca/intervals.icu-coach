@@ -27,7 +27,7 @@ Step 2: get_activity_streams(activity_id, stream_types="latlng,bearing")
               Do NOT skip this call based on activity details — GPS lives here, not there.
 
 Step 3 (Claude Code): Run weather script
-        Bash: echo '{"date": "...", "hour": H, "lats": [...], "lngs": [...], "bearings": [...]}' | python3 tools/weather.py
+        Bash: echo '{"date": "...", "hour": H, "lats": [...], "lngs": [...], "bearings": [...]}' | python3 skills/triathlon-training/scripts/weather.py
 
 Step 3 (Claude Desktop / no Bash): Fetch Open-Meteo directly via WebFetch
         Sample every 30 min of GPS track. For each waypoint:
@@ -107,7 +107,7 @@ Step 2: get_activity_streams(activity_id, stream_types="latlng,bearing")
               Do NOT skip this call based on activity details — GPS lives here, not there.
 
 Step 3 (Claude Code): Run weather script
-        Bash: echo '{"date": "...", "hour": H, "lats": [...], "lngs": [...], "bearings": [...]}' | python3 tools/weather.py
+        Bash: echo '{"date": "...", "hour": H, "lats": [...], "lngs": [...], "bearings": [...]}' | python3 skills/triathlon-training/scripts/weather.py
 
 Step 3 (Claude Desktop / no Bash): Fetch Open-Meteo directly via WebFetch
         Sample every 30 min of GPS track. For each waypoint:
