@@ -17,23 +17,27 @@ Sport-specific guidance for session breakdowns. Use this alongside METRICS_REFER
 
 ```python
 # 1. Get activity start time
-details = get_activity_details(activity_id)  # extract start_date_local → date + hour
+details = get_activity_details(activity_id)
+# → extract start_date_local (e.g. "2026-03-11T09:03:26") → date="2026-03-11", hour=9
 
-# 2. Get GPS streams
-streams = get_activity_streams(activity_id, stream_types="latlng")  # data=lats, data2=lngs
+# 2. Get GPS + bearing streams — must request explicitly, not in defaults
+streams = get_activity_streams(activity_id, stream_types="latlng,bearing")
+# → latlng stream: data=lats (floats), data2=lngs (floats)
+# → bearing stream: data=bearings (integers, degrees 0-359, may contain None)
 
 # 3. Pipe to weather script
-Bash: echo '{"date": "YYYY-MM-DD", "hour": HH, "lats": [...], "lngs": [...]}' | python3 tools/weather.py
+Bash: echo '{"date": "YYYY-MM-DD", "hour": HH, "lats": [...], "lngs": [...], "bearings": [...]}' | python3 tools/weather.py
 ```
 
-- If streams unavailable or no latlng → skip weather, note "weather unavailable" and proceed to step 1.
-- If `plot_path` present in output → read the file to display the wind rose chart.
+- If latlng or bearing stream unavailable → skip weather, note "weather unavailable" and proceed to step 1.
+- Script samples Open-Meteo every 30 min along the route for spatially-accurate wind data.
+- If `plot_path` in output → Read the file to display the wind rose chart.
 - Extract from output:
   - `description` — plain-language summary (e.g. "Partly cloudy")
   - `average_feels_like` — perceived temperature (accounts for humidity + wind)
   - `average_wind_speed`, `prevailing_wind_cardinal` — wind speed and direction
-  - `headwind_percent`, `tailwind_percent` — route-aware wind impact computed from GPS
-  - `max_rain`, `max_snow` — precipitation flag
+  - `headwind_percent`, `tailwind_percent` — route-aware, matched per-second to nearest waypoint
+  - `max_rain`, `max_snow` — worst-case across all waypoints
 
 Lead output with: "{description} — {feels_like}°C feels-like, {wind} km/h {cardinal} ({headwind}% headwind / {tailwind}% tailwind)"
 
@@ -86,17 +90,20 @@ Lead output with: "{description} — {feels_like}°C feels-like, {wind} km/h {ca
 
 ```python
 # 1. Get activity start time
-details = get_activity_details(activity_id)  # extract start_date_local → date + hour
+details = get_activity_details(activity_id)
+# → extract start_date_local (e.g. "2026-03-11T09:03:26") → date="2026-03-11", hour=9
 
-# 2. Get GPS streams
-streams = get_activity_streams(activity_id, stream_types="latlng")  # data=lats, data2=lngs
+# 2. Get GPS + bearing streams — must request explicitly, not in defaults
+streams = get_activity_streams(activity_id, stream_types="latlng,bearing")
+# → latlng stream: data=lats (floats), data2=lngs (floats)
+# → bearing stream: data=bearings (integers, degrees 0-359, may contain None)
 
 # 3. Pipe to weather script
-Bash: echo '{"date": "YYYY-MM-DD", "hour": HH, "lats": [...], "lngs": [...]}' | python3 tools/weather.py
+Bash: echo '{"date": "YYYY-MM-DD", "hour": HH, "lats": [...], "lngs": [...], "bearings": [...]}' | python3 tools/weather.py
 ```
 
-- If streams unavailable or no latlng → skip weather, note "weather unavailable" and proceed to step 1.
-- If `plot_path` present in output → read the file to display the wind rose chart.
+- If latlng or bearing stream unavailable → skip weather, note "weather unavailable" and proceed to step 1.
+- If `plot_path` in output → Read the file to display the wind rose chart.
 - Extract from output:
   - `description` — plain-language summary
   - `average_feels_like` — primary heat signal (more relevant than raw temp for running)
