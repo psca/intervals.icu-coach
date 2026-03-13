@@ -1,68 +1,35 @@
 #!/usr/bin/env python3
 """
-Compute activity weather context from GPS streams + Open-Meteo (free, no API key).
+Compute activity weather context + wind rose chart from GPS + Open-Meteo (free, no API key).
 
 Usage:
-    python3 tools/weather.py <activity_id>
+    echo '{"date": "YYYY-MM-DD", "hour": HH, "lats": [...], "lngs": [...]}' | python3 tools/weather.py
 
-Output: JSON matching intervals.icu ActivityWeatherSummary fields:
-    description, average_feels_like, average_wind_speed, prevailing_wind_deg,
-    headwind_percent, tailwind_percent, max_rain, max_showers, max_snow,
-    average_clouds, average_temp
+Input JSON (stdin):
+    date   - activity date, e.g. "2026-03-11"
+    hour   - activity start hour (0-23), e.g. 17
+    lats   - list of latitude floats from latlng stream (MCP data field)
+    lngs   - list of longitude floats from latlng stream (MCP data2 field)
+
+Output JSON (stdout):
+    description, average_temp, average_feels_like, average_wind_speed,
+    prevailing_wind_deg, prevailing_wind_cardinal, headwind_percent,
+    tailwind_percent, avg_yaw, max_rain, max_snow, average_clouds,
+    plot_path (PNG wind rose chart, None if matplotlib unavailable)
 """
 
-import base64
 import json
 import math
-import os
 import sys
+import tempfile
 import urllib.request
-from datetime import datetime, timezone
-
-
-# ── Auth ──────────────────────────────────────────────────────────────────────
-
-def _auth_header():
-    key = os.environ.get("INTERVALS_API_KEY", "")
-    if not key:
-        raise SystemExit("INTERVALS_API_KEY not set")
-    return "Basic " + base64.b64encode(f"API_KEY:{key}".encode()).decode()
-
-
-def _fetch(url, auth):
-    req = urllib.request.Request(url, headers={"Authorization": auth, "Accept": "application/json"})
-    with urllib.request.urlopen(req, timeout=15) as resp:
-        return json.loads(resp.read())
-
-
-# ── intervals.icu ─────────────────────────────────────────────────────────────
-
-def get_activity(activity_id, auth):
-    return _fetch(f"https://intervals.icu/api/v1/activity/{activity_id}", auth)
-
-
-def get_streams(activity_id, auth):
-    streams = _fetch(f"https://intervals.icu/api/v1/activity/{activity_id}/streams", auth)
-    result = {}
-    for s in streams:
-        t = s.get("type")
-        if t == "latlng":
-            result["lat"] = s["data"]
-            result["lng"] = s["data2"]
-        elif t == "time":
-            result["time"] = s["data"]
-    return result
+from datetime import date as date_cls
 
 
 # ── Open-Meteo ────────────────────────────────────────────────────────────────
 
 def get_openmeteo_weather(lat, lng, date_str, hour):
-    """
-    Fetch hourly weather from Open-Meteo for the given date.
-    Uses forecast API (supports past_days=2) for recent activities,
-    archive API for older ones.
-    """
-    from datetime import date as date_cls
+    """Fetch hourly weather from Open-Meteo. Forecast API for ≤5 days ago, archive for older."""
     activity_date = date_cls.fromisoformat(date_str)
     days_ago = (date_cls.today() - activity_date).days
 
@@ -90,20 +57,14 @@ def get_openmeteo_weather(lat, lng, date_str, hour):
         data = json.loads(resp.read())
 
     hourly = data["hourly"]
-    times = hourly["time"]
-
-    # Find the index for the activity hour
     target = f"{date_str}T{hour:02d}:00"
-    idx = next((i for i, t in enumerate(times) if t.startswith(target[:13])), None)
-    if idx is None:
-        # fallback: closest hour
-        idx = 0
+    idx = next((i for i, t in enumerate(hourly["time"]) if t.startswith(target[:13])), 0)
 
     return {
         "temp": hourly["temperature_2m"][idx],
         "feels_like": hourly["apparent_temperature"][idx],
         "wind_speed": hourly["windspeed_10m"][idx],
-        "wind_deg": hourly["winddirection_10m"][idx],  # FROM direction (meteorological)
+        "wind_deg": hourly["winddirection_10m"][idx],
         "precipitation": hourly["precipitation"][idx],
         "snowfall": hourly["snowfall"][idx],
         "clouds": hourly["cloudcover"][idx],
@@ -122,16 +83,10 @@ def bearing(lat1, lon1, lat2, lon2):
     return (math.degrees(math.atan2(x, y)) + 360) % 360
 
 
-def wind_component(travel_bearing, wind_from_deg):
-    """
-    Angle between travel direction and wind.
-    Returns: 'headwind' if wind is mostly in the face, 'tailwind' otherwise.
-    wind_from_deg: the direction the wind is coming FROM.
-    wind_to_deg: where the wind is going TO = wind_from_deg + 180.
-    """
+def is_headwind(travel_bearing, wind_from_deg):
     wind_to = (wind_from_deg + 180) % 360
     angle_diff = abs(((travel_bearing - wind_to + 180) % 360) - 180)
-    return "headwind" if angle_diff < 90 else "tailwind"
+    return angle_diff < 90
 
 
 def deg_to_cardinal(deg):
@@ -141,7 +96,6 @@ def deg_to_cardinal(deg):
 
 
 def weathercode_to_description(code):
-    """WMO weather code to plain English."""
     if code == 0: return "Clear sky"
     if code in (1, 2, 3): return "Partly cloudy" if code < 3 else "Overcast"
     if code in (45, 48): return "Foggy"
@@ -153,90 +107,189 @@ def weathercode_to_description(code):
     return "Mixed conditions"
 
 
-# ── Main ──────────────────────────────────────────────────────────────────────
+# ── Wind rose chart ───────────────────────────────────────────────────────────
 
-def compute_weather(activity_id):
-    auth = _auth_header()
+def plot_wind_rose(bearings, wind_from_deg, wind_speed, weather, date_str, hour):
+    """
+    Generate two-panel wind rose chart (matches intervals.icu layout).
+    Left:  compass rose — GPS bearing distribution coloured by headwind/tailwind.
+    Right: relative rose — bearing relative to wind (headwind at top, tailwind at bottom).
+    Returns path to saved PNG, or None if matplotlib is unavailable.
+    """
+    try:
+        import matplotlib
+        matplotlib.use("Agg")
+        import matplotlib.pyplot as plt
+        import numpy as np
+    except ImportError:
+        return None
 
-    # 1. Fetch activity for start time + basic info
-    activity = get_activity(activity_id, auth)
-    start_local = activity.get("start_date_local", "")  # e.g. "2026-03-11T17:03:26"
-    dt = datetime.fromisoformat(start_local)
-    date_str = dt.strftime("%Y-%m-%d")
-    hour = dt.hour
+    N = 16
+    sector_deg = 360 / N
+    wind_to = (wind_from_deg + 180) % 360
 
-    # 2. Fetch GPS streams
-    print(f"Fetching GPS streams for {activity_id}...", file=sys.stderr)
-    streams = get_streams(activity_id, auth)
-    lats = streams.get("lat", [])
-    lngs = streams.get("lng", [])
+    # Bin bearings
+    compass_hw = np.zeros(N)   # headwind counts per compass sector
+    compass_tw = np.zeros(N)   # tailwind counts per compass sector
+    rel_hw = np.zeros(N)       # headwind counts per relative sector
+    rel_tw = np.zeros(N)       # tailwind counts per relative sector
 
-    if not lats or not lngs:
-        return {"error": "No GPS data available for this activity"}
+    for b in bearings:
+        hw = is_headwind(b, wind_from_deg)
+        cs = int((b + sector_deg / 2) % 360 / sector_deg) % N
+        rel_angle = (b - wind_to) % 360
+        rs = int((rel_angle + sector_deg / 2) % 360 / sector_deg) % N
+        if hw:
+            compass_hw[cs] += 1
+            rel_hw[rs] += 1
+        else:
+            compass_tw[cs] += 1
+            rel_tw[rs] += 1
 
-    # Start location for weather lookup
+    fig = plt.figure(figsize=(11, 6), facecolor="white")
+    fig.suptitle(
+        f"{weathercode_to_description(weather['weathercode'])} — "
+        f"{weather['feels_like']:.0f}°C feels-like · "
+        f"{wind_speed:.0f} km/h {deg_to_cardinal(wind_from_deg)}",
+        fontsize=12, fontweight="bold", y=0.97
+    )
+
+    GREEN  = "#4CAF50"
+    ORANGE = "#FFA726"
+    GREY   = "#CCCCCC"
+
+    def polar_rose(ax, hw_counts, tw_counts, title, tick_labels):
+        angles = np.radians(np.arange(0, 360, sector_deg))
+        width = 2 * np.pi / N * 0.85
+        peak = max((hw_counts + tw_counts).max(), 1)
+
+        ax.bar(angles, hw_counts / peak, width=width, color=GREEN,  alpha=0.85, edgecolor="white", linewidth=0.5, label="Headwind")
+        ax.bar(angles, tw_counts / peak, width=width, color=ORANGE, alpha=0.85, edgecolor="white", linewidth=0.5,
+               bottom=hw_counts / peak, label="Tailwind")
+
+        ax.set_theta_zero_location("N")
+        ax.set_theta_direction(-1)
+        ax.set_xticks(np.radians(np.arange(0, 360, 45)))
+        ax.set_xticklabels(tick_labels, fontsize=9)
+        ax.set_yticklabels([])
+        ax.set_title(title, pad=12, fontsize=10)
+        ax.spines["polar"].set_color(GREY)
+        ax.grid(color=GREY, linewidth=0.5)
+
+    # Left: compass rose
+    ax1 = fig.add_subplot(121, projection="polar")
+    polar_rose(ax1, compass_hw, compass_tw, "Route Direction", ["N", "NE", "E", "SE", "S", "SW", "W", "NW"])
+
+    # Mark wind-from direction with an arrow
+    arrow_angle = math.radians(wind_from_deg)
+    ax1.annotate(
+        "", xy=(arrow_angle, 0.15), xytext=(arrow_angle, 0.9),
+        xycoords="data", textcoords="data",
+        arrowprops=dict(arrowstyle="->", color="navy", lw=1.8),
+    )
+
+    # Right: relative rose (headwind at top = 0°)
+    hw_pct = round(sum(compass_hw) / max(sum(compass_hw) + sum(compass_tw), 1) * 100)
+    tw_pct = 100 - hw_pct
+    ax2 = fig.add_subplot(122, projection="polar")
+    polar_rose(ax2, rel_hw, rel_tw,
+               f"Headwind {hw_pct}%  /  Tailwind {tw_pct}%",
+               ["Head", "R", "Tail", "L", "", "", "", ""])
+
+    # Legend + bottom summary
+    handles = [
+        plt.Rectangle((0, 0), 1, 1, color=GREEN,  alpha=0.85, label="Headwind"),
+        plt.Rectangle((0, 0), 1, 1, color=ORANGE, alpha=0.85, label="Tailwind"),
+    ]
+    fig.legend(handles=handles, loc="lower center", ncol=2, fontsize=9,
+               frameon=False, bbox_to_anchor=(0.5, 0.01))
+
+    summary_parts = [
+        f"Temp {weather['temp']:.0f}°C",
+        f"Clouds {weather['clouds']}%",
+    ]
+    if weather["precipitation"] > 0:
+        summary_parts.append(f"Rain {weather['precipitation']:.1f} mm")
+    if weather["snowfall"] > 0:
+        summary_parts.append(f"Snow {weather['snowfall']:.1f} cm")
+    fig.text(0.5, 0.05, "  ·  ".join(summary_parts), ha="center", fontsize=9, color="#555")
+
+    plt.tight_layout(rect=[0, 0.09, 1, 0.94])
+
+    out = tempfile.mktemp(suffix=f"_weather_{date_str}_{hour:02d}h.png")
+    plt.savefig(out, dpi=150, bbox_inches="tight", facecolor="white")
+    plt.close(fig)
+    return out
+
+
+# ── Core computation ──────────────────────────────────────────────────────────
+
+def compute_weather(date_str, hour, lats, lngs):
     start_lat, start_lng = lats[0], lngs[0]
-
-    # 3. Fetch weather for the activity hour
     print(f"Fetching weather for {date_str} {hour:02d}:00 at {start_lat:.4f},{start_lng:.4f}...", file=sys.stderr)
     weather = get_openmeteo_weather(start_lat, start_lng, date_str, hour)
 
     wind_from = weather["wind_deg"]
-    wind_speed = weather["wind_speed"]
-
-    # 4. Compute headwind/tailwind from GPS bearings
-    headwind_secs = 0
-    tailwind_secs = 0
-    yaw_sum = 0
-    yaw_count = 0
-
-    # Downsample: compute bearing every 10 points to avoid noise
     step = 10
+    bearings_list = []
+    headwind_count = tailwind_count = 0
+    yaw_sum = yaw_count = 0
+
     for i in range(0, len(lats) - step, step):
         b = bearing(lats[i], lngs[i], lats[i + step], lngs[i + step])
-        component = wind_component(b, wind_from)
-        if component == "headwind":
-            headwind_secs += step
+        bearings_list.append(b)
+        if is_headwind(b, wind_from):
+            headwind_count += 1
         else:
-            tailwind_secs += step
-
-        # Yaw = angle between travel bearing and wind direction
+            tailwind_count += 1
         yaw = abs(((b - wind_from + 180) % 360) - 180)
         yaw_sum += yaw
         yaw_count += 1
 
-    total = headwind_secs + tailwind_secs
-    headwind_pct = round(headwind_secs / total * 100, 1) if total else 0
-    tailwind_pct = round(tailwind_secs / total * 100, 1) if total else 0
+    total = headwind_count + tailwind_count
+    headwind_pct = round(headwind_count / total * 100, 1) if total else 0
+    tailwind_pct = round(tailwind_count / total * 100, 1) if total else 0
     avg_yaw = round(yaw_sum / yaw_count, 1) if yaw_count else None
 
-    # 5. Build output matching ActivityWeatherSummary
-    result = {
+    plot_path = plot_wind_rose(bearings_list, wind_from, weather["wind_speed"], weather, date_str, hour)
+
+    return {
         "description": weathercode_to_description(weather["weathercode"]),
         "average_temp": weather["temp"],
         "average_feels_like": weather["feels_like"],
-        "average_wind_speed": wind_speed,
+        "average_wind_speed": weather["wind_speed"],
         "prevailing_wind_deg": wind_from,
         "prevailing_wind_cardinal": deg_to_cardinal(wind_from),
         "headwind_percent": headwind_pct,
         "tailwind_percent": tailwind_pct,
         "avg_yaw": avg_yaw,
         "max_rain": weather["precipitation"],
-        "max_showers": 0.0,
         "max_snow": weather["snowfall"],
         "average_clouds": weather["clouds"],
+        "plot_path": plot_path,
         "source": "open-meteo",
-        "activity_date": date_str,
-        "activity_hour": hour,
     }
 
-    return result
 
+# ── Entry point ───────────────────────────────────────────────────────────────
 
 if __name__ == "__main__":
-    if len(sys.argv) < 2:
-        print("Usage: python3 tools/weather.py <activity_id>", file=sys.stderr)
+    try:
+        inp = json.loads(sys.stdin.read())
+    except json.JSONDecodeError as e:
+        print(json.dumps({"error": f"Invalid JSON input: {e}"}))
         sys.exit(1)
 
-    result = compute_weather(sys.argv[1])
+    required = {"date", "hour", "lats", "lngs"}
+    missing = required - inp.keys()
+    if missing:
+        print(json.dumps({"error": f"Missing required fields: {missing}"}))
+        sys.exit(1)
+
+    lats, lngs = inp["lats"], inp["lngs"]
+    if not lats or not lngs:
+        print(json.dumps({"error": "No GPS data available for this activity"}))
+        sys.exit(1)
+
+    result = compute_weather(inp["date"], inp["hour"], lats, lngs)
     print(json.dumps(result, indent=2))

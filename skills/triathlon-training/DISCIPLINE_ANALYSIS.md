@@ -15,12 +15,20 @@ Sport-specific guidance for session breakdowns. Use this alongside METRICS_REFER
 
 **0. Fetch weather context**
 
-```bash
-python3 tools/weather.py {id}
+```python
+# 1. Get activity start time
+details = get_activity_details(activity_id)  # extract start_date_local → date + hour
+
+# 2. Get GPS streams
+streams = get_activity_streams(activity_id, stream_types="latlng")  # data=lats, data2=lngs
+
+# 3. Pipe to weather script
+Bash: echo '{"date": "YYYY-MM-DD", "hour": HH, "lats": [...], "lngs": [...]}' | python3 tools/weather.py
 ```
 
-- If error or no GPS → skip weather, note "weather unavailable" and proceed to step 1.
-- If OK → extract:
+- If streams unavailable or no latlng → skip weather, note "weather unavailable" and proceed to step 1.
+- If `plot_path` present in output → read the file to display the wind rose chart.
+- Extract from output:
   - `description` — plain-language summary (e.g. "Partly cloudy")
   - `average_feels_like` — perceived temperature (accounts for humidity + wind)
   - `average_wind_speed`, `prevailing_wind_cardinal` — wind speed and direction
@@ -76,12 +84,20 @@ Lead output with: "{description} — {feels_like}°C feels-like, {wind} km/h {ca
 
 **0. Fetch weather context**
 
-```bash
-python3 tools/weather.py {id}
+```python
+# 1. Get activity start time
+details = get_activity_details(activity_id)  # extract start_date_local → date + hour
+
+# 2. Get GPS streams
+streams = get_activity_streams(activity_id, stream_types="latlng")  # data=lats, data2=lngs
+
+# 3. Pipe to weather script
+Bash: echo '{"date": "YYYY-MM-DD", "hour": HH, "lats": [...], "lngs": [...]}' | python3 tools/weather.py
 ```
 
-- If error or no GPS → skip weather, note "weather unavailable" and proceed to step 1.
-- If OK → extract:
+- If streams unavailable or no latlng → skip weather, note "weather unavailable" and proceed to step 1.
+- If `plot_path` present in output → read the file to display the wind rose chart.
+- Extract from output:
   - `description` — plain-language summary
   - `average_feels_like` — primary heat signal (more relevant than raw temp for running)
   - `average_wind_speed`, `prevailing_wind_cardinal` — wind speed and direction
