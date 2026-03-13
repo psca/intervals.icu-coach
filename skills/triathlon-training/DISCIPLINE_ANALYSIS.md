@@ -7,10 +7,9 @@ Sport-specific guidance for session breakdowns. Use this alongside METRICS_REFER
 ## Cycling Session Analysis
 
 ### Tools to Call
-1. `Bash curl /api/v1/activity/{id}` — NP, IF, average power, average HR, duration, distance
-2. `Bash curl /api/v1/activity/{id}/weather-summary` — weather context; see Weather Context block below
-3. `Bash curl /api/v1/activity/{id}/intervals` — if structured workout (intervals present)
-4. `Bash curl /api/v1/activity/{id}/streams` — only if computing aerobic decoupling manually (high token cost; check if decoupling is already in details response first)
+1. `get_activity_details` — NP, IF, average power, average HR, duration, distance
+2. `get_activity_intervals` — if structured workout (intervals present)
+3. `get_activity_streams` — only if computing aerobic decoupling manually (high token cost; check if decoupling is already in details response first)
 
 ### Analysis Sequence
 
@@ -69,10 +68,9 @@ Lead output with: "{description} — {feels_like}°C feels-like, {wind} km/h {ca
 ## Running Session Analysis
 
 ### Tools to Call
-1. `Bash curl /api/v1/activity/{id}` — pace, average HR, cadence, elevation, distance, duration
-2. `Bash curl /api/v1/activity/{id}/weather-summary` — weather context; see Weather Context block below
-3. `Bash curl /api/v1/activity/{id}/intervals` — if structured (track workout, tempo intervals)
-4. `Bash curl /api/v1/activity/{id}/streams` — for decoupling analysis if not in details response
+1. `get_activity_details` — pace, average HR, cadence, elevation, distance, duration
+2. `get_activity_intervals` — if structured (track workout, tempo intervals)
+3. `get_activity_streams` — for decoupling analysis if not in details response
 
 ### Analysis Sequence
 
@@ -117,7 +115,7 @@ Lead output with: "{description} — {feels_like}°C feels-like, {wind} km/h {ca
 - Declining EF = flag — possible causes: accumulated fatigue, heat, illness, overtraining
 
 **5. Interval Analysis (structured workouts)**
-- Use `WebFetch GET /api/v1/activity/{id}/intervals` for track/tempo sessions
+- Use `get_activity_intervals` for track/tempo sessions
 - Flag intervals where HR exceeded target zone significantly (pacing errors)
 - Rest interval HR recovery rate: faster recovery = better fitness
 - Compare interval times to prior similar sessions
