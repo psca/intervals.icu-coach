@@ -259,8 +259,12 @@ function isHeadwind(travelBearing: number, windFromDeg: number): boolean {
 }
 ```
 
-Count `headwindCount` and `tailwindCount`.
+Count `headwindCount` and `tailwindCount`. Accumulate `yawSum` with the same angular delta expression used in `isHeadwind`:
 ```typescript
+const delta = Math.abs(((travelBearing - windFromDeg + 180) % 360) - 180);
+yawSum += delta;
+// delta < 90 → headwind, else tailwind
+
 headwind_percent = Math.round(headwindCount / total * 1000) / 10;  // one decimal
 tailwind_percent = Math.round(tailwindCount / total * 1000) / 10;
 avg_yaw = Math.round(yawSum / total * 10) / 10;  // mean absolute delta
