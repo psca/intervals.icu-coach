@@ -92,6 +92,8 @@ export interface Env {
 export default {
   async fetch(request: Request, env: Env): Promise<Response> {
     const server = new McpServer({ name: "intervals-mcp", version: "1.0.0" });
+    // sessionIdGenerator: undefined = stateless mode (no session state between requests)
+    // Supported in @modelcontextprotocol/sdk >=1.10.0 — validate this path works before adding state
     const transport = new StreamableHTTPServerTransport({ sessionIdGenerator: undefined });
 
     // Register all tools (pass env to each)
@@ -326,7 +328,7 @@ compatibility_date = "2026-01-01"
 ```bash
 cd intervals.icu-server
 npm create cloudflare@latest .   # select "Hello World" Worker, TypeScript
-npm install @modelcontextprotocol/sdk
+npm install @modelcontextprotocol/sdk  # pin to >=1.10.0 — stateless sessionIdGenerator:undefined path requires this
 
 wrangler secret put API_KEY
 wrangler secret put ATHLETE_ID
