@@ -1,26 +1,26 @@
 {
   "manifest_version": "0.3",
   "name": "intervals-mcp",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "display_name": "intervals.icu — Triathlon Training",
-  "description": "Connects Claude to your intervals.icu training data. Required for the Triathlon Training Insights skill. Powered by intervals-mcp-server (https://github.com/psca/intervals-mcp-server).",
+  "description": "Connects Claude to your intervals.icu training data via the intervals-mcp Cloudflare Worker. Deploy your own Worker from https://github.com/psca/intervals.icu-server first.",
   "icon": "icon.png",
   "author": {
     "name": "intervals.icu Triathlon Coach"
   },
 
   "user_config": {
-    "API_KEY": {
+    "INTERVALS_MCP_URL": {
       "type": "string",
-      "title": "intervals.icu API Key",
-      "description": "Found at intervals.icu → Settings → API → API Key",
-      "sensitive": true,
+      "title": "Worker URL",
+      "description": "The deployed Worker URL, e.g. https://intervals-mcp.your-account.workers.dev/mcp",
       "required": true
     },
-    "ATHLETE_ID": {
+    "INTERVALS_MCP_SECRET": {
       "type": "string",
-      "title": "Athlete ID",
-      "description": "Found at intervals.icu → Settings → API (e.g. i12345)",
+      "title": "Worker Secret",
+      "description": "The WORKER_SECRET set on your Cloudflare Worker via wrangler secret put WORKER_SECRET",
+      "sensitive": true,
       "required": true
     }
   },
@@ -29,17 +29,11 @@
     "type": "python",
     "entry_point": "server/run.py",
     "mcp_config": {
-      "command": "uvx",
-      "args": [
-        "--from",
-        "git+https://github.com/psca/intervals-mcp-server.git",
-        "python",
-        "-m",
-        "intervals_mcp_server.server"
-      ],
+      "command": "npx",
+      "args": ["mcp-remote", "${user_config.INTERVALS_MCP_URL}"],
       "env": {
-        "API_KEY": "${user_config.API_KEY}",
-        "ATHLETE_ID": "${user_config.ATHLETE_ID}"
+        "INTERVALS_MCP_URL": "${user_config.INTERVALS_MCP_URL}",
+        "INTERVALS_MCP_SECRET": "${user_config.INTERVALS_MCP_SECRET}"
       }
     }
   }
