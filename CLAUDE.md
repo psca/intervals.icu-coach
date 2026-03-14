@@ -8,16 +8,14 @@ A Claude skill that acts as a triathlon coach, pulling live data from intervals.
 
 ## MCP Setup
 
-**Claude Code — team/project config (`.mcp.json` already present):**
+**Claude Code -- env vars required:**
 
-No local env vars needed. Credentials (`API_KEY`, `ATHLETE_ID`) are stored as Cloudflare Worker secrets on the deployed server.
-
-The `.mcp.json` points to the deployed CF Worker:
-```
-https://intervals-mcp.anthonypoh1998.workers.dev/mcp
+```bash
+export INTERVALS_MCP_URL=https://<your-worker-name>.<your-account>.workers.dev/mcp
+export INTERVALS_MCP_SECRET=<your-worker-secret>
 ```
 
-No `uvx`, no Python, no local process required.
+Deploy your own Worker from [intervals.icu-server](https://github.com/psca/intervals.icu-server), then add both env vars to your shell profile (`~/.zshrc` or `~/.bashrc`). The `.mcp.json` in this repo reads them automatically.
 
 ## MCP Server
 

@@ -21,23 +21,41 @@ The skill files work on both platforms. Only the MCP setup differs:
 
 ---
 
-### Claude Desktop
+### Claude Code
 
-Install the intervals.icu Desktop Extension (`.mcpb`). It prompts for your credentials on install — no config files or shell exports needed.
+Deploy your own Worker from [intervals.icu-server](https://github.com/psca/intervals.icu-server), then export these in your shell profile (`~/.zshrc` or `~/.bashrc`):
 
-1. Download `intervals-mcp.mcpb`
-2. Drag it into Claude Desktop → Settings → Extensions
-3. Enter your API key and Athlete ID when prompted
+```bash
+export INTERVALS_MCP_URL=https://<your-worker-name>.<your-account>.workers.dev/mcp
+export INTERVALS_MCP_SECRET=<your-worker-secret>
+```
+
+The `.mcp.json` in this repo reads them automatically. No local process needed.
 
 ---
 
-### Claude Code
+### Claude Desktop
 
-**Claude Code setup:** The `.mcp.json` in this repo configures `intervals-mcp` using the deployed Cloudflare Worker.
-Ensure the `url` points to the deployed CF Worker:
-`https://intervals-mcp.your-subdomain.workers.dev/mcp`
+Add to `~/Library/Application Support/Claude/claude_desktop_config.json`:
 
-Credentials (`API_KEY`, `ATHLETE_ID`) are set as Cloudflare Worker secrets — no local env vars needed.
+```json
+{
+  "mcpServers": {
+    "intervals-mcp": {
+      "command": "npx",
+      "args": [
+        "mcp-remote",
+        "https://<your-worker-name>.<your-account>.workers.dev/mcp",
+        "--header",
+        "Authorization: Bearer <your-worker-secret>"
+      ]
+    }
+  }
+}
+```
+
+Deploy your own Worker from [intervals.icu-server](https://github.com/psca/intervals.icu-server). Replace the URL and secret with your deployed values.
+Note the space after `Authorization:` -- required by the `mcp-remote` header format.
 
 ---
 

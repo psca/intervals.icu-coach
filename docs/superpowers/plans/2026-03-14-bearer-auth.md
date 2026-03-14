@@ -138,19 +138,19 @@ Expected: `wrangler secret put` confirms the secret was set; `wrangler deploy` s
 ```bash
 # No auth — must return 401
 curl -s -o /dev/null -w "%{http_code}" \
-  -X POST https://intervals-mcp.anthonypoh1998.workers.dev/mcp
+  -X POST https://<your-worker-name>.<your-account>.workers.dev/mcp
 # Expected: 401
 
 # Wrong token — must return 401
 curl -s -o /dev/null -w "%{http_code}" \
   -X POST -H "Authorization: Bearer wrongtoken" \
-  https://intervals-mcp.anthonypoh1998.workers.dev/mcp
+  https://<your-worker-name>.<your-account>.workers.dev/mcp
 # Expected: 401
 
 # Correct token — use $TOKEN from Step 7 (must be in the same shell session)
 curl -s -o /dev/null -w "%{http_code}" \
   -X POST -H "Authorization: Bearer $TOKEN" \
-  https://intervals-mcp.anthonypoh1998.workers.dev/mcp
+  https://<your-worker-name>.<your-account>.workers.dev/mcp
 # Expected: anything except 401
 ```
 
@@ -199,7 +199,7 @@ Replace the current content of `.mcp.json` with:
 Set the env vars and verify the deployed Worker responds (not 401):
 
 ```bash
-export INTERVALS_MCP_URL=https://intervals-mcp.anthonypoh1998.workers.dev/mcp
+export INTERVALS_MCP_URL=https://<your-worker-name>.<your-account>.workers.dev/mcp
 export INTERVALS_MCP_SECRET=<paste-TOKEN-from-Task-1-Step-7>
 
 curl -s -o /dev/null -w "%{http_code}" \
@@ -218,7 +218,7 @@ Read `CLAUDE.md` first to locate the Claude Code setup block. Replace that block
 **Claude Code — env vars required:**
 
 ```bash
-export INTERVALS_MCP_URL=https://intervals-mcp.anthonypoh1998.workers.dev/mcp
+export INTERVALS_MCP_URL=https://<your-worker-name>.<your-account>.workers.dev/mcp
 export INTERVALS_MCP_SECRET=<your-worker-secret>
 ```
 
@@ -235,7 +235,7 @@ Read `SKILL.md` first to locate the Claude Code setup block (under `### Claude C
 Export these in your shell profile (`~/.zshrc` or `~/.bashrc`):
 
 ```bash
-export INTERVALS_MCP_URL=https://intervals-mcp.anthonypoh1998.workers.dev/mcp
+export INTERVALS_MCP_URL=https://<your-worker-name>.<your-account>.workers.dev/mcp
 export INTERVALS_MCP_SECRET=<your-worker-secret>
 ```
 
@@ -256,7 +256,7 @@ Add to `~/Library/Application Support/Claude/claude_desktop_config.json`:
       "command": "npx",
       "args": [
         "mcp-remote",
-        "https://intervals-mcp.anthonypoh1998.workers.dev/mcp",
+        "https://<your-worker-name>.<your-account>.workers.dev/mcp",
         "--header",
         "Authorization: Bearer YOUR_WORKER_SECRET"
       ]

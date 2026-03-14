@@ -2,7 +2,10 @@
   "mcpServers": {
     "intervals-mcp": {
       "type": "http",
-      "url": "https://intervals-mcp.anthonypoh1998.workers.dev/mcp"
+      "url": "${INTERVALS_MCP_URL}",
+      "headers": {
+        "Authorization": "Bearer ${INTERVALS_MCP_SECRET}"
+      }
     }
   }
 }
