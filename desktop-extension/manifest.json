@@ -30,11 +30,12 @@
     "entry_point": "server/run.py",
     "mcp_config": {
       "command": "npx",
-      "args": ["mcp-remote", "${user_config.INTERVALS_MCP_URL}"],
-      "env": {
-        "INTERVALS_MCP_URL": "${user_config.INTERVALS_MCP_URL}",
-        "INTERVALS_MCP_SECRET": "${user_config.INTERVALS_MCP_SECRET}"
-      }
+      "args": [
+        "mcp-remote",
+        "${user_config.INTERVALS_MCP_URL}",
+        "--header",
+        "Authorization: Bearer ${user_config.INTERVALS_MCP_SECRET}"
+      ]
     }
   }
 }
