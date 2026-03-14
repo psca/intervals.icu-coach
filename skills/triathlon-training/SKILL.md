@@ -127,6 +127,16 @@ Map athlete phrases to analysis type:
 
 When an athlete asks about a specific activity (e.g. "how did I do on my last ride", "give me feedback on activity X"), always structure the response with these labelled sections in this order:
 
+**Before producing output:** For any outdoor Run or Ride, call `get_activity_weather(activity_id)` as the first tool call and include a Weather section. Do not wait to be asked. If the activity is indoor (trainer, treadmill, pool swim) or the tool returns "Weather unavailable", skip the section silently.
+
+### 0. Weather (outdoor Run/Ride only)
+
+Lead with: "{description} — {average_feels_like}°C feels-like, {average_wind_speed} km/h {prevailing_wind_cardinal}"
+
+For cycling: include headwind/tailwind percentages. For running: omit headwind/tailwind (wind drag at running pace is negligible).
+
+Include `temp_bar` if feels-like > 25°C or < 5°C.
+
 ### 1. Session Snapshot
 A compact stats table with available fields:
 

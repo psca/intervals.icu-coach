@@ -76,15 +76,16 @@ Lead output with: "{description} — {average_feels_like}°C feels-like, {averag
 
 ### Analysis Sequence
 
-**0. Fetch weather context — MANDATORY, do not skip**
+**0. Fetch weather context — MANDATORY for outdoor runs, do not skip**
 
 Call `get_activity_weather(activity_id)`. Parse the returned JSON:
 - `description` — plain-language summary (e.g. "Partly cloudy")
-- `average_feels_like` — perceived temperature (accounts for humidity + wind; more relevant than raw temp for running)
+- `average_feels_like` — perceived temperature (accounts for humidity + wind; most relevant metric for running)
 - `average_wind_speed`, `prevailing_wind_cardinal` — wind speed and direction
-- `headwind_percent`, `tailwind_percent` — route-aware wind impact
 - `max_rain`, `max_snow` — precipitation flags
 - `temp_bar` — ASCII temperature visualisation
+
+Do NOT report `headwind_percent` / `tailwind_percent` for running — wind drag at running pace is negligible and the figures mislead. Omit them entirely.
 
 If the tool returns `"Weather unavailable: ..."` → skip weather, note unavailable, proceed to step 1.
 
