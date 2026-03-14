@@ -8,7 +8,8 @@ Sport-specific guidance for session breakdowns. Use this alongside METRICS_REFER
 
 ### Tools to Call
 1. `get_activity_details` — NP, IF, average power, average HR, duration, distance
-2. `get_activity_stream_sampled(stream_types="latlng,bearing")` — **always call this for weather** (returns pre-sampled waypoints, no truncation)
+2. `get_activity_weather` — weather context for the session; parse returned JSON for `description`,
+   `average_feels_like`, `average_wind_speed`, `prevailing_wind_cardinal`, `headwind_percent`, `tailwind_percent`
 3. `get_activity_intervals` — if structured workout (intervals present)
 4. `get_activity_streams` with default types — only if computing aerobic decoupling manually (high token cost; check if decoupling is already in details response first)
 
@@ -16,38 +17,17 @@ Sport-specific guidance for session breakdowns. Use this alongside METRICS_REFER
 
 **0. Fetch weather context — MANDATORY, do not skip**
 
-```
-Step 1: get_activity_details(activity_id)
-        → extract start_date_local → date="2026-03-11", hour=9
+Call `get_activity_weather(activity_id)`. Parse the returned JSON:
+- `description` — plain-language summary (e.g. "Partly cloudy")
+- `average_feels_like` — perceived temperature (accounts for humidity + wind)
+- `average_wind_speed`, `prevailing_wind_cardinal` — wind speed and direction
+- `headwind_percent`, `tailwind_percent` — route-aware wind impact
+- `max_rain`, `max_snow` — precipitation flags
+- `temp_bar` — ASCII temperature visualisation
 
-Step 2: get_activity_stream_sampled(activity_id, stream_types="latlng,bearing")
-        → returns: {"latlng": {"lats": [...], "lngs": [...]}, "bearing": {"data": [...]},
-                    "interval_seconds": 1800, "total_points": N, "sampled_points": M}
-        NOTE: Use this tool, NOT get_activity_streams — it returns full sampled arrays with no truncation.
-              Do NOT skip this call based on activity details — GPS lives here, not there.
+If the tool returns `"Weather unavailable: ..."` → skip weather, note unavailable, proceed to step 1.
 
-Step 3 (Claude Code): Run weather script
-        Extract from step 2: lats=latlng.lats, lngs=latlng.lngs, bearings=bearing.data
-        Bash: echo '{"date": "...", "hour": H, "lats": [...], "lngs": [...], "bearings": [...]}' | python3 skills/triathlon-training/scripts/weather.py
-
-Step 3 (Claude Desktop / no Bash): Fetch Open-Meteo directly via WebFetch
-        Sample every 30 min of GPS track. For each waypoint:
-        URL (recent ≤5 days): https://api.open-meteo.com/v1/forecast?latitude={lat}&longitude={lng}&hourly=temperature_2m,apparent_temperature,windspeed_10m,winddirection_10m,precipitation,snowfall,cloudcover,weathercode&past_days=5&forecast_days=1&timezone=auto&wind_speed_unit=kmh
-        URL (older): https://archive-api.open-meteo.com/v1/archive?latitude={lat}&longitude={lng}&start_date={date}&end_date={date}&hourly=temperature_2m,apparent_temperature,windspeed_10m,winddirection_10m,precipitation,snowfall,cloudcover,weathercode&timezone=auto&wind_speed_unit=kmh
-        Extract the hourly slot matching the waypoint hour. Average across waypoints.
-        Headwind logic: abs(((travel_bearing - wind_from_deg + 180) % 360) - 180) < 90 → headwind
-```
-
-- Only skip weather if `get_activity_stream_sampled` returns no latlng data (e.g. treadmill, indoor trainer).
-- Do NOT assume weather is unavailable from the activity details response alone.
-- Extract from output:
-  - `description` — plain-language summary (e.g. "Partly cloudy")
-  - `average_feels_like` — perceived temperature (accounts for humidity + wind)
-  - `average_wind_speed`, `prevailing_wind_cardinal` — wind speed and direction
-  - `headwind_percent`, `tailwind_percent` — route-aware, matched per-second to nearest waypoint
-  - `max_rain`, `max_snow` — worst-case across all waypoints
-
-Lead output with: "{description} — {feels_like}°C feels-like, {wind} km/h {cardinal} ({headwind}% headwind / {tailwind}% tailwind)"
+Lead output with: "{description} — {average_feels_like}°C feels-like, {average_wind_speed} km/h {prevailing_wind_cardinal} ({headwind_percent}% headwind / {tailwind_percent}% tailwind)"
 
 **Use weather context in steps 1–5**: contextualize VI and IF against headwind before flagging; adjust decoupling thresholds for feels-like temp. See METRICS_REFERENCE.md `## Weather Context Thresholds`.
 
@@ -89,7 +69,8 @@ Lead output with: "{description} — {feels_like}°C feels-like, {wind} km/h {ca
 
 ### Tools to Call
 1. `get_activity_details` — pace, average HR, cadence, elevation, distance, duration
-2. `get_activity_streams(stream_types="latlng,bearing")` — **always call this for weather**
+2. `get_activity_weather` — weather context for the session; parse returned JSON for `description`,
+   `average_feels_like`, `average_wind_speed`, `prevailing_wind_cardinal`, `headwind_percent`, `tailwind_percent`
 3. `get_activity_intervals` — if structured (track workout, tempo intervals)
 4. `get_activity_streams` with default types — for decoupling analysis if not in details response
 
@@ -97,38 +78,17 @@ Lead output with: "{description} — {feels_like}°C feels-like, {wind} km/h {ca
 
 **0. Fetch weather context — MANDATORY, do not skip**
 
-```
-Step 1: get_activity_details(activity_id)
-        → extract start_date_local → date="2026-03-11", hour=9
+Call `get_activity_weather(activity_id)`. Parse the returned JSON:
+- `description` — plain-language summary (e.g. "Partly cloudy")
+- `average_feels_like` — perceived temperature (accounts for humidity + wind; more relevant than raw temp for running)
+- `average_wind_speed`, `prevailing_wind_cardinal` — wind speed and direction
+- `headwind_percent`, `tailwind_percent` — route-aware wind impact
+- `max_rain`, `max_snow` — precipitation flags
+- `temp_bar` — ASCII temperature visualisation
 
-Step 2: get_activity_stream_sampled(activity_id, stream_types="latlng,bearing")
-        → returns: {"latlng": {"lats": [...], "lngs": [...]}, "bearing": {"data": [...]},
-                    "interval_seconds": 1800, "total_points": N, "sampled_points": M}
-        NOTE: Use this tool, NOT get_activity_streams — it returns full sampled arrays with no truncation.
-              Do NOT skip this call based on activity details — GPS lives here, not there.
+If the tool returns `"Weather unavailable: ..."` → skip weather, note unavailable, proceed to step 1.
 
-Step 3 (Claude Code): Run weather script
-        Extract from step 2: lats=latlng.lats, lngs=latlng.lngs, bearings=bearing.data
-        Bash: echo '{"date": "...", "hour": H, "lats": [...], "lngs": [...], "bearings": [...]}' | python3 skills/triathlon-training/scripts/weather.py
-
-Step 3 (Claude Desktop / no Bash): Fetch Open-Meteo directly via WebFetch
-        Sample every 30 min of GPS track. For each waypoint:
-        URL (recent ≤5 days): https://api.open-meteo.com/v1/forecast?latitude={lat}&longitude={lng}&hourly=temperature_2m,apparent_temperature,windspeed_10m,winddirection_10m,precipitation,snowfall,cloudcover,weathercode&past_days=5&forecast_days=1&timezone=auto&wind_speed_unit=kmh
-        URL (older): https://archive-api.open-meteo.com/v1/archive?latitude={lat}&longitude={lng}&start_date={date}&end_date={date}&hourly=temperature_2m,apparent_temperature,windspeed_10m,winddirection_10m,precipitation,snowfall,cloudcover,weathercode&timezone=auto&wind_speed_unit=kmh
-        Extract the hourly slot matching the waypoint hour. Average across waypoints.
-        Headwind logic: abs(((travel_bearing - wind_from_deg + 180) % 360) - 180) < 90 → headwind
-```
-
-- Only skip weather if `get_activity_stream_sampled` returns no latlng data (e.g. treadmill, track with no GPS).
-- Do NOT assume weather is unavailable from the activity details response alone.
-- Extract from output:
-  - `description` — plain-language summary
-  - `average_feels_like` — primary heat signal (more relevant than raw temp for running)
-  - `average_wind_speed`, `prevailing_wind_cardinal` — wind speed and direction
-  - `headwind_percent`, `tailwind_percent`
-  - `max_rain`, `max_snow`
-
-Lead output with: "{description} — {feels_like}°C feels-like, {wind} km/h {cardinal}"
+Lead output with: "{description} — {average_feels_like}°C feels-like, {average_wind_speed} km/h {prevailing_wind_cardinal}"
 
 **Running is more heat-sensitive than cycling.** `average_feels_like > 25°C` warrants decoupling threshold adjustment even without high humidity — the feels-like value already accounts for both. See METRICS_REFERENCE.md `## Weather Context Thresholds`.
 

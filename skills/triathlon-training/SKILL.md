@@ -33,41 +33,11 @@ Install the intervals.icu Desktop Extension (`.mcpb`). It prompts for your crede
 
 ### Claude Code
 
-**Option A — `claude mcp add` (recommended)**
+**Claude Code setup:** The `.mcp.json` in this repo configures `intervals-mcp` using the deployed Cloudflare Worker.
+Ensure the `url` points to the deployed CF Worker:
+`https://intervals-mcp.your-subdomain.workers.dev/mcp`
 
-One-time command. Stores credentials in Claude Code's local config — no shell exports needed.
-
-```bash
-claude mcp add intervals \
-  --env API_KEY=your_api_key_here \
-  --env ATHLETE_ID=your_athlete_id_here \
-  -- uvx \
-  --from git+https://github.com/mvilanova/intervals-mcp-server.git \
-  python -m intervals_mcp_server.server
-```
-
-**Option B — `.mcp.json` (team sharing)**
-
-Check this into git so teammates don't need to run the command above. Each person still needs the env vars in their shell profile (`~/.zshrc`), but the server config is shared.
-
-```json
-{
-  "mcpServers": {
-    "intervals": {
-      "command": "uvx",
-      "args": [
-        "--from",
-        "git+https://github.com/mvilanova/intervals-mcp-server.git",
-        "python", "-m", "intervals_mcp_server.server"
-      ],
-      "env": {
-        "API_KEY": "${INTERVALS_API_KEY}",
-        "ATHLETE_ID": "${ATHLETE_ID}"
-      }
-    }
-  }
-}
-```
+Credentials (`API_KEY`, `ATHLETE_ID`) are set as Cloudflare Worker secrets — no local env vars needed.
 
 ---
 
@@ -109,6 +79,8 @@ Use COACH_PERSONA.md style. Start with observation, translate numbers, flag patt
 | Create / update planned workout | `add_or_update_event` | ⚠️ Write operation — run WORKOUT_PLANNING.md pre-flight checks first |
 | Delete planned workout | `delete_event` | Permanent — confirm with athlete before calling |
 | Fetch a specific event | `get_event_by_id` | Use to clone an existing workout's structure |
+| Get weather for an outdoor activity | `get_activity_weather` | activity_id |
+| Get sampled GPS/bearing stream | `get_activity_stream_sampled` | activity_id, stream_types, interval_seconds — used internally by get_activity_weather; callable for route analysis |
 
 **Tool call order for fitness status:** `get_activities` → `get_wellness_data` → `get_activity_details` (for most recent session of each discipline)
 

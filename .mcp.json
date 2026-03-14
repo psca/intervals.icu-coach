@@ -1,18 +1,8 @@
 {
   "mcpServers": {
     "intervals-mcp": {
-      "command": "uvx",
-      "args": [
-        "--from",
-        "git+https://github.com/mvilanova/intervals-mcp-server.git",
-        "python",
-        "-m",
-        "intervals_mcp_server.server"
-      ],
-      "env": {
-        "API_KEY": "${INTERVALS_API_KEY}",
-        "ATHLETE_ID": "${INTERVALS_ATHLETE_ID}"
-      }
+      "type": "http",
+      "url": "https://intervals-mcp.anthonypoh1998.workers.dev/mcp"
     }
   }
 }
