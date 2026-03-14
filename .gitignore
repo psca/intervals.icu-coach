@@ -18,3 +18,5 @@ __pycache__/
 
 # Weather chart outputs
 tools/weather_*.png
+
+*.zip
