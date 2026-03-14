@@ -2,56 +2,66 @@
 
 A Claude skill that acts as a triathlon coach, pulling live data from intervals.icu via MCP and delivering per-discipline analysis (swim / bike / run analysed separately — never aggregated).
 
-## Quick Start
+## Prerequisites
 
-### Claude Desktop (Marketplace)
+You need a deployed **intervals-mcp Worker** — a Cloudflare Worker that connects to your intervals.icu account.
 
-1. Install the **Triathlon Training** skill from the Claude skills marketplace.
-2. The skill includes the intervals.icu MCP connector — enter your API Key and Athlete ID when prompted.
+1. Follow the setup guide at [psca/intervals.icu-server](https://github.com/psca/intervals.icu-server)
+2. Deploy your own Worker with your `API_KEY`, `ATHLETE_ID`, and `WORKER_SECRET` set as CF secrets
+3. Note your Worker URL: `https://intervals-mcp.<your-account>.workers.dev/mcp`
 
-### Claude Desktop (Desktop Extension)
+---
 
-1. Double-click `intervals-mcp-1.0.0.mcpb` to install.
-2. Enter your intervals.icu API Key and Athlete ID in the install dialog.
-3. Install the **Triathlon Training** skill separately from the marketplace.
+## Setup by Platform
 
-To repack the extension after changes:
+### Claude Desktop (Extension)
+
+1. Build the extension:
+   ```bash
+   npx @anthropic-ai/mcpb pack ./desktop-extension
+   ```
+2. Double-click the generated `.mcpb` to install
+3. Enter your **Worker URL** and **Worker Secret** in the install dialog
+4. Install the **Triathlon Training** skill from the marketplace (or load skill files manually)
+
+### Claude Code
+
+Add to your shell profile (`~/.zshrc` or `~/.bashrc`):
 ```bash
-npx @anthropic-ai/mcpb pack ./desktop-extension
-# Output goes to parent dir — rename/move manually
+export INTERVALS_MCP_URL=https://intervals-mcp.<your-account>.workers.dev/mcp
+export INTERVALS_MCP_SECRET=<your-worker-secret>
 ```
 
-### Claude Code (CLI)
+The `.mcp.json` in this repo picks them up automatically. Then load the skill:
+```
+/plugin install triathlon-training@intervals-icu-coach
+```
 
-1. **Add the MCP server** (one-time):
-   ```bash
-   claude mcp add intervals \
-     --env API_KEY=<your-key> \
-     --env ATHLETE_ID=<i12345> \
-     -- uvx \
-     --from git+https://github.com/psca/intervals-mcp-server.git \
-     python -m intervals_mcp_server.server
-   ```
+### claude.ai (Web)
 
-2. **Or use `.mcp.json`** (team/project-level):
-   ```bash
-   export INTERVALS_API_KEY=<your-key>
-   export INTERVALS_ATHLETE_ID=<i12345>
-   # .mcp.json is already in this repo — Claude Code picks it up automatically
-   ```
+Add a custom connector at **Settings → Integrations → Add integration**:
+- URL: `https://intervals-mcp.<your-account>.workers.dev/mcp`
 
-3. **Start coaching:**
-   ```
-   Analyse my last 6 weeks of running
-   Am I ready for my A-race in 3 weeks?
-   How did I do on activity i131201794?
-   ```
+Then load the skill from the marketplace.
 
-## Credentials
+---
 
-Find them at **intervals.icu → Settings → API**:
-- **API Key** — long alphanumeric string
-- **Athlete ID** — format `i12345`
+## Local MCP (Alternative — no Worker)
+
+If you prefer to run the MCP server locally instead of deploying a Worker:
+
+```bash
+claude mcp add intervals \
+  --env API_KEY=<your-intervals-api-key> \
+  --env ATHLETE_ID=<i12345> \
+  -- uvx \
+  --from git+https://github.com/psca/intervals-mcp-server.git \
+  python -m intervals_mcp_server.server
+```
+
+Or via `.mcp.json` (replace the `type: http` entry with the `uvx` command form). Note: the `get_activity_weather` tool is only available on the CF Worker — local MCP uses the Python fork which does not include it.
+
+---
 
 ## Skill Files
 
@@ -63,47 +73,25 @@ All skill files live in `skills/triathlon-training/`:
 | `METRICS_REFERENCE.md` | Thresholds: CTL ramp rates, TSB by race distance, decoupling, VI, EF, SWOLF |
 | `COACH_PERSONA.md` | Communication style and liability guardrail |
 | `DISCIPLINE_ANALYSIS.md` | Per-sport analysis sequences with exact MCP tool call order |
-| `scripts/weather.py` | Weather context script — called by agent for bike/run analysis |
 
 ## Weather Analysis
 
-The skill fetches weather context for every outdoor bike and run using Open-Meteo (free, no API key). It samples GPS waypoints every 30 minutes along the route and computes:
-
-- Temperature and feels-like (accounts for humidity + wind chill)
-- Prevailing wind speed and direction
-- Headwind % and tailwind % (per-second bearing matched to nearest waypoint)
-- Max rain and snow
-
-**Platform support:**
-- **Claude Code** — full weather via `weather.py` script (requires Bash)
-- **Claude Desktop** — full weather via WebFetch to Open-Meteo directly
-- **claude.ai** — weather unavailable (network egress blocked)
-
-## MCP Server
-
-Uses a custom fork at [psca/intervals-mcp-server](https://github.com/psca/intervals-mcp-server) which adds:
-- `get_activity_stream_sampled` — returns GPS + bearing at 30-min intervals (no truncation, correct lat/lng separation)
-- Fixed `get_activity_streams` longitude handling (`data2` field previously dropped)
+Weather context is fetched automatically for every outdoor bike and run via the `get_activity_weather` MCP tool (CF Worker only). It samples GPS waypoints every 30 minutes and computes temperature, feels-like, wind speed/direction, headwind %, and precipitation — all via Open-Meteo (free, no API key).
 
 ## Project Structure
 
 ```
 intervals.icu-coach/
-├── .claude-plugin/
-│   └── plugin.json            ← marketplace plugin manifest
 ├── skills/triathlon-training/
 │   ├── SKILL.md
 │   ├── METRICS_REFERENCE.md
 │   ├── COACH_PERSONA.md
-│   ├── DISCIPLINE_ANALYSIS.md
-│   └── scripts/
-│       └── weather.py         ← weather context script (bundled with skill)
-├── desktop-extension/
-│   ├── manifest.json          ← points to psca/intervals-mcp-server
+│   └── DISCIPLINE_ANALYSIS.md
+├── desktop-extension/         ← source for .mcpb (pack with npx @anthropic-ai/mcpb)
+│   ├── manifest.json
 │   ├── icon.png
 │   └── server/run.py
-├── tools/
-│   └── weather.py             ← development copy (keep in sync with scripts/)
-├── .mcp.json                  ← team/project MCP config
-└── intervals-mcp-1.0.0.mcpb  ← pre-built desktop extension
+├── .mcp.json                  ← Claude Code config (reads INTERVALS_MCP_URL/SECRET from env)
+└── .claude-plugin/
+    └── plugin.json            ← marketplace plugin manifest
 ```
