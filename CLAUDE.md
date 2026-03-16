@@ -8,18 +8,28 @@ A Claude skill that acts as a triathlon coach, pulling live data from intervals.
 
 ## MCP Setup
 
-**Claude Code -- env vars required:**
+**Local mode (Claude Code + Claude Desktop):**
 
-```bash
-export INTERVALS_MCP_URL=https://<your-worker-name>.<your-account>.workers.dev/mcp
-export INTERVALS_MCP_SECRET=<your-worker-secret>
-```
+1. Clone and install the server:
+   ```bash
+   git clone https://github.com/psca/intervals.icu-server
+   cd intervals.icu-server
+   npm install
+   ```
+2. Set credentials in your shell profile (`~/.zshrc` or `~/.bashrc`):
+   ```bash
+   export INTERVALS_API_KEY=<your-intervals-api-key>
+   export INTERVALS_ATHLETE_ID=<your-athlete-id>
+   ```
+3. Update `cwd` in `.mcp.json` to the cloned repo path — Claude Code will spawn the server automatically via `npm run stdio`.
 
-Deploy your own Worker from [intervals.icu-server](https://github.com/psca/intervals.icu-server), then add both env vars to your shell profile (`~/.zshrc` or `~/.bashrc`). The `.mcp.json` in this repo reads them automatically.
+**Remote mode (Claude Web only):**
+
+Deploy the CF Worker from [intervals.icu-server](https://github.com/psca/intervals.icu-server) via Wrangler, then add the Worker URL to Claude Web MCP settings. Authentication is handled by GitHub OAuth — no Bearer secret required.
 
 ## MCP Server
 
-TypeScript Cloudflare Worker at `github.com:psca/intervals.icu-server`. Deployed via Wrangler. Tools:
+TypeScript server at `github.com:psca/intervals.icu-server`. Runs locally via `npm run stdio` or remotely as a Cloudflare Worker. Tools:
 - All standard intervals.icu tools (activities, events, wellness)
 - `get_activity_weather` — full GPS + Open-Meteo weather pipeline, server-side (replaces `weather.py`)
 - `get_activity_stream_sampled` — GPS + bearing at 30-min intervals (still available for direct use)
