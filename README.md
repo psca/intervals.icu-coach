@@ -50,10 +50,10 @@ All skill files live in `skills/triathlon-training/`:
 
 | File | Purpose |
 |------|---------|
-| `SKILL.md` | Entry point: 5-step workflow, MCP tool map, command patterns |
+| `SKILL.md` | Router: command routing table, MCP tool map, data quality gates |
+| `COMMANDS.md` | All commands: trigger phrases, tool sequences, output templates |
 | `METRICS_REFERENCE.md` | Thresholds: CTL ramp rates, TSB by race distance, decoupling, VI, EF, SWOLF |
-| `COACH_PERSONA.md` | Communication style and liability guardrail |
-| `DISCIPLINE_ANALYSIS.md` | Per-sport analysis sequences with exact MCP tool call order |
+| `WORKOUT_PLANNING.md` | Write-operation guidance for add_or_update_event |
 
 ## Weather Analysis
 
@@ -65,13 +65,10 @@ Weather context is fetched automatically for every outdoor bike and run via the 
 intervals.icu-coach/
 ├── skills/triathlon-training/
 │   ├── SKILL.md
+│   ├── COMMANDS.md
 │   ├── METRICS_REFERENCE.md
-│   ├── COACH_PERSONA.md
-│   └── DISCIPLINE_ANALYSIS.md
-├── desktop-extension/         ← source for .mcpb (pack with npx @anthropic-ai/mcpb)
-│   ├── manifest.json
-│   ├── icon.png
-│   └── server/run.py
+│   └── WORKOUT_PLANNING.md
+├── desktop-extension/         ← pre-built .mcpb (drag-and-drop install)
 ├── .mcp.json                  ← Claude Code config (stdio, spawns npm run stdio)
 └── .claude-plugin/
     └── plugin.json            ← marketplace plugin manifest

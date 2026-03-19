@@ -8,8 +8,6 @@ A Claude skill that acts as a triathlon coach, pulling live data from intervals.
 
 ## MCP Setup
 
-**Local mode (Claude Code + Claude Desktop):**
-
 1. Clone and install the server:
    ```bash
    git clone https://github.com/psca/intervals.icu-server
@@ -23,10 +21,6 @@ A Claude skill that acts as a triathlon coach, pulling live data from intervals.
    ```
 3. Update `cwd` in `.mcp.json` to the cloned repo path — Claude Code will spawn the server automatically via `npm run stdio`.
 
-**Remote mode (Claude Web only):**
-
-Deploy the CF Worker from [intervals.icu-server](https://github.com/psca/intervals.icu-server) via Wrangler, then add the Worker URL to Claude Web MCP settings. Authentication is handled by GitHub OAuth — no Bearer secret required.
-
 ## MCP Server
 
 TypeScript server at `github.com:psca/intervals.icu-server`. Runs locally via `npm run stdio` or remotely as a Cloudflare Worker. Tools:
@@ -34,30 +28,16 @@ TypeScript server at `github.com:psca/intervals.icu-server`. Runs locally via `n
 - `get_activity_weather` — full GPS + Open-Meteo weather pipeline, server-side (replaces `weather.py`)
 - `get_activity_stream_sampled` — GPS + bearing at 30-min intervals (still available for direct use)
 
-## Desktop Extension
-
-Pack command:
-```bash
-npx @anthropic-ai/mcpb pack ./desktop-extension
-# Output goes to parent dir as desktop-extension.mcpb — rename/move manually
-```
-
-The packed `.mcpb` is pre-built at `intervals-mcp-1.0.0.mcpb`. Double-click to install in Claude Desktop; credentials are entered in the install dialog.
-
 ## Architecture
 
 **Skill files** (`skills/triathlon-training/` — loaded via marketplace or manually):
 
 | File | Role |
 |------|------|
-| `SKILL.md` | Entry point: 5-step workflow, MCP tool map, command patterns, data quality gates |
-| `METRICS_REFERENCE.md` | All thresholds: CTL ramp rates, TSB by race distance, decoupling %, VI, IF, EF, SWOLF |
-| `COACH_PERSONA.md` | Output style and liability guardrail |
-| `DISCIPLINE_ANALYSIS.md` | Per-sport analysis sequences with exact MCP tool call order |
-**Desktop extension** (`desktop-extension/`):
-- `manifest.json` — manifest_version `"0.3"`, requires `author` field, `sensitive` (not `secret`) for API key
-- `server/run.py` — thin launcher that calls `uvx` to fetch and run the MCP server at runtime
-- `icon.png` — 128×128 (512×512 recommended for quality)
+| `SKILL.md` | Router: command routing table, MCP tool map, data quality gates |
+| `COMMANDS.md` | All commands: trigger phrases, tool sequences, output templates |
+| `METRICS_REFERENCE.md` | Thresholds: CTL ramp rates, TSB, decoupling, VI, IF, EF, SWOLF |
+| `WORKOUT_PLANNING.md` | Write-operation guidance for `add_or_update_event` |
 
 ## Key Constraints
 
