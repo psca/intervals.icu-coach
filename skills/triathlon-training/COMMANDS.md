@@ -247,3 +247,76 @@ One bar per discipline (Swim / Bike / Run): completed TSS = sum of `Training Loa
 - Wellness data entirely absent: omit the wellness strip row. Note gap in summary.
 
 ---
+
+## /readiness [sprint|olympic|703|ironman]
+
+**Triggers:** "am I ready for [race]", "race readiness", "ready for [distance]"
+**Distance arg:** required. If missing, ask before calling any tool: "Which distance are you preparing for — sprint, olympic, 703, or ironman?"
+**Tools:** `get_activities` (90 days) → `get_wellness_data` (14 days)
+**Guardrail:** yes
+
+### Tool sequence
+1. `get_activities` with `start_date` = 90 days ago, `end_date` = today, `limit` = 100
+2. `get_wellness_data` with `start_date` = 14 days ago, `end_date` = today
+
+For per-discipline CTL/ATL/TSB computation: use the same method as /status (filter by `Type`, use `Fitness (CTL)` and `Fatigue (ATL)` from most recent activity per discipline, compute TSB = CTL − ATL).
+
+### CTL benchmark targets (approximate minimums for completing the distance without significant suffering)
+
+| Distance | Swim CTL | Bike CTL | Run CTL |
+|---|---|---|---|
+| Sprint | 12–20 | 40–55 | 30–45 |
+| Olympic | 18–28 | 55–70 | 45–60 |
+| 70.3 | 22–32 | 65–80 | 50–65 |
+| 140.6 | 28–40 | 75–95 | 55–75 |
+
+These are benchmarks, not hard thresholds. Note when an athlete is near the boundary of a range.
+
+### Output
+Render an HTML artifact, then a 1-sentence verdict, then the liability guardrail.
+
+**HTML artifact — readiness card:**
+
+*Race distance banner* at top (e.g. "70.3 Half Ironman Readiness")
+
+*Per-discipline row* (Swim / Bike / Run):
+- CTL gauge: actual value vs midpoint of target range for this distance. Colour: green if at/above lower bound, amber if within 10% below, red if >10% below
+- TSB chip: colour-coded — for race readiness, green if TSB is 0 to +25 (fresh), amber if -10 to 0 (some fatigue but raceable), red if < -10 (too fatigued) or > +25 (detrained)
+- Decoupling indicator: green/amber/red based on average decoupling across last 3 long aerobic sessions for this discipline
+
+*Verdict chip* at bottom:
+- `READY` — all disciplines at or above lower bound of range, TSB within race-day target window
+- `CLOSE` — one discipline below lower bound, or TSB outside window but trending in the right direction
+- `NOT YET` — two or more disciplines below lower bound, or TSB significantly outside target window
+
+With the single biggest gap called out in one sentence below the chip.
+
+---
+
+## /plan [date] [sport] [description]
+
+**Triggers:** "schedule a workout", "add a session", "plan [sport] for [date]"
+**Tools:** `add_or_update_event`
+**Guardrail:** none
+
+### Arg handling
+- If date is missing: ask "What date should I schedule this for?"
+- If sport is missing: ask "What sport — ride, run, or swim?"
+- Description is optional — generate a sensible default name if not provided (e.g. "Easy aerobic run", "Z2 long ride")
+
+### Tool sequence
+1. Build the event payload following WORKOUT_PLANNING.md pre-flight checklist
+2. Display the proposed event as a markdown summary (do NOT call the tool yet):
+   ```
+   Proposed workout:
+   - Date: [date]
+   - Sport: [sport]
+   - Name: [name]
+   - Duration: [if specified]
+   - Target: [if specified]
+   ```
+3. Ask: "Schedule this?" — wait for explicit yes before calling `add_or_update_event`
+4. On confirmation: call `add_or_update_event` with the payload
+5. Echo the created event fields to confirm success
+
+---
