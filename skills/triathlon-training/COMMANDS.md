@@ -42,3 +42,33 @@ Output a markdown table:
 | /plan [date] [sport] [description] | Schedule a planned workout on your calendar |
 
 ---
+
+## /wellness
+
+**Triggers:** "how's my wellness", "how am I recovering", "HRV", "recovery check", "how's my recovery"
+**Tools:** `get_wellness_data` (14 days)
+**Guardrail:** yes
+
+### Tool sequence
+1. Call `get_wellness_data` with `start_date` = 14 days ago, `end_date` = today
+
+### Output
+Render an HTML artifact, then a 2-sentence markdown summary below it, then the liability guardrail.
+
+**HTML artifact — wellness card:**
+- HRV sparkline (7 days): plot daily `HRV` values with a horizontal baseline marker (7-day average)
+- Resting HR line (7 days): plot below the HRV sparkline, using the `Resting HR` value per day
+- Sleep score row (7 days): one dot per day using `Device Sleep Score` (out of 100). Omit this row silently if the field is absent or null for all days.
+- Verdict chip: `● RECOVERING WELL` (green) / `● MONITOR` (amber) / `● REST NEEDED` (red)
+  - RECOVERING WELL: HRV at or above 7-day average for ≥4 of last 7 days, resting HR stable
+  - MONITOR: HRV below average for 3–4 consecutive days, or resting HR elevated 3–5 bpm vs baseline
+  - REST NEEDED: HRV below average ≥5 consecutive days, or resting HR elevated >7 bpm vs baseline
+
+**Markdown summary (below artifact):**
+2 sentences: one stating the key signal (e.g., "HRV has been trending down for 4 days"), one interpreting it (e.g., "This suggests accumulated fatigue — a lighter day would support recovery").
+
+### Degradation
+- HRV data absent: use resting HR as primary signal. Note the gap: "HRV data isn't available — using resting HR as the recovery indicator."
+- Both HRV and resting HR absent: do not render the artifact. Tell the user: "I don't see HRV or resting HR data in your wellness log for the last 14 days. Enable HRV tracking in intervals.icu Settings → Wellness to unlock this view."
+
+---
