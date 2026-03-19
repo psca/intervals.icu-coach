@@ -119,3 +119,90 @@ Apply these patterns in priority order:
 - CTL/ATL absent from activity objects: surface the gap — "CTL data isn't available in the activity response. Check that your intervals.icu account has training load tracking enabled."
 
 ---
+
+## /last [sport?]
+
+**Triggers:** "how was my last run/ride/swim", "analyze my last [sport]", "feedback on yesterday's [sport]", "last activity"
+**Sport arg:** optional. If omitted, use the most recent activity of any type. If provided (run/ride/swim), filter to that sport.
+**Guardrail:** yes
+
+**Scope guardrail:** If the athlete asks for a training plan during this conversation, respond: "Building a full training plan is outside what I can do responsibly — that requires knowing your full schedule, injury history, and race timeline in ways that need a coach's ongoing involvement. What I can do is analyze your current data and flag what's working and what needs attention."
+
+### Tool sequence
+1. `get_activities` — limit 10, `start_date` = 60 days ago; filter by sport type if arg provided
+2. `get_activity_details` — for the most recent activity from step 1
+3. `get_activity_weather` — **ONLY for outdoor Run or Ride**. Skip for: Swim, VirtualRide, indoor Run (detect via activity type or name). Call this before constructing any output.
+4. `get_activity_intervals` — only if the activity is structured (intervals present in the details response)
+5. `get_activity_streams` — only if aerobic decoupling % is not already in the details response; high token cost, use as last resort
+
+### Output — Part 1: HTML artifact (stat card)
+
+**Weather strip (outdoor Run/Ride only):**
+Lead with: "{description} — {average_feels_like}°C feels-like, {average_wind_speed} km/h {prevailing_wind_cardinal}"
+- Cycling only: append " ({headwind_percent}% headwind / {tailwind_percent}% tailwind)"
+- Running: omit headwind/tailwind — wind drag at running pace is negligible
+- Include `temp_bar` if feels-like > 25°C or < 5°C
+- If tool returns "Weather unavailable": skip strip silently
+
+**Key metrics grid:**
+Show available fields only — omit rows where data is null/absent:
+
+| Metric | Notes |
+|---|---|
+| Date | |
+| Type | Sport + session type (e.g. "Z2 long ride") |
+| Duration | |
+| Avg Power / Avg Pace | Power for cycling, NGP for running, pace/100m for swimming |
+| IF | Cycling only |
+| Avg HR | |
+| Decoupling % | Long aerobic efforts only (≥90 min bike, ≥60 min run) |
+| EF | NP/Avg HR (cycling) or NGP/Avg HR (running) |
+| VI | Cycling only (NP / Avg Power) |
+| SWOLF | Swimming only |
+
+**Signals row:**
+One badge per signal. Tag each: 🟢 Good / 🟡 Watch / 🔴 Flag. Use thresholds from METRICS_REFERENCE.md.
+Always apply weather context before flagging — heat explains decoupling; headwind explains elevated power and IF.
+
+**Comparison bar:**
+Show this session vs last 3 comparable efforts. Comparable = same sport, duration within ±25%, session type inferred from IF or pace zone.
+- If FTP changed between sessions: add footnote "† FTP changed from [X] to [Y] on [date] — IF values before and after are not directly comparable"
+- If <3 comparable sessions exist: write "Not enough comparable sessions to compare — this is the baseline"
+
+### Output — Part 2: Markdown narrative
+
+**What happened (2–4 sentences):**
+Observation only — describe what the data shows. No recommendations. Examples:
+- "This was a Z2 long ride at IF 0.79, which aligns with the intended aerobic session."
+- "Decoupling of 8.2% is above the 5% threshold for a 2-hour effort — worth watching across the next few long rides."
+
+**One question:**
+A single clarifying question inviting athlete context. Examples: sleep quality, life stress, race schedule, perceived effort, recent illness. Never ask more than one question.
+
+### Sport-specific analysis rules
+
+**Cycling:**
+- Assess IF vs intended session type — a "Z2 long ride" with IF > 0.85 is a pacing issue or mislabelled session
+- VI (NP / Avg Power): target 1.00–1.05 on flat/rolling; always contextualize with course profile before flagging; mountain stage VI 1.12 is fine, flat TT VI 1.12 is a problem
+- Aerobic decoupling: only flag for efforts ≥90 min at Z1–Z2; adjust threshold +2–3% if average_feels_like > 28°C
+- EF trend: compare to 3 most recent similar efforts (same type, similar duration); rising = aerobic gain; declining ≥3 sessions = flag
+- Power zone distribution: in base phase, flag if >30% of TSS from Z3+
+- **FTP change caveat:** IF is computed as NP ÷ FTP. If FTP was updated between sessions being compared, the IF values are against different denominators and are not directly comparable. Flag affected rows with a footnote and note the FTP change date.
+
+**Running:**
+- EF = NGP / Avg HR (NGP accounts for elevation — use it for fair cross-course comparison)
+- Aerobic decoupling: only flag for efforts ≥60 min at Z2; running is more heat-sensitive than cycling — apply heat adjustment at average_feels_like > 25°C
+- Cadence: compare first 20% of session vs last 20% — drop >5 spm = fatigue signal
+- EF trend: compare to 3 most recent efforts of similar distance and course type (flat road vs flat road, trail vs trail)
+- Do NOT report headwind/tailwind for running
+
+**Swimming:**
+- No weather fetch — skip get_activity_weather entirely
+- SWOLF (stroke count + time per length): target 35–45 (25m pool), low 70s (50m pool); improving SWOLF at same pace = technique + fitness gain; SWOLF improving while pace slows = fatigue signal, not progress
+- Pace per 100m: track relative to effort level, not absolute
+- Interval consistency: use get_activity_intervals — flag drop-off in later intervals vs earlier
+- Stroke rate: compare early vs late session; inconsistency = fatigue indicator
+- HR data less reliable (chest strap issues underwater) — note uncertainty if HR is the basis for any flag
+- GPS unreliable in pool — rely on laps/intervals data, not GPS distance
+
+---
