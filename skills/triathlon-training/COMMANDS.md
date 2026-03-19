@@ -206,3 +206,44 @@ A single clarifying question inviting athlete context. Examples: sleep quality, 
 - GPS unreliable in pool — rely on laps/intervals data, not GPS distance
 
 ---
+
+## /weekly
+
+**Triggers:** "weekly summary", "how was my week", "this week", "week recap"
+**Tools:** `get_activities` (14 days) → `get_wellness_data` (7 days) → `get_events` (current week)
+**Week boundaries:** Mon–Sun; current week = Monday of the current week through today
+**Guardrail:** yes
+
+### Tool sequence
+1. `get_activities` with `start_date` = 14 days ago, `end_date` = today (provides this week + last week for context)
+2. `get_wellness_data` with `start_date` = 7 days ago, `end_date` = today
+3. `get_events` with `start_date` = Monday of the current week, `end_date` = today (get planned sessions)
+
+### Output
+Render an HTML artifact, then a 2–3 sentence markdown summary, then the liability guardrail.
+
+**HTML artifact — weekly view:**
+
+*Wellness strip (Mon–Sun across top):*
+One column per day. Each cell: HRV dot + Resting HR dot. Empty dot (grey outline) for days with no wellness data — do not interpolate missing days. If wellness data is entirely absent for all 7 days: omit this row and note the gap in the markdown summary.
+
+*7-day calendar row (Mon–Sun):*
+Each day cell shows:
+- Completed activities: card with sport icon (inferred from `Type`), duration, and key metric (avg power for Ride, avg pace for Run, distance for Swim)
+- Planned sessions (from get_events): same card style but dashed border, lighter colour, name only (no sport icon — `Type` is always "Other" for planned events, cannot infer sport)
+- Empty days: blank cell
+
+*TSS bar chart by discipline (bottom):*
+One bar per discipline (Swim / Bike / Run): completed TSS = sum of `Training Load` values for that discipline this week. No planned target bars — `load_target` is not available from get_events.
+
+**Markdown summary (2–3 sentences, below artifact):**
+- What got done this week (total sessions, disciplines covered)
+- What's planned but not yet done (by name from get_events)
+- Any load flag (e.g., TSB < -20 across disciplines, or ramp rate >6 pts/week)
+
+### Degradation
+- No planned sessions from get_events: omit planned session cards in the calendar row. Note in summary: "No planned sessions found for this week."
+- Wellness data absent for some days: show empty dots for those days — do not interpolate
+- Wellness data entirely absent: omit the wellness strip row. Note gap in summary.
+
+---
