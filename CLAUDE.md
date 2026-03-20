@@ -23,7 +23,7 @@ A Claude skill that acts as a triathlon coach, pulling live data from intervals.
 
 ## MCP Server
 
-TypeScript server at `github.com:psca/intervals.icu-server`. Runs locally via `npm run stdio` or remotely as a Cloudflare Worker. Tools:
+TypeScript server at `github.com:psca/intervals.icu-server`. Runs locally via `npm run stdio`. Tools:
 - All standard intervals.icu tools (activities, events, wellness)
 - `get_activity_weather` — full GPS + Open-Meteo weather pipeline, server-side (replaces `weather.py`)
 - `get_activity_stream_sampled` — GPS + bearing at 30-min intervals (still available for direct use)
@@ -45,3 +45,7 @@ TypeScript server at `github.com:psca/intervals.icu-server`. Runs locally via `n
 - Use `get_activity_weather` for weather context — single call returns full GPS + Open-Meteo summary; do not call `get_activity_stream_sampled` manually for weather
 - `get_activity_streams` is high token cost — only call it when aerobic decoupling or VI analysis explicitly requires second-by-second data
 - MCP tool call order matters: `get_activities` → `get_wellness_data` → `get_activity_details` for fitness status; `get_activity_details` → `get_activity_intervals` → `get_activity_streams` for single activity analysis
+
+## Testing Changes
+
+No automated tests — validation is manual. Load the skill in Claude Code and invoke each scenario conversationally. See the Validation checklist in `docs/superpowers/plans/` for scenarios to cover.
