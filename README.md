@@ -55,6 +55,18 @@ All skill files live in `skills/triathlon-training/`:
 | `METRICS_REFERENCE.md` | Thresholds: CTL ramp rates, TSB by race distance, decoupling, VI, EF, SWOLF |
 | `WORKOUT_PLANNING.md` | Write-operation guidance for add_or_update_event |
 
+## MCP Server
+
+This skill requires the [psca/intervals.icu-server](https://github.com/psca/intervals.icu-server) MCP server — a TypeScript server that wraps the intervals.icu API and exposes it as MCP tools.
+
+Notable tools beyond the standard intervals.icu API:
+- **`get_activity_weather`** — fetches GPS waypoints from the activity and queries Open-Meteo to return feels-like temperature, wind speed/direction, headwind/tailwind %, and precipitation. No API key required.
+- **`get_activity_stream_sampled`** — GPS + bearing sampled at configurable intervals, useful for route analysis.
+
+The server runs locally via `npm run stdio` (Claude Code / Claude Desktop) or can be deployed as a Cloudflare Worker for claude.ai Web. See the server repo for deployment instructions.
+
+---
+
 ## Weather Analysis
 
 Weather context is fetched automatically for every outdoor bike and run via the `get_activity_weather` MCP tool. It samples GPS waypoints every 30 minutes and computes temperature, feels-like, wind speed/direction, headwind %, and precipitation — all via Open-Meteo (free, no API key).
