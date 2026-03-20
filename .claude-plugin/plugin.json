@@ -1,7 +1,7 @@
 {
   "name": "intervals-icu-coach",
   "version": "1.1.0",
-  "description": "Triathlon coaching backed by intervals.icu data. Analyses swim, bike, and run independently — never aggregated — covering recovery, fitness trends, race readiness, and session breakdowns. Requires the intervals.icu MCP server.",
+  "description": "Coach to analyse swim, bike, and run. Covering recovery, fitness trends, race readiness, and session breakdowns. Requires the intervals.icu MCP server.",
   "author": {
     "name": "Anthony"
   }

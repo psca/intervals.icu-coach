@@ -5,13 +5,13 @@
     "email": ""
   },
   "metadata": {
-    "description": "Triathlon coaching backed by intervals.icu data. Analyses swim, bike, and run independently — never aggregated — covering recovery, fitness trends, race readiness, and session breakdowns. Requires the intervals.icu MCP server.",
+    "description": "Coach to analyse swim, bike, and run. Covering recovery, fitness trends, race readiness, and session breakdowns. Requires the intervals.icu MCP server.",
     "version": "1.1.0"
   },
   "plugins": [
     {
       "name": "triathlon-training",
-      "description": "Triathlon coaching skill that analyses intervals.icu training data per discipline (swim/bike/run). Provides CTL/ATL/TSB trends, aerobic decoupling assessment, overtraining signals, race readiness, and session breakdowns. Requires the intervals.icu MCP server configured with your API key and athlete ID.",
+      "description": "Coach to analyse swim, bike, and run. Covering recovery, fitness trends, race readiness, and session breakdowns. Requires the intervals.icu MCP server.",
       "source": "./",
       "strict": true,
       "skills": [
