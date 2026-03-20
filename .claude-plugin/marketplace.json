@@ -5,7 +5,7 @@
     "email": ""
   },
   "metadata": {
-    "description": "A triathlon training coach powered by your intervals.icu data. Analyses swim, bike, and run independently — never aggregated — to surface recovery signals, fitness trends, race readiness, and session breakdowns. Ask naturally; the coach pulls the data. Requires the intervals.icu MCP server.",
+    "description": "Triathlon coaching backed by intervals.icu data. Analyses swim, bike, and run independently — never aggregated — covering recovery, fitness trends, race readiness, and session breakdowns. Requires the intervals.icu MCP server.",
     "version": "1.1.0"
   },
   "plugins": [
