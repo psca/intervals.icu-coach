@@ -14,19 +14,29 @@ A Claude skill that acts as a triathlon coach, pulling live data from intervals.
    cd intervals.icu-server
    npm install
    ```
-2. Set credentials in your shell profile (`~/.zshrc` or `~/.bashrc`):
-   ```bash
-   export INTERVALS_API_KEY=<your-intervals-api-key>
-   export INTERVALS_ATHLETE_ID=<your-athlete-id>
+2. Add credentials to `.mcp.json` — Claude Code spawns the server automatically:
+   ```json
+   {
+     "mcpServers": {
+       "intervals-mcp": {
+         "type": "stdio",
+         "command": "npm",
+         "args": ["run", "stdio"],
+         "env": {
+           "API_KEY": "your_intervals_icu_api_key",
+           "ATHLETE_ID": "i12345"
+         }
+       }
+     }
+   }
    ```
-3. Update `cwd` in `.mcp.json` to the cloned repo path — Claude Code will spawn the server automatically via `npm run stdio`.
 
 ## MCP Server
 
-TypeScript server at `github.com:psca/intervals.icu-server`. Runs locally via `npm run stdio`. Tools:
+TypeScript server at `github.com:psca/intervals.icu-server`. Two modes: local stdio (Claude Code / Desktop) and remote Cloudflare Worker (Claude Web — see server repo for deploy instructions). Tools:
 - All standard intervals.icu tools (activities, events, wellness)
-- `get_activity_weather` — full GPS + Open-Meteo weather pipeline, server-side (replaces `weather.py`)
-- `get_activity_stream_sampled` — GPS + bearing at 30-min intervals (still available for direct use)
+- `get_activity_weather` — GPS + Open-Meteo weather pipeline with headwind/tailwind analysis
+- `get_activity_route` — GPS route data sampled at regular intervals for route and elevation analysis
 
 ## Architecture
 
@@ -42,7 +52,7 @@ TypeScript server at `github.com:psca/intervals.icu-server`. Runs locally via `n
 ## Key Constraints
 
 - **Never aggregate swim/bike/run** into a single training load figure — this is a hard invariant enforced throughout the skill
-- Use `get_activity_weather` for weather context — single call returns full GPS + Open-Meteo summary; do not call `get_activity_stream_sampled` manually for weather
+- Use `get_activity_weather` for weather context — single call returns full GPS + Open-Meteo summary; do not call `get_activity_route` manually for weather
 - `get_activity_streams` is high token cost — only call it when aerobic decoupling or VI analysis explicitly requires second-by-second data
 - MCP tool call order matters: `get_activities` → `get_wellness_data` → `get_activity_details` for fitness status; `get_activity_details` → `get_activity_intervals` → `get_activity_streams` for single activity analysis
 

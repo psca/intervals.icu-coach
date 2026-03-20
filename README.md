@@ -14,14 +14,24 @@ A Claude skill that acts as a triathlon coach, pulling live data from intervals.
    cd intervals.icu-server
    npm install
    ```
-2. Add credentials to your shell profile (`~/.zshrc` or `~/.bashrc`):
-   ```bash
-   export INTERVALS_API_KEY=<your-intervals-api-key>
-   export INTERVALS_ATHLETE_ID=<your-athlete-id>
+2. Add to your `.mcp.json`:
+   ```json
+   {
+     "mcpServers": {
+       "intervals-mcp": {
+         "type": "stdio",
+         "command": "npm",
+         "args": ["run", "stdio"],
+         "env": {
+           "API_KEY": "your_intervals_icu_api_key",
+           "ATHLETE_ID": "i12345"
+         }
+       }
+     }
+   }
    ```
-3. Update `cwd` in `.mcp.json` to the path of your cloned repo.
 
-The `.mcp.json` spawns the server automatically via `npm run stdio`. Then load the skill:
+Claude Code will spawn the server automatically. Then load the skill:
 ```
 /plugin install triathlon-training@intervals-icu-coach
 ```
@@ -61,9 +71,9 @@ This skill requires the [psca/intervals.icu-server](https://github.com/psca/inte
 
 Notable tools beyond the standard intervals.icu API:
 - **`get_activity_weather`** — fetches GPS waypoints from the activity and queries Open-Meteo to return feels-like temperature, wind speed/direction, headwind/tailwind %, and precipitation. No API key required.
-- **`get_activity_stream_sampled`** — GPS + bearing sampled at configurable intervals, useful for route analysis.
+- **`get_activity_route`** — GPS route data sampled at regular intervals, useful for route and elevation analysis.
 
-The server runs locally via `npm run stdio` (Claude Code / Claude Desktop) or can be deployed as a Cloudflare Worker for claude.ai Web. See the server repo for deployment instructions.
+Two modes: local stdio (Claude Code / Claude Desktop) and remote Cloudflare Worker with GitHub OAuth (claude.ai Web). See the server repo for full setup and deployment instructions.
 
 ---
 
