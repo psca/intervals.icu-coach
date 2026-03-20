@@ -34,8 +34,8 @@ TypeScript server at `github.com:psca/intervals.icu-server`. Runs locally via `n
 
 | File | Role |
 |------|------|
-| `SKILL.md` | Router: command routing table, MCP tool map, data quality gates |
-| `COMMANDS.md` | All commands: trigger phrases, tool sequences, output templates |
+| `SKILL.md` | Router: natural language trigger table, MCP tool map, data quality gates |
+| `COACH.md` | Coach knowledge: how to respond to each type of request, tool sequences, response templates |
 | `METRICS_REFERENCE.md` | Thresholds: CTL ramp rates, TSB, decoupling, VI, IF, EF, SWOLF |
 | `WORKOUT_PLANNING.md` | Write-operation guidance for `add_or_update_event` |
 
