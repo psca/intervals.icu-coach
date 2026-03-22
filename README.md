@@ -36,7 +36,9 @@ Claude Code will spawn the server automatically. Then load the skill:
 /plugin install triathlon-training@intervals-icu-coach
 ```
 
-### Claude Desktop (Extension)
+### Claude Desktop (recommended for claude.ai + mobile)
+
+Skills added to Claude Desktop sync automatically to claude.ai web and appear on Claude mobile — this is the easiest path for cross-platform use.
 
 1. Build the extension:
    ```bash
@@ -44,13 +46,20 @@ Claude Code will spawn the server automatically. Then load the skill:
    ```
 2. Double-click the generated `.mcpb` to install
 3. Enter your **intervals.icu API key** and **Athlete ID** in the install dialog
-4. Install the **Triathlon Training** skill from the marketplace (or load skill files manually)
+4. Upload the skill files manually in Claude Desktop (Settings → Skills → Add skill), pointing at the `skills/triathlon-training/` folder
 
-### claude.ai (Web — requires CF Worker)
+Once uploaded via Desktop, the skill will appear in claude.ai and Claude mobile automatically. Note: MCP (live data) is only available on Desktop and claude.ai web — mobile shows the skill but cannot call MCP tools.
 
-Deploy the CF Worker from [psca/intervals.icu-server](https://github.com/psca/intervals.icu-server) via Wrangler, then add the Worker URL at **Settings → Integrations → Add integration**. Authentication is handled by GitHub OAuth — no bearer secret required.
+### claude.ai Web (standalone)
 
-Then load the skill from the marketplace.
+If you don't use Claude Desktop, you can connect directly via web:
+
+1. Go to **Settings → Integrations → Add integration** and enter:
+   ```
+   https://intervals-mcp.anthonypoh1998.workers.dev/mcp
+   ```
+2. Authenticate via GitHub OAuth — you'll be prompted to enter your intervals.icu Athlete ID and API key on first connection
+3. Upload skill files manually via **Settings → Skills**
 
 ---
 
@@ -73,7 +82,7 @@ Notable tools beyond the standard intervals.icu API:
 - **`get_activity_weather`** — fetches GPS waypoints from the activity and queries Open-Meteo to return feels-like temperature, wind speed/direction, headwind/tailwind %, and precipitation. No API key required.
 - **`get_activity_route`** — GPS route data sampled at regular intervals, useful for route and elevation analysis.
 
-Two modes: local stdio (Claude Code / Claude Desktop) and remote Cloudflare Worker with GitHub OAuth (claude.ai Web). See the server repo for full setup and deployment instructions.
+Two modes: local stdio (Claude Code / Claude Desktop) and remote Cloudflare Worker with GitHub OAuth (claude.ai Web) at `https://intervals-mcp.anthonypoh1998.workers.dev/mcp`.
 
 ---
 
