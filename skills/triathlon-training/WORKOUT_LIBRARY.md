@@ -158,3 +158,135 @@ Main Set
 
 Cooldown
 - 200mtr 55% Pace
+
+---
+
+## Bike
+
+### Easy Endurance
+- **When:** Base / All phases
+- **Duration range:** 60-180min
+- **Intensity:** Z2, 55-75% FTP
+
+Warmup
+- 10m ramp 40-60% 85rpm
+
+Main Set
+- 50m 60-70% 85-90rpm
+
+Cooldown
+- 10m ramp 65-40%
+
+---
+
+### Tempo
+- **When:** Base 2 / Build phase
+- **Duration range:** 75-120min
+- **Intensity:** 76-87% FTP
+
+Warmup
+- 15m ramp 40-65% 85rpm
+
+Main Set 3x
+- 12m 76-87% 85-90rpm
+- 5m 55% 85rpm
+
+Cooldown
+- 10m ramp 65-40%
+
+---
+
+### Sweet Spot Intervals
+- **When:** Build phase
+- **Duration range:** 60-90min
+- **Intensity:** 88-93% FTP
+
+Warmup
+- 15m ramp 40-65% 85rpm
+
+Main Set 3x
+- 12m 88-93% 90rpm
+- 5m 55% 85rpm
+
+Cooldown
+- 10m ramp 65-40%
+
+---
+
+### Threshold Intervals
+- **When:** Build phase
+- **Duration range:** 60-90min
+- **Intensity:** 95-105% FTP
+
+Warmup
+- 15m ramp 40-65% 85rpm
+
+Main Set 3x
+- 10m 95-105% 90rpm
+- 5m 55% 85rpm
+
+Cooldown
+- 10m ramp 65-40%
+
+---
+
+### VO2max Intervals
+- **When:** Build / Peak phase
+- **Duration range:** 60-75min
+- **Intensity:** 106-120% FTP
+
+Warmup
+- 15m ramp 40-65% 85rpm
+
+Main Set 5x
+- 4m 106-120% 95-100rpm
+- 4m 55% 85rpm
+
+Cooldown
+- 10m ramp 65-40%
+
+---
+
+### Race Pace Ride
+- **When:** Peak phase
+- **Duration range:** 90-180min
+- **Intensity:** Race IF (distance-dependent)
+
+Warmup
+- 15m ramp 40-65% 85rpm
+
+Main Set
+- 60m 75-85% 85-90rpm
+
+Cooldown
+- 10m ramp 65-40%
+
+---
+
+### Recovery Spin
+- **When:** All phases (recovery days)
+- **Duration range:** 45-60min
+- **Intensity:** <55% FTP
+
+Easy Spin
+- 45m 40-55% 85-90rpm
+
+---
+
+### Openers
+- **When:** Taper / Race week
+- **Duration range:** 45-60min
+- **Intensity:** Easy with short bursts
+
+Warmup
+- 15m ramp 40-60% 85rpm
+
+Easy Riding
+- 15m 55% 85rpm
+
+Activation 3x
+- 30s 120% 100rpm
+- 3m 50% 85rpm
+
+Cooldown
+- 10m 50% 85rpm
