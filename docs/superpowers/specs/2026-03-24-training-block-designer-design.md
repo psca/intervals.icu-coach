@@ -67,9 +67,9 @@ This avoids both the rigidity of fully pre-built plans and the risk of LLM frees
 
 | File | Changes |
 |------|---------|
-| `SKILL.md` | New trigger row for "build a training plan" |
-| `COACH.md` | New "Build Training Block" section with intake flow, preview format, approval gate |
-| `WORKOUT_PLANNING.md` | Add intervals.icu workout description syntax reference |
+| `SKILL.md` | New trigger row for "build a training plan", "create a block", "plan my season", "build me a plan for [race]" |
+| `COACH.md` | New "Build Training Block" section with intake flow, preview format, approval gate. **Remove "Never prescribe" from Coaching Principles.** Update Last Activity scope guardrail to: "For ad-hoc analysis, do not freestyle training recommendations. For block design requests, use the template assembly flow." |
+| `WORKOUT_PLANNING.md` | Add intervals.icu workout description syntax reference. Add batch write guidance. |
 
 **Unchanged:** `METRICS_REFERENCE.md`
 
@@ -107,20 +107,16 @@ Before asking any questions, the skill pulls:
 | Upcoming events | `get_events` | Existing calendar conflicts, possibly race date already entered |
 | Athlete zones | from activity data | FTP, threshold pace, HR zones for workout parameterization |
 
-### Step 1-10: Structured Intake
+### Step 1-6: Structured Intake
 
-Each question has a sensible default. The athlete can skip through quickly or fine-tune.
+Each question has a sensible default. The LLM should consolidate related questions and accept multi-part answers to keep the conversation brisk. Target 4-6 conversational turns, not 10.
 
-1. **Race date + distance** — required, triggers everything
-2. **Confirm weeks available** — "That's 16 weeks. I'll build a 16-week block." (minimum-weeks guardrail per distance)
-3. **Confirm inferred fitness** — "You're averaging ~9 hrs/week. Sound right?" (falls back to asking if MCP data is sparse)
-4. **Available hours/week** — contextualized: "You're doing 9 now. Want to keep that, build, or scale back?"
-5. **Discipline focus** — "Your run is lagging. Focus there, or stay balanced?" (skip for marathon-only)
-6. **Key sessions to protect** — "Any existing sessions to keep? (group ride, masters swim)"
-7. **Scheduling constraints** — "Days you can't train or sport-specific day limits?"
-8. **Include strength?** — Yes / No (default: no). If yes: 2x/week base → 1x/week build → drop in peak
-9. **Injury/health notes** — "Anything I should know?"
-10. **Methodology preference** — only for intermediate+, otherwise standard by default
+1. **Race date + distance + weeks confirmation** — required. "That's 16 weeks — I'll build a 16-week block." (minimum-weeks guardrail per distance)
+2. **Confirm inferred fitness + available hours** — present MCP-inferred data in one turn: "You're averaging ~9 hrs/week across swim/bike/run. Want to keep that, build to more, or scale back?" (falls back to asking from scratch if MCP data is sparse)
+3. **Discipline focus + methodology** — "Your run CTL is lagging. Focus there, or stay balanced? Any preference on training approach (standard/polarized) or should I choose?" (skip discipline focus for marathon-only; skip methodology for beginners)
+4. **Schedule: protected sessions + constraints** — "Any sessions to keep (group ride, masters swim)? Days you can't train?"
+5. **Strength + health** — "Want strength sessions included? Anything injury/health-wise I should know?" Strength events use `type: "WeightTraining"`. If yes: 2x/week base → 1x/week build → drop in peak.
+6. **Confirmation** — summarize all inputs, confirm before assembly
 
 ### Step 11: Template Selection + Assembly
 
@@ -129,9 +125,11 @@ Based on intake answers:
 2. Adjust plan length if athlete's timeline doesn't match (stretch/compress base phase)
 3. Swap in phase variants if athlete requested (polarized, discipline focus, etc.)
 4. Walk through template week-by-week, pull workout archetypes from library
-5. Parameterize workouts with athlete's zones
+5. Parameterize workouts with athlete's zones (see Zone Resolution in WORKOUT_LIBRARY.md section)
 6. Apply scheduling constraints (slot sessions into available days)
 7. Respect protected sessions (build around group ride, masters swim, etc.)
+
+**For plans longer than 12 weeks:** assemble and present one phase at a time to manage context window load. Preview base phase first, then build, then peak/taper.
 
 ### Step 12: Preview
 
@@ -178,10 +176,24 @@ On approval, batch-write all events to intervals.icu via `add_or_update_event`:
 - One event per session per day (never aggregate disciplines into a single event)
 - Use intervals.icu structured workout description syntax in the `description` field
 - Follow all WORKOUT_PLANNING.md pre-flight checks per event
+- Create a `RACE_A` category event for race day if one doesn't already exist
 
-### Step 15: Fire and Forget
+**Batch write strategy:**
+- All events must include a deterministic `uid` (e.g., `block-{race-date}-{week}-{day}-{discipline}`) to enable idempotent writes
+- Use `upsertOnUid=true` on all calls — retries do not create duplicates
+- Write in phase-sized batches (base, then build, then peak/taper) with progress feedback: "Base phase written (weeks 1-5). Writing build phase..."
+- On partial failure: surface which events succeeded and which failed, offer retry for failed events only
 
-The block lives on the intervals.icu calendar. The existing coaching commands (fitness status, weekly summary, race readiness) naturally pick up planned vs completed workouts. No special block awareness needed.
+**Calendar conflict resolution:**
+- Before writing, check `get_events` for existing events in the target date range
+- If conflicts found, offer three options:
+  - **Work around** — write new events, slot around existing ones (no deletions)
+  - **Merge** — write new events alongside existing ones (no deletions)
+  - **Clear and replace** — call `delete_events_by_date_range` for the target range, then write. Requires explicit second confirmation before any deletion.
+
+### Step 15: Handoff to Existing Coaching
+
+The block lives on the intervals.icu calendar. The existing coaching commands (fitness status, weekly summary, race readiness) naturally pick up planned vs completed workouts. No special block awareness needed. Do not describe this as "fire and forget" to the athlete — instead explain that the workouts are on their calendar and the coaching commands will help them track progress.
 
 ---
 
@@ -208,7 +220,7 @@ Each template entry defines a phase-by-phase weekly pattern referencing workout 
 ## Olympic Triathlon — Standard (14 weeks)
 
 Phases: Base (5wk) → Build (5wk) → Peak (2wk) → Taper (2wk)
-Mesocycle: 3:1 (2 load weeks + 1 recovery)
+Mesocycle: 2:1 (2 load weeks + 1 recovery) — use 3:1 for experienced athletes; 2:1 for beginners, masters (45+), or high-intensity blocks
 Weekly hours: 8-10hr (tier: intermediate)
 
 | Week | Phase | Swim | Bike | Run | Strength | Notes |
@@ -272,7 +284,19 @@ Cooldown
 - 200mtr 60% Pace
 ```
 
-The LLM scales sets (e.g., 6x100 for short tier, 10x100 for long tier) based on the template's load target for that week.
+The LLM scales sets based on the template's load target for that week. Each archetype should specify tier variants:
+- **Short tier:** ~75% of standard volume (fewer sets/shorter duration)
+- **Standard tier:** baseline as written
+- **Long tier:** ~125% of standard volume (more sets/longer duration)
+
+### Zone Resolution
+
+Workout targets use percentage-based syntax (e.g., `88-93%` FTP), which intervals.icu resolves against the athlete's settings. The skill should verify zone data is available:
+
+- **Bike:** FTP from most recent ride with power data, or intervals.icu athlete settings
+- **Run:** threshold pace from most recent tempo/interval run, or ask athlete
+- **Swim:** CSS from most recent CSS test or interval set, or ask athlete
+- **Fallback:** if zone data is unavailable for a discipline, use HR zones (`Z2 HR`) or RPE-based text cues instead of pace/power targets
 
 ---
 
@@ -306,7 +330,7 @@ All templates and rules grounded in freely available research:
 | Taper performance gain ~2-3% | Bosquet et al. 2007 | Free summary |
 | Triathlon-specific taper | Mujika 2011, J Human Sport & Exercise | Free |
 | Tri load distribution (~15-20% swim, 40-50% bike, 30-35% run) | Etxebarria, Mujika & Pyne 2019 | Free (PMC6571715) |
-| ACWR guardrails (avoid >10% weekly spikes) | Gabbett 2016 | Free PDF |
+| Load ramp guardrails | Practitioner consensus (Friel, Couzens); Gabbett 2016 ACWR as supporting context | Free blogs / Free PDF |
 | Periodization phases (base/build/peak/taper) | Friel, Bompa — general coaching knowledge | Not copyrightable |
 | Workout archetypes (sweet spot, threshold, VO2max, etc.) | Generic coaching terminology | Not copyrightable |
 | CTL/ATL/TSB math (Banister's model) | Banister 1975; implemented in GoldenCheetah GPL v2 | Free |
