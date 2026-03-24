@@ -290,3 +290,117 @@ Activation 3x
 
 Cooldown
 - 10m 50% 85rpm
+
+---
+
+## Run
+
+### Easy Aerobic
+- **When:** Base / All phases
+- **Duration range:** 30-90min
+- **Intensity:** Z2 HR or 65-75% Pace
+
+Easy Run
+- 45m Z2 HR
+
+---
+
+### Easy + Strides
+- **When:** Base / Build phase
+- **Duration range:** 45-60min easy + strides
+- **Intensity:** Z2 + short fast bursts
+
+Easy Run
+- 40m Z2 HR
+
+Strides 6x
+- 20s 100% Pace
+- 60s freeride
+
+---
+
+### Threshold Cruise Intervals
+- **When:** Build phase
+- **Duration range:** 50-70min total
+- **Intensity:** 90-95% Pace
+
+Warmup
+- 15m ramp 60-75% Pace
+
+Main Set 3x
+- 10m 90-95% Pace
+- 3m 60% Pace
+
+Cooldown
+- 10m 65% Pace
+
+---
+
+### VO2max Intervals
+- **When:** Build / Peak phase
+- **Duration range:** 50-65min total
+- **Intensity:** 98-105% Pace
+
+Warmup
+- 15m ramp 60-75% Pace
+
+Main Set 5x
+- 3m 98-105% Pace
+- 3m 55% Pace
+
+Cooldown
+- 10m 60% Pace
+
+---
+
+### Long Run
+- **When:** Base / Build phase
+- **Duration range:** 75-150min
+- **Intensity:** Z2 HR, steady effort
+
+Long Run
+- 90m Z2 HR
+
+---
+
+### Race Pace Run
+- **When:** Peak phase
+- **Duration range:** 45-75min
+- **Intensity:** Target race pace
+
+Warmup
+- 15m ramp 60-75% Pace
+
+Main Set 3x
+- 10m 90-95% Pace
+- 2m 60% Pace
+
+Cooldown
+- 10m 60% Pace
+
+---
+
+### Recovery Jog
+- **When:** All phases (recovery days)
+- **Duration range:** 30-40min
+- **Intensity:** Very easy, Z1 HR
+
+Recovery
+- 30m Z1 HR
+
+---
+
+### Hill Repeats
+- **When:** Build phase
+- **Duration range:** 50-65min total
+- **Intensity:** 5K effort uphill
+
+Warmup
+- 15m ramp 60-75% Pace
+
+Hill Repeats 8x
+- 90s 98-105% Pace uphill
+- 2m freeride jog down
+
+Cooldown
+- 10m 60% Pace
