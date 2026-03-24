@@ -186,3 +186,205 @@ Weekly hours: 9-12hr
 | 16 | Recovery | Technique Drills | Easy Endurance | Easy Aerobic | — | -40% volume |
 | 17 | Peak | Race Pace Set, Technique Drills | Threshold Intervals, Easy Endurance | Race Pace Run, Easy + Strides | — | Sharpening |
 | 18 | Taper | Recovery Swim | Openers | Recovery Jog | — | Race week |
+
+---
+
+## 70.3 Half Ironman
+
+### 70.3 — Short (16 weeks)
+
+Phases: Base (5wk) → Build (6wk) → Peak (2wk) → Taper (2wk + race day)
+Mesocycle: 2:1 (base), 2:1 (build)
+Weekly hours: 8-11hr
+
+| Wk | Phase | Swim | Bike | Run | Strength | Notes |
+|----|-------|------|------|-----|----------|-------|
+| 1 | Base 1 | Aerobic Endurance, Technique Drills | Easy Endurance | Easy Aerobic, Easy + Strides | General Strength A x2 | Build consistency |
+| 2 | Base 1 | Aerobic Endurance, CSS Intervals | Easy Endurance, Tempo | Easy Aerobic, Long Run | General Strength A x2 | +10% volume |
+| 3 | Recovery | Technique Drills | Easy Endurance | Easy Aerobic | General Strength A x1 | -40% volume |
+| 4 | Base 2 | CSS Intervals, Technique Drills | Easy Endurance, Tempo | Easy Aerobic, Long Run | General Strength B x2 | Introduce threshold swim |
+| 5 | Base 2 | CSS Intervals, Aerobic Endurance | Easy Endurance, Tempo | Easy Aerobic, Easy + Strides, Long Run | General Strength B x2 | +10% volume |
+| 6 | Recovery | Technique Drills | Easy Endurance | Easy Aerobic | General Strength B x1 | -40% volume |
+| 7 | Build | CSS Intervals, Technique Drills | Sweet Spot Intervals, Easy Endurance | Threshold Cruise Intervals, Easy Aerobic, Long Run | Maintenance Strength x1 | Introduce bike intensity |
+| 8 | Build | CSS Intervals, Open Water Simulation | Threshold Intervals, Easy Endurance | VO2max Intervals, Easy Aerobic | Maintenance Strength x1 | Peak intensity |
+| 9 | Recovery | Technique Drills | Easy Endurance | Easy Aerobic | — | -40% volume |
+| 10 | Build | Race Pace Set, CSS Intervals | Sweet Spot Intervals, Easy Endurance | Threshold Cruise Intervals, Long Run | — | Race-specific volume |
+| 11 | Build | VO2max Swim, Technique Drills | Race Pace Ride, Easy Endurance | Race Pace Run, Easy Aerobic | — | Brick: Race Pace Ride→Race Pace Run |
+| 12 | Recovery | Technique Drills | Easy Endurance | Easy Aerobic | — | -40% volume |
+| 13 | Build | Race Pace Set, CSS Intervals | Threshold Intervals, Easy Endurance | Race Pace Run, Long Run | — | Final build |
+| 14 | Peak | Race Pace Set, Technique Drills | Race Pace Ride, Easy Endurance | Race Pace Run, Easy + Strides | — | Brick: Race Pace Ride→Easy Aerobic |
+| 15 | Taper | CSS Intervals | Easy Endurance | Easy Aerobic, Easy + Strides | — | -30% volume, maintain intensity |
+| 16 | Taper | Recovery Swim | Openers | Recovery Jog | — | Race week |
+
+---
+
+### 70.3 — Standard (20 weeks)
+
+Phases: Base (8wk) → Build (7wk) → Peak (2wk) → Taper (2wk + race day)
+Mesocycle: 3:1 (base), 2:1 (build)
+Weekly hours: 9-12hr
+
+| Wk | Phase | Swim | Bike | Run | Strength | Notes |
+|----|-------|------|------|-----|----------|-------|
+| 1 | Base 1 | Aerobic Endurance, Technique Drills | Easy Endurance | Easy Aerobic | General Strength A x2 | Build consistency |
+| 2 | Base 1 | Aerobic Endurance, Technique Drills | Easy Endurance | Easy Aerobic, Easy + Strides | General Strength A x2 | +10% volume |
+| 3 | Base 1 | Aerobic Endurance, Technique Drills | Easy Endurance, Tempo | Easy Aerobic, Easy + Strides | General Strength A x2 | +10% volume |
+| 4 | Recovery | Technique Drills | Easy Endurance | Easy Aerobic | General Strength A x1 | -40% volume |
+| 5 | Base 2 | CSS Intervals, Technique Drills | Easy Endurance, Tempo | Easy Aerobic, Long Run | General Strength B x2 | Introduce threshold swim |
+| 6 | Base 2 | CSS Intervals, Aerobic Endurance | Easy Endurance, Tempo | Easy Aerobic, Easy + Strides, Long Run | General Strength B x2 | +10% volume |
+| 7 | Base 2 | CSS Intervals, Technique Drills | Easy Endurance, Tempo | Easy Aerobic, Long Run | General Strength B x2 | +10% volume |
+| 8 | Recovery | Technique Drills | Easy Endurance | Easy Aerobic | General Strength B x1 | -40% volume |
+| 9 | Build | CSS Intervals, Technique Drills | Sweet Spot Intervals, Easy Endurance | Threshold Cruise Intervals, Easy Aerobic, Long Run | Maintenance Strength x1 | Introduce bike intensity |
+| 10 | Build | CSS Intervals, Open Water Simulation | Threshold Intervals, Easy Endurance | VO2max Intervals, Easy Aerobic | Maintenance Strength x1 | Peak intensity |
+| 11 | Recovery | Technique Drills | Easy Endurance | Easy Aerobic | — | -40% volume |
+| 12 | Build | Race Pace Set, CSS Intervals | Sweet Spot Intervals, Easy Endurance | Threshold Cruise Intervals, Long Run | — | Race-specific volume |
+| 13 | Build | VO2max Swim, Technique Drills | Race Pace Ride, Easy Endurance | Race Pace Run, Easy Aerobic | — | Brick: Race Pace Ride→Race Pace Run |
+| 14 | Recovery | Technique Drills | Easy Endurance | Easy Aerobic | — | -40% volume |
+| 15 | Build | Race Pace Set, CSS Intervals | Threshold Intervals, Easy Endurance | Race Pace Run, Long Run | — | Final build |
+| 16 | Build | Open Water Simulation, Technique Drills | Race Pace Ride, Easy Endurance | Race Pace Run, Easy Aerobic | — | Brick: Race Pace Ride→Easy Aerobic |
+| 17 | Recovery | Technique Drills | Easy Endurance | Easy Aerobic | — | -40% volume |
+| 18 | Peak | Race Pace Set, Technique Drills | Race Pace Ride, Easy Endurance | Race Pace Run, Easy + Strides | — | Final sharpening |
+| 19 | Taper | CSS Intervals | Easy Endurance | Easy Aerobic, Easy + Strides | — | -30% volume, maintain intensity |
+| 20 | Taper | Recovery Swim | Openers | Recovery Jog | — | Race week |
+
+---
+
+### 70.3 — Long (24 weeks)
+
+Phases: Base (11wk) → Build (8wk) → Peak (2wk) → Taper (2wk + race day)
+Mesocycle: 3:1 (base), 2:1 (build)
+Weekly hours: 10-14hr
+
+| Wk | Phase | Swim | Bike | Run | Strength | Notes |
+|----|-------|------|------|-----|----------|-------|
+| 1 | Base 1 | Aerobic Endurance, Technique Drills | Easy Endurance | Easy Aerobic | General Strength A x2 | Build consistency |
+| 2 | Base 1 | Aerobic Endurance, Technique Drills | Easy Endurance | Easy Aerobic, Easy + Strides | General Strength A x2 | +10% volume |
+| 3 | Base 1 | Aerobic Endurance, Technique Drills | Easy Endurance, Tempo | Easy Aerobic, Easy + Strides | General Strength A x2 | +10% volume |
+| 4 | Recovery | Technique Drills | Easy Endurance | Easy Aerobic | General Strength A x1 | -40% volume |
+| 5 | Base 2 | CSS Intervals, Technique Drills | Easy Endurance, Tempo | Easy Aerobic, Long Run | General Strength B x2 | Introduce threshold swim |
+| 6 | Base 2 | CSS Intervals, Aerobic Endurance | Easy Endurance, Tempo | Easy Aerobic, Easy + Strides, Long Run | General Strength B x2 | +10% volume |
+| 7 | Base 2 | CSS Intervals, Technique Drills | Easy Endurance, Tempo | Easy Aerobic, Long Run | General Strength B x2 | +10% volume |
+| 8 | Recovery | Technique Drills | Easy Endurance | Easy Aerobic | General Strength B x1 | -40% volume |
+| 9 | Base 3 | CSS Intervals, Aerobic Endurance | Easy Endurance, Tempo | Easy Aerobic, Long Run | General Strength B x2 | Extended base |
+| 10 | Base 3 | CSS Intervals, Open Water Simulation | Easy Endurance, Tempo | Easy Aerobic, Easy + Strides, Long Run | General Strength B x2 | +10% volume |
+| 11 | Base 3 | CSS Intervals, Technique Drills | Easy Endurance, Tempo | Easy Aerobic, Long Run | General Strength B x2 | +10% volume |
+| 12 | Recovery | Technique Drills | Easy Endurance | Easy Aerobic | General Strength B x1 | -40% volume |
+| 13 | Build | CSS Intervals, Technique Drills | Sweet Spot Intervals, Easy Endurance | Threshold Cruise Intervals, Easy Aerobic, Long Run | Maintenance Strength x1 | Introduce bike intensity |
+| 14 | Build | CSS Intervals, Open Water Simulation | Threshold Intervals, Easy Endurance | VO2max Intervals, Easy Aerobic | Maintenance Strength x1 | Peak intensity |
+| 15 | Recovery | Technique Drills | Easy Endurance | Easy Aerobic | — | -40% volume |
+| 16 | Build | Race Pace Set, CSS Intervals | Sweet Spot Intervals, Easy Endurance | Threshold Cruise Intervals, Long Run | — | Race-specific volume |
+| 17 | Build | VO2max Swim, Technique Drills | Race Pace Ride, Easy Endurance | Race Pace Run, Easy Aerobic | — | Brick: Race Pace Ride→Race Pace Run |
+| 18 | Recovery | Technique Drills | Easy Endurance | Easy Aerobic | — | -40% volume |
+| 19 | Build | Race Pace Set, CSS Intervals | Threshold Intervals, Easy Endurance | Race Pace Run, Long Run | — | Final build |
+| 20 | Build | Open Water Simulation, Technique Drills | Race Pace Ride, Easy Endurance | Race Pace Run, Easy Aerobic | — | Brick: Race Pace Ride→Easy Aerobic |
+| 21 | Recovery | Technique Drills | Easy Endurance | Easy Aerobic | — | -40% volume |
+| 22 | Peak | Race Pace Set, Technique Drills | Race Pace Ride, Easy Endurance | Race Pace Run, Easy + Strides | — | Final sharpening |
+| 23 | Taper | CSS Intervals | Easy Endurance | Easy Aerobic, Easy + Strides | — | -30% volume, maintain intensity |
+| 24 | Taper | Recovery Swim | Openers | Recovery Jog | — | Race week |
+
+---
+
+## Ironman
+
+### Ironman — Short (20 weeks)
+
+Phases: Base (7wk) → Build (7wk) → Peak (3wk) → Taper (3wk)
+Mesocycle: 3:1 (base), 2:1 (build)
+Weekly hours: 10-14hr
+
+| Wk | Phase | Swim | Bike | Run | Strength | Notes |
+|----|-------|------|------|-----|----------|-------|
+| 1 | Base 1 | Aerobic Endurance, Technique Drills | Easy Endurance | Easy Aerobic, Easy + Strides | General Strength A x2 | Build consistency |
+| 2 | Base 1 | Aerobic Endurance, Technique Drills | Easy Endurance, Tempo | Easy Aerobic, Long Run | General Strength A x2 | +10% volume |
+| 3 | Base 1 | Aerobic Endurance, CSS Intervals | Easy Endurance, Tempo | Easy Aerobic, Easy + Strides, Long Run | General Strength A x2 | +10% volume |
+| 4 | Recovery | Technique Drills | Easy Endurance | Easy Aerobic | General Strength A x1 | -40% volume |
+| 5 | Base 2 | CSS Intervals, Technique Drills | Easy Endurance, Tempo | Easy Aerobic, Long Run | General Strength B x2 | Introduce threshold swim |
+| 6 | Base 2 | CSS Intervals, Aerobic Endurance | Easy Endurance, Tempo | Easy Aerobic, Easy + Strides, Long Run | General Strength B x2 | +10% volume, long ride to 3hr |
+| 7 | Base 2 | CSS Intervals, Technique Drills | Easy Endurance, Tempo | Easy Aerobic, Long Run | General Strength B x2 | +10% volume |
+| 8 | Recovery | Technique Drills | Easy Endurance | Easy Aerobic | General Strength B x1 | -40% volume |
+| 9 | Build | CSS Intervals, Technique Drills | Sweet Spot Intervals, Easy Endurance | Threshold Cruise Intervals, Easy Aerobic, Long Run | Maintenance Strength x1 | Introduce bike intensity |
+| 10 | Build | CSS Intervals, Open Water Simulation | Threshold Intervals, Easy Endurance | VO2max Intervals, Easy Aerobic | Maintenance Strength x1 | Peak intensity |
+| 11 | Recovery | Technique Drills | Easy Endurance | Easy Aerobic | — | -40% volume |
+| 12 | Build | Race Pace Set, CSS Intervals | Sweet Spot Intervals, Race Pace Ride | Threshold Cruise Intervals, Long Run | — | Brick: Race Pace Ride→Easy Aerobic; long ride 4hr |
+| 13 | Build | Open Water Simulation, CSS Intervals | Race Pace Ride, Easy Endurance | Race Pace Run, Easy Aerobic | — | Brick: Race Pace Ride→Race Pace Run; nutrition practice |
+| 14 | Recovery | Technique Drills | Easy Endurance | Easy Aerobic | — | -40% volume |
+| 15 | Build | Race Pace Set, CSS Intervals | Threshold Intervals, Race Pace Ride | Race Pace Run, Long Run | — | Brick: Race Pace Ride→Race Pace Run; long ride 4-5hr |
+| 16 | Peak | Race Pace Set, Open Water Simulation | Race Pace Ride, Easy Endurance | Race Pace Run, Easy Aerobic | — | Race simulation; nutrition practice |
+| 17 | Peak | Race Pace Set, Technique Drills | Sweet Spot Intervals, Easy Endurance | Race Pace Run, Easy + Strides | — | Reduced volume, maintain intensity |
+| 18 | Taper | CSS Intervals, Technique Drills | Easy Endurance, Tempo | Easy Aerobic, Easy + Strides | — | -30% volume |
+| 19 | Taper | Recovery Swim | Easy Endurance | Easy Aerobic | — | -50% volume |
+| 20 | Taper | Recovery Swim | Openers | Recovery Jog | — | Race week |
+
+---
+
+### Ironman — Standard (24 weeks)
+
+Phases: Base (10wk) → Build (8wk) → Peak (3wk) → Taper (3wk)
+Mesocycle: 3:1 (base), 2:1 (build)
+Weekly hours: 11-16hr
+
+| Wk | Phase | Swim | Bike | Run | Strength | Notes |
+|----|-------|------|------|-----|----------|-------|
+| 1 | Base 1 | Aerobic Endurance, Technique Drills | Easy Endurance | Easy Aerobic | General Strength A x2 | Build consistency |
+| 2 | Base 1 | Aerobic Endurance, Technique Drills | Easy Endurance | Easy Aerobic, Easy + Strides | General Strength A x2 | +10% volume |
+| 3 | Base 1 | Aerobic Endurance, Technique Drills | Easy Endurance, Tempo | Easy Aerobic, Easy + Strides, Long Run | General Strength A x2 | +10% volume |
+| 4 | Recovery | Technique Drills | Easy Endurance | Easy Aerobic | General Strength A x1 | -40% volume |
+| 5 | Base 2 | CSS Intervals, Technique Drills | Easy Endurance, Tempo | Easy Aerobic, Long Run | General Strength B x2 | Introduce threshold swim |
+| 6 | Base 2 | CSS Intervals, Aerobic Endurance | Easy Endurance, Tempo | Easy Aerobic, Easy + Strides, Long Run | General Strength B x2 | +10% volume |
+| 7 | Base 2 | CSS Intervals, Technique Drills | Easy Endurance, Tempo | Easy Aerobic, Long Run | General Strength B x2 | +10% volume; long ride to 3hr |
+| 8 | Recovery | Technique Drills | Easy Endurance | Easy Aerobic | General Strength B x1 | -40% volume |
+| 9 | Base 3 | CSS Intervals, Aerobic Endurance | Easy Endurance, Tempo | Easy Aerobic, Long Run | General Strength B x2 | Extended base |
+| 10 | Base 3 | CSS Intervals, Open Water Simulation | Easy Endurance, Tempo | Easy Aerobic, Easy + Strides, Long Run | General Strength B x2 | +10% volume |
+| 11 | Recovery | Technique Drills | Easy Endurance | Easy Aerobic | General Strength B x1 | -40% volume |
+| 12 | Build | CSS Intervals, Technique Drills | Sweet Spot Intervals, Easy Endurance | Threshold Cruise Intervals, Easy Aerobic, Long Run | Maintenance Strength x1 | Introduce bike intensity |
+| 13 | Build | CSS Intervals, Open Water Simulation | Threshold Intervals, Easy Endurance | VO2max Intervals, Easy Aerobic | Maintenance Strength x1 | Peak intensity |
+| 14 | Recovery | Technique Drills | Easy Endurance | Easy Aerobic | — | -40% volume |
+| 15 | Build | Race Pace Set, CSS Intervals | Sweet Spot Intervals, Race Pace Ride | Threshold Cruise Intervals, Long Run | — | Brick: Race Pace Ride→Easy Aerobic; long ride 4hr |
+| 16 | Build | Open Water Simulation, CSS Intervals | Race Pace Ride, Easy Endurance | Race Pace Run, Easy Aerobic | — | Brick: Race Pace Ride→Race Pace Run; nutrition practice |
+| 17 | Recovery | Technique Drills | Easy Endurance | Easy Aerobic | — | -40% volume |
+| 18 | Build | Race Pace Set, CSS Intervals | Threshold Intervals, Race Pace Ride | Race Pace Run, Long Run | — | Brick: Race Pace Ride→Race Pace Run; long ride 4-5hr |
+| 19 | Build | Open Water Simulation, Technique Drills | Race Pace Ride, Easy Endurance | Race Pace Run, Easy Aerobic | — | Final build brick; nutrition practice |
+| 20 | Recovery | Technique Drills | Easy Endurance | Easy Aerobic | — | -40% volume |
+| 21 | Peak | Race Pace Set, Open Water Simulation | Race Pace Ride, Easy Endurance | Race Pace Run, Easy Aerobic | — | Race simulation; nutrition practice |
+| 22 | Taper | CSS Intervals, Technique Drills | Easy Endurance, Tempo | Easy Aerobic, Easy + Strides | — | -30% volume |
+| 23 | Taper | Recovery Swim | Easy Endurance | Easy Aerobic | — | -50% volume |
+| 24 | Taper | Recovery Swim | Openers | Recovery Jog | — | Race week |
+
+---
+
+### Ironman — Long (28 weeks)
+
+Phases: Base (13wk) → Build (9wk) → Peak (3wk) → Taper (3wk)
+Mesocycle: 3:1 (base), 2:1 (build)
+Weekly hours: 12-18hr
+
+| Wk | Phase | Swim | Bike | Run | Strength | Notes |
+|----|-------|------|------|-----|----------|-------|
+| 1 | Base 1 | Aerobic Endurance, Technique Drills | Easy Endurance | Easy Aerobic | General Strength A x2 | Build consistency |
+| 2 | Base 1 | Aerobic Endurance, Technique Drills | Easy Endurance | Easy Aerobic, Easy + Strides | General Strength A x2 | +10% volume |
+| 3 | Base 1 | Aerobic Endurance, Technique Drills | Easy Endurance, Tempo | Easy Aerobic, Easy + Strides | General Strength A x2 | +10% volume |
+| 4 | Recovery | Technique Drills | Easy Endurance | Easy Aerobic | General Strength A x1 | -40% volume |
+| 5 | Base 2 | CSS Intervals, Technique Drills | Easy Endurance, Tempo | Easy Aerobic, Long Run | General Strength B x2 | Introduce threshold swim |
+| 6 | Base 2 | CSS Intervals, Aerobic Endurance | Easy Endurance, Tempo | Easy Aerobic, Easy + Strides, Long Run | General Strength B x2 | +10% volume |
+| 7 | Base 2 | CSS Intervals, Technique Drills | Easy Endurance, Tempo | Easy Aerobic, Long Run | General Strength B x2 | +10% volume |
+| 8 | Recovery | Technique Drills | Easy Endurance | Easy Aerobic | General Strength B x1 | -40% volume |
+| 9 | Base 3 | CSS Intervals, Aerobic Endurance | Easy Endurance, Tempo | Easy Aerobic, Long Run | General Strength B x2 | Extended base; long ride to 3hr |
+| 10 | Base 3 | CSS Intervals, Open Water Simulation | Easy Endurance, Tempo | Easy Aerobic, Easy + Strides, Long Run | General Strength B x2 | +10% volume |
+| 11 | Base 3 | CSS Intervals, Technique Drills | Easy Endurance, Tempo | Easy Aerobic, Long Run | General Strength B x2 | +10% volume |
+| 12 | Recovery | Technique Drills | Easy Endurance | Easy Aerobic | General Strength B x1 | -40% volume |
+| 13 | Base 4 | CSS Intervals, Aerobic Endurance | Easy Endurance, Tempo | Easy Aerobic, Easy + Strides, Long Run | General Strength B x1 | Final base block |
+| 14 | Recovery | Technique Drills | Easy Endurance | Easy Aerobic | — | -40% volume |
+| 15 | Build | CSS Intervals, Technique Drills | Sweet Spot Intervals, Easy Endurance | Threshold Cruise Intervals, Easy Aerobic, Long Run | Maintenance Strength x1 | Introduce bike intensity |
+| 16 | Build | CSS Intervals, Open Water Simulation | Threshold Intervals, Easy Endurance | VO2max Intervals, Easy Aerobic | Maintenance Strength x1 | Peak intensity |
+| 17 | Recovery | Technique Drills | Easy Endurance | Easy Aerobic | — | -40% volume |
+| 18 | Build | Race Pace Set, CSS Intervals | Sweet Spot Intervals, Race Pace Ride | Threshold Cruise Intervals, Long Run | — | Brick: Race Pace Ride→Easy Aerobic; long ride 4hr |
+| 19 | Build | Open Water Simulation, CSS Intervals | Race Pace Ride, Easy Endurance | Race Pace Run, Easy Aerobic | — | Brick: Race Pace Ride→Race Pace Run; nutrition practice |
+| 20 | Recovery | Technique Drills | Easy Endurance | Easy Aerobic | — | -40% volume |
+| 21 | Build | Race Pace Set, CSS Intervals | Threshold Intervals, Race Pace Ride | Race Pace Run, Long Run | — | Brick: Race Pace Ride→Race Pace Run; long ride 4-5hr |
+| 22 | Build | Open Water Simulation, Technique Drills | Race Pace Ride, Easy Endurance | Race Pace Run, Easy Aerobic | — | Final build brick; nutrition practice |
+| 23 | Recovery | Technique Drills | Easy Endurance | Easy Aerobic | — | -40% volume |
+| 24 | Peak | Race Pace Set, Open Water Simulation | Race Pace Ride, Easy Endurance | Race Pace Run, Easy Aerobic | — | Race simulation; nutrition practice |
+| 25 | Peak | Race Pace Set, Technique Drills | Sweet Spot Intervals, Easy Endurance | Race Pace Run, Easy + Strides | — | Reduced volume, maintain intensity |
+| 26 | Taper | CSS Intervals, Technique Drills | Easy Endurance, Tempo | Easy Aerobic, Easy + Strides | — | -30% volume |
+| 27 | Taper | Recovery Swim | Easy Endurance | Easy Aerobic | — | -50% volume |
+| 28 | Taper | Recovery Swim | Openers | Recovery Jog | — | Race week |
