@@ -139,30 +139,74 @@ entered, oauth_client_id, shared_event_id
 
 ---
 
-## Workout Description Format
+## Workout Description Syntax
 
-The `description` field accepts free text. intervals.icu also parses a structured step syntax from this field to populate `workout_doc` — use plain language if unsure of the exact syntax.
+The `description` field supports structured text that intervals.icu parses into workout steps. This is the recommended approach — use `description` text, not raw `workout_doc` JSON.
 
-**Effective description patterns:**
+### Step Format
 
+Each step starts with `- ` (dash + space):
 ```
-// Time-based with HR zone
-Warm-up 10 min easy (Z1)
-Main set: 3x10 min at threshold HR (Z4), 3 min recovery jog between
-Cool-down 10 min easy (Z1)
-
-// Distance-based swim set
-Warm-up: 400m easy (mix of strokes)
-Main: 8x100m on 1:50 (target 1:30/100m)
-Cool-down: 200m easy backstroke
-
-// Power-based cycling
-20 min warm-up, building to Z2
-3x8 min at 95-105% FTP (sweet spot), 4 min recovery at 55% FTP
-15 min cool-down
+- [optional text cue] [duration OR distance] [target] [optional cadence]
 ```
 
-**Note on `workout_doc`:** This is an opaque JSON object populated by intervals.icu's workout builder. If you have a `workout_doc` from a prior event or plan template (e.g., fetched via `get_event_by_id`), you may pass it through unmodified. Do not construct `workout_doc` JSON by hand — use `description` text instead and let the server parse it.
+### Duration
+`30s`, `10m`, `1h`, `1h30m`, `5'30"` (short form)
+
+### Distance
+`500mtr`, `2km`, `1mi`, `100y` — space between number and unit is allowed
+
+### Power Targets
+- FTP-relative: `75%`, `88-93%` (range)
+- Absolute: `220w`, `200-240w`
+- Zones: `Z2`, `Z3-Z4`
+
+### Heart Rate Targets
+- Max HR: `70% HR`, `75-80% HR`
+- LTHR: `95% LTHR`, `90-95% LTHR`
+- Zones: `Z2 HR`, `Z2-Z3 HR`
+
+### Pace Targets
+- Threshold-relative: `60% Pace`, `78-82% Pace`
+- Zones: `Z2 Pace`, `Z2-Z3 Pace`
+- Absolute: `5:00/km Pace`, `3:00/100m Pace`
+- Units: `/100m`, `/100y`, `/km`, `/mi`, `/500m`, `/400m`
+
+### Cadence
+Append after target: `- 10m 75% 90rpm` or `- 12m 85% 90-100rpm`
+
+### Ramps
+`- 10m ramp 50%-75%` — gradual change over step duration
+
+### Freeride
+`- 20m freeride` — no target (ERG mode off)
+
+### Repeats
+Header before step block — blank lines required before and after:
+```
+Main Set 5x
+- 2m 95%
+- 2m 55%
+```
+Nested repeats are NOT supported.
+
+### Section Headers
+Lines without `- ` prefix become section headers:
+```
+Warmup
+- 10m ramp 40-65%
+
+Main Set 4x
+- 8m 88-93%
+- 4m 55%
+
+Cooldown
+- 10m ramp 65-40%
+```
+
+**Source:** [R2Tom's Quick Guide](https://forum.intervals.icu/t/workout-builder-syntax-quick-guide/123701), [Workout Builder thread](https://forum.intervals.icu/t/workout-builder/1163)
+
+**Note on `workout_doc`:** Do not construct `workout_doc` JSON by hand. Use `description` text and let the server parse it. If cloning from an existing event, pass `workout_doc` through unmodified.
 
 ---
 
@@ -181,6 +225,28 @@ Pass `uid` in the payload and use `upsertOnUid=true` if the MCP tool exposes tha
 get_event_by_id(athlete_id, event_id)
 ```
 Use this to clone a prior workout's `workout_doc` into a new planned event.
+
+---
+
+## Batch Write Guidance (Training Blocks)
+
+When writing a multi-week training block to the calendar:
+
+**Idempotent writes:**
+- All events must include a deterministic `uid` (e.g., `block-{race-date}-w{week}-{day}-{discipline}`)
+- Use `upsertOnUid=true` on all calls — retries do not create duplicates
+
+**Batch strategy:**
+- Write in phase-sized batches (base → build → peak/taper)
+- Provide progress feedback after each phase: "Base phase written (weeks 1-5). Writing build phase..."
+- On partial failure: surface which events succeeded and which failed, offer retry
+
+**Calendar conflicts:**
+- Before writing, call `get_events` for the target date range
+- If conflicts found, offer: **work around** (slot around existing), **merge** (write alongside), or **clear and replace** (`delete_events_by_date_range` — requires second confirmation)
+
+**Race day event:**
+- If the race date does not already have a `RACE_A` event, create one with `category: "RACE_A"`, the race name, and distance
 
 ---
 
