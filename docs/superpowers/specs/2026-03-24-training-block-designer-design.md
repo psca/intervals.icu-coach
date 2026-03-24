@@ -1,7 +1,7 @@
 # Training Block Designer — Design Spec
 
 **Date:** 2026-03-24
-**Status:** Draft
+**Status:** Ready for Implementation
 **Scope:** New feature for the triathlon-training skill
 
 ---
@@ -118,7 +118,7 @@ Each question has a sensible default. The LLM should consolidate related questio
 5. **Strength + health** — "Want strength sessions included? Anything injury/health-wise I should know?" Strength events use `type: "WeightTraining"`. If yes: 2x/week base → 1x/week build → drop in peak.
 6. **Confirmation** — summarize all inputs, confirm before assembly
 
-### Step 11: Template Selection + Assembly
+### Assembly
 
 Based on intake answers:
 1. Select the closest matching template (distance + tier)
@@ -131,7 +131,7 @@ Based on intake answers:
 
 **For plans longer than 12 weeks:** assemble and present one phase at a time to manage context window load. Preview base phase first, then build, then peak/taper.
 
-### Step 12: Preview
+### Preview
 
 Present a scannable overview:
 
@@ -159,7 +159,7 @@ Base (wk 1-5) → Build (wk 6-10) → Peak (wk 11-12) → Taper (wk 13-14)
 Total planned hours: ~124 | Swim: 22 | Bike: 52 | Run: 42 | Strength: 8
 ```
 
-### Step 13: Free Customization
+### Free Customization
 
 The athlete can modify anything in conversation:
 - Swap days ("move long ride to Sunday")
@@ -168,7 +168,7 @@ The athlete can modify anything in conversation:
 - Remove sessions
 - No restrictions — full creative control
 
-### Step 14: Approval + Batch Write
+### Approval + Batch Write
 
 **Hard gate: no writes without explicit athlete approval.**
 
@@ -191,7 +191,7 @@ On approval, batch-write all events to intervals.icu via `add_or_update_event`:
   - **Merge** — write new events alongside existing ones (no deletions)
   - **Clear and replace** — call `delete_events_by_date_range` for the target range, then write. Requires explicit second confirmation before any deletion.
 
-### Step 15: Handoff to Existing Coaching
+### Handoff to Existing Coaching
 
 The block lives on the intervals.icu calendar. The existing coaching commands (fitness status, weekly summary, race readiness) naturally pick up planned vs completed workouts. No special block awareness needed. Do not describe this as "fire and forget" to the athlete — instead explain that the workouts are on their calendar and the coaching commands will help them track progress.
 
@@ -201,7 +201,7 @@ The block lives on the intervals.icu calendar. The existing coaching commands (f
 
 | Guardrail | Rule |
 |-----------|------|
-| Minimum weeks | Sprint 6wk, Olympic 10wk, 70.3 14wk, Ironman 18wk, HM 8wk, Marathon 12wk — warn below these |
+| Minimum weeks | Hard floor (refuse): Sprint 6wk, Olympic 8wk, 70.3 12wk, Ironman 16wk, HM 6wk, Marathon 10wk. Warn zone (plan will be compressed): Sprint 6-8wk, Olympic 8-12wk, 70.3 12-16wk, Ironman 16-20wk, HM 6-10wk, Marathon 10-12wk |
 | Volume ramp | If requested hours > current hours × 1.3, add explicit ramp-up weeks and warn |
 | Beginner + polarized | Silently default to standard periodization — beginners lack pacing discipline |
 | Calendar conflicts | If existing events in target date range, surface: "You have X events. Clear, work around, or merge?" |
@@ -296,7 +296,7 @@ Workout targets use percentage-based syntax (e.g., `88-93%` FTP), which interval
 - **Bike:** FTP from most recent ride with power data, or intervals.icu athlete settings
 - **Run:** threshold pace from most recent tempo/interval run, or ask athlete
 - **Swim:** CSS from most recent CSS test or interval set, or ask athlete
-- **Fallback:** if zone data is unavailable for a discipline, use HR zones (`Z2 HR`) or RPE-based text cues instead of pace/power targets
+- **Fallback chain:** power/pace zones → HR zones (`Z2 HR`) → RPE-based text cues. If no zone data exists for any discipline (e.g., new athlete), ask the athlete directly for recent test results. If unavailable, generate RPE-only plans with a note that workouts can be updated once zones are established.
 
 ---
 
