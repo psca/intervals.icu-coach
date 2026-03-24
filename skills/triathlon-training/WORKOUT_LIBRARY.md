@@ -404,3 +404,66 @@ Hill Repeats 8x
 
 Cooldown
 - 10m 60% Pace
+
+---
+
+## Strength
+
+Strength workouts use plain-text descriptions (not intervals.icu structured syntax — intervals.icu doesn't parse strength sets). Set `type: "WeightTraining"` in the event payload.
+
+### General Strength A
+- **When:** Base phase
+- **Duration range:** 45-60min
+- **Intensity:** Moderate load, compound movements
+
+Full-body compound session. 3 sets x 10-12 reps each:
+- Back squat or goblet squat
+- Romanian deadlift
+- Walking lunge
+- Overhead press
+- Bent-over row
+- Plank hold (3 x 45s)
+
+Rest 60-90s between sets.
+
+---
+
+### General Strength B
+- **When:** Base / Build phase
+- **Duration range:** 45-60min
+- **Intensity:** Moderate load, single-leg focus
+
+Single-leg and core emphasis. 3 sets x 8-10 reps each:
+- Bulgarian split squat
+- Single-leg deadlift
+- Step-ups (box height: knee)
+- Single-arm dumbbell press
+- Pallof press (3 x 10 each side)
+- Side plank (3 x 30s each side)
+
+Rest 60-90s between sets.
+
+---
+
+### Maintenance Strength
+- **When:** Build phase
+- **Duration range:** 30-40min
+- **Intensity:** Reduced volume — maintain, don't build
+
+Abbreviated session. 2 sets only of key movements:
+- Back squat (2 x 8)
+- Romanian deadlift (2 x 8)
+- Bulgarian split squat (2 x 8 each)
+- Plank hold (2 x 45s)
+
+Rest 60s between sets. Goal is to preserve neuromuscular adaptations without adding fatigue.
+
+---
+
+## Brick Workouts
+
+Brick sessions are NOT a single workout archetype. Per the no-aggregation rule, a brick is two separate events on the same day:
+- A **Bike** event (e.g., Race Pace Ride, 60-90min)
+- A **Run** event (e.g., Easy Aerobic or Race Pace Run, 15-30min) scheduled immediately after
+
+When templates in BLOCK_TEMPLATES.md reference "Brick: Bike→Run", the implementer should create two events on that day using the named bike and run archetypes. Add a text cue in the run event description: "Off-the-bike run — start easy, settle into pace."
