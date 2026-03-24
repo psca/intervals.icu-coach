@@ -162,6 +162,20 @@ Append `## Strength` section with these archetypes. Strength workouts use plain-
 2. **General Strength B** — Base / Build. 45-60min. Single-leg focus (Bulgarian split squat, single-leg deadlift, step-ups) + core. 3 sets x 8-10 reps.
 3. **Maintenance Strength** — Build. 30-40min. Reduced volume (2 sets) of key movements. Maintain, don't build.
 
+Also add a **Brick Workouts** note at the end of the file:
+
+```markdown
+---
+
+## Brick Workouts
+
+Brick sessions are NOT a single workout archetype. Per the no-aggregation rule, a brick is two separate events on the same day:
+- A **Bike** event (e.g., Race Pace Ride, 60-90min)
+- A **Run** event (e.g., Easy Aerobic or Race Pace Run, 15-30min) scheduled immediately after
+
+When templates in BLOCK_TEMPLATES.md reference "Brick: Bike→Run", the implementer should create two events on that day using the named bike and run archetypes. Add a text cue in the run event description: "Off-the-bike run — start easy, settle into pace."
+```
+
 - [ ] **Step 2: Commit**
 
 ```bash
@@ -458,13 +472,22 @@ git commit -m "feat: add intervals.icu workout syntax reference and batch write 
 
 - [ ] **Step 1: Add trigger row to "What I Can Help With" table**
 
-Add this row to the table in SKILL.md:
+Append this row as the last entry in the trigger table in SKILL.md:
 
 ```markdown
 | "build a training plan", "create a block", "plan my season", "build me a plan for [race]", "training block" | Build Training Block |
 ```
 
-- [ ] **Step 2: Commit**
+- [ ] **Step 2: Add `get_events` and `delete_events_by_date_range` to MCP Tool Map**
+
+The MCP Tool Map table in SKILL.md needs these tools listed (they're used by the block designer for calendar conflict detection and the "clear and replace" option):
+
+```markdown
+| Calendar conflict check | `get_events` | Fetch events in target date range before batch write |
+| Clear calendar range | `delete_events_by_date_range` | ⚠️ Destructive — only for "clear and replace" conflict resolution, requires double confirmation |
+```
+
+- [ ] **Step 3: Commit**
 
 ```bash
 git add skills/triathlon-training/SKILL.md
@@ -511,7 +534,7 @@ Add to the help text list (after the "Schedule a workout" bullet):
 
 - [ ] **Step 4: Add "Build Training Block" section**
 
-Append a new section at the end of COACH.md (before the final `---`), structured like the existing command sections:
+Append a new section at the end of COACH.md (after the "Schedule a Workout" section, at the very end of the file), structured like the existing command sections:
 
 ```markdown
 ## Build Training Block
