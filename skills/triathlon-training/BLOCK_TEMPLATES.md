@@ -388,3 +388,177 @@ Weekly hours: 12-18hr
 | 26 | Taper | CSS Intervals, Technique Drills | Easy Endurance, Tempo | Easy Aerobic, Easy + Strides | — | -30% volume |
 | 27 | Taper | Recovery Swim | Easy Endurance | Easy Aerobic | — | -50% volume |
 | 28 | Taper | Recovery Swim | Openers | Recovery Jog | — | Race week |
+
+---
+
+## Half Marathon
+
+Run-only templates. No swim/bike columns.
+
+### Half Marathon — Short (10 weeks)
+
+Phases: Base (3wk) → Build (4wk) → Peak (1wk) → Taper (2wk)
+Mesocycle: 2:1
+Weekly runs: 4-5
+Weekly hours: 4-6hr
+
+| Wk | Phase | Run Sessions | Strength | Notes |
+|----|-------|-------------|----------|-------|
+| 1 | Base | Easy Aerobic x3, Easy + Strides | General Strength A x2 | Build consistency |
+| 2 | Base | Easy Aerobic x3, Easy + Strides, Long Run | General Strength A x2 | +10% volume |
+| 3 | Recovery | Easy Aerobic x2, Recovery Jog | General Strength A x1 | -40% volume |
+| 4 | Build | Threshold Cruise Intervals, Easy Aerobic x2, Long Run | Maintenance Strength x1 | Introduce intensity |
+| 5 | Build | VO2max Intervals, Easy Aerobic x2, Long Run | Maintenance Strength x1 | Peak intensity |
+| 6 | Recovery | Easy Aerobic x2, Recovery Jog | — | -40% volume |
+| 7 | Build | Threshold Cruise Intervals, Easy Aerobic x2, Long Run | — | Race-specific |
+| 8 | Build | Race Pace Run, Easy Aerobic x2, Long Run | — | Race-pace work |
+| 9 | Peak | Race Pace Run, Easy Aerobic, Easy + Strides | — | Sharpening |
+| 10 | Taper | Easy Aerobic, Easy + Strides, Recovery Jog | — | Race week — 10-14 day taper |
+
+---
+
+### Half Marathon — Standard (12 weeks)
+
+Phases: Base (4wk) → Build (5wk) → Peak (1wk) → Taper (2wk)
+Mesocycle: 2:1
+Weekly runs: 5
+Weekly hours: 5-7hr
+
+| Wk | Phase | Run Sessions | Strength | Notes |
+|----|-------|-------------|----------|-------|
+| 1 | Base | Easy Aerobic x3, Easy + Strides, Long Run | General Strength A x2 | Build consistency |
+| 2 | Base | Easy Aerobic x3, Easy + Strides, Long Run | General Strength A x2 | +10% volume |
+| 3 | Recovery | Easy Aerobic x2, Recovery Jog | General Strength A x1 | -40% volume |
+| 4 | Base | Easy Aerobic x2, Easy + Strides, Hill Repeats, Long Run | General Strength B x2 | Introduce hills |
+| 5 | Build | Threshold Cruise Intervals, Easy Aerobic x2, Easy + Strides, Long Run | Maintenance Strength x1 | Introduce threshold |
+| 6 | Build | VO2max Intervals, Easy Aerobic x2, Easy + Strides, Long Run | Maintenance Strength x1 | Peak intensity |
+| 7 | Recovery | Easy Aerobic x2, Recovery Jog | — | -40% volume |
+| 8 | Build | Threshold Cruise Intervals, Easy Aerobic x2, Long Run | — | Race-specific |
+| 9 | Build | Race Pace Run, Easy Aerobic x2, Long Run | — | Race-pace practice |
+| 10 | Build | VO2max Intervals, Easy Aerobic x2, Long Run | — | Final quality |
+| 11 | Peak | Race Pace Run, Easy Aerobic, Easy + Strides | — | Sharpening |
+| 12 | Taper | Easy Aerobic, Easy + Strides, Recovery Jog | — | Race week |
+
+---
+
+### Half Marathon — Long (18 weeks)
+
+Phases: Base (8wk) → Build (6wk) → Peak (2wk) → Taper (2wk)
+Mesocycle: 3:1 (base), 2:1 (build)
+Weekly runs: 5-6
+Weekly hours: 6-9hr
+
+| Wk | Phase | Run Sessions | Strength | Notes |
+|----|-------|-------------|----------|-------|
+| 1 | Base 1 | Easy Aerobic x3, Easy + Strides | General Strength A x2 | Build consistency |
+| 2 | Base 1 | Easy Aerobic x3, Easy + Strides, Long Run | General Strength A x2 | +10% volume |
+| 3 | Base 1 | Easy Aerobic x3, Easy + Strides, Long Run | General Strength A x2 | +10% volume |
+| 4 | Recovery | Easy Aerobic x2, Recovery Jog | General Strength A x1 | -40% volume |
+| 5 | Base 2 | Easy Aerobic x2, Easy + Strides, Hill Repeats, Long Run | General Strength B x2 | Introduce hills |
+| 6 | Base 2 | Easy Aerobic x2, Easy + Strides, Hill Repeats, Long Run | General Strength B x2 | +10% volume |
+| 7 | Base 2 | Easy Aerobic x3, Easy + Strides, Long Run | General Strength B x2 | +10% volume |
+| 8 | Recovery | Easy Aerobic x2, Recovery Jog | General Strength B x1 | -40% volume |
+| 9 | Build | Threshold Cruise Intervals, Easy Aerobic x2, Easy + Strides, Long Run | Maintenance Strength x1 | Introduce threshold |
+| 10 | Build | VO2max Intervals, Easy Aerobic x2, Easy + Strides, Long Run | Maintenance Strength x1 | Peak intensity |
+| 11 | Recovery | Easy Aerobic x2, Recovery Jog | — | -40% volume |
+| 12 | Build | Threshold Cruise Intervals, Easy Aerobic x2, Long Run | — | Race-specific |
+| 13 | Build | Race Pace Run, Easy Aerobic x2, Long Run | — | Race-pace practice |
+| 14 | Build | VO2max Intervals, Easy Aerobic x2, Long Run | — | Final quality |
+| 15 | Recovery | Easy Aerobic x2, Recovery Jog | — | -40% volume |
+| 16 | Peak | Race Pace Run, Easy Aerobic, Easy + Strides | — | Sharpening |
+| 17 | Taper | Easy Aerobic x2, Easy + Strides | — | -30% volume |
+| 18 | Taper | Easy Aerobic, Easy + Strides, Recovery Jog | — | Race week |
+
+---
+
+## Marathon
+
+Run-only templates. Hansons-influenced cumulative fatigue approach — no single run > ~2.5hr.
+
+### Marathon — Short (12 weeks)
+
+Phases: Base (3wk) → Build (5wk) → Peak (1wk) → Taper (3wk)
+Mesocycle: 2:1
+Weekly runs: 5-6
+Weekly hours: 6-9hr
+
+| Wk | Phase | Run Sessions | Strength | Notes |
+|----|-------|-------------|----------|-------|
+| 1 | Base | Easy Aerobic x3, Easy + Strides, Long Run | General Strength A x2 | Build consistency |
+| 2 | Base | Easy Aerobic x3, Easy + Strides, Long Run | General Strength A x2 | +10% volume |
+| 3 | Recovery | Easy Aerobic x2, Recovery Jog | General Strength A x1 | -40% volume |
+| 4 | Build | Threshold Cruise Intervals, Easy Aerobic x2, Easy + Strides, Long Run | Maintenance Strength x1 | Introduce threshold |
+| 5 | Build | VO2max Intervals, Easy Aerobic x2, Long Run | Maintenance Strength x1 | Peak intensity |
+| 6 | Recovery | Easy Aerobic x2, Recovery Jog | — | -40% volume |
+| 7 | Build | Threshold Cruise Intervals, Easy Aerobic x2, Long Run | — | Race-specific |
+| 8 | Build | Race Pace Run, Easy Aerobic x2, Long Run | — | Marathon pace practice; long run to 2.5hr |
+| 9 | Build | Race Pace Run, Easy Aerobic x2, Long Run | — | Peak volume week |
+| 10 | Taper | Threshold Cruise Intervals, Easy Aerobic x2, Long Run | — | -20% volume; long run 90min |
+| 11 | Taper | Easy Aerobic x2, Easy + Strides | — | -40% volume |
+| 12 | Taper | Easy Aerobic, Easy + Strides, Recovery Jog | — | Race week |
+
+---
+
+### Marathon — Standard (18 weeks)
+
+Phases: Base (6wk) → Build (7wk) → Peak (2wk) → Taper (3wk)
+Mesocycle: 3:1 (base), 2:1 (build)
+Weekly runs: 5-6
+Weekly hours: 7-11hr
+
+| Wk | Phase | Run Sessions | Strength | Notes |
+|----|-------|-------------|----------|-------|
+| 1 | Base 1 | Easy Aerobic x3, Easy + Strides, Long Run | General Strength A x2 | Build consistency |
+| 2 | Base 1 | Easy Aerobic x3, Easy + Strides, Long Run | General Strength A x2 | +10% volume |
+| 3 | Base 1 | Easy Aerobic x3, Easy + Strides, Long Run | General Strength A x2 | +10% volume; long run to 90min |
+| 4 | Recovery | Easy Aerobic x2, Recovery Jog | General Strength A x1 | -40% volume |
+| 5 | Base 2 | Easy Aerobic x2, Easy + Strides, Hill Repeats, Long Run | General Strength B x2 | Introduce hills |
+| 6 | Base 2 | Easy Aerobic x2, Easy + Strides, Hill Repeats, Long Run | General Strength B x2 | +10% volume; long run to 100min |
+| 7 | Recovery | Easy Aerobic x2, Recovery Jog | General Strength B x1 | -40% volume |
+| 8 | Build | Threshold Cruise Intervals, Easy Aerobic x2, Easy + Strides, Long Run | Maintenance Strength x1 | Introduce threshold |
+| 9 | Build | VO2max Intervals, Easy Aerobic x2, Long Run | Maintenance Strength x1 | Peak intensity |
+| 10 | Recovery | Easy Aerobic x2, Recovery Jog | — | -40% volume |
+| 11 | Build | Threshold Cruise Intervals, Easy Aerobic x2, Long Run | — | Race-specific; long run to 2hr |
+| 12 | Build | Race Pace Run, Easy Aerobic x2, Long Run | — | Marathon pace practice |
+| 13 | Build | Race Pace Run, Easy Aerobic x2, Long Run | — | Long run to 2.5hr; peak volume |
+| 14 | Build | VO2max Intervals, Easy Aerobic x2, Long Run | — | Final quality session |
+| 15 | Peak | Race Pace Run, Easy Aerobic, Easy + Strides, Long Run | — | Sharpening; long run 100min |
+| 16 | Taper | Threshold Cruise Intervals, Easy Aerobic x2, Long Run | — | -20% volume; long run 90min |
+| 17 | Taper | Easy Aerobic x2, Easy + Strides | — | -40% volume |
+| 18 | Taper | Easy Aerobic, Easy + Strides, Recovery Jog | — | Race week |
+
+---
+
+### Marathon — Long (24 weeks)
+
+Phases: Base (10wk) → Build (8wk) → Peak (2wk) → Taper (3wk + race day)
+Mesocycle: 3:1 (base), 2:1 (build)
+Weekly runs: 5-6
+Weekly hours: 8-13hr
+
+| Wk | Phase | Run Sessions | Strength | Notes |
+|----|-------|-------------|----------|-------|
+| 1 | Base 1 | Easy Aerobic x3, Easy + Strides | General Strength A x2 | Build consistency |
+| 2 | Base 1 | Easy Aerobic x3, Easy + Strides, Long Run | General Strength A x2 | +10% volume |
+| 3 | Base 1 | Easy Aerobic x3, Easy + Strides, Long Run | General Strength A x2 | +10% volume |
+| 4 | Recovery | Easy Aerobic x2, Recovery Jog | General Strength A x1 | -40% volume |
+| 5 | Base 2 | Easy Aerobic x2, Easy + Strides, Hill Repeats, Long Run | General Strength B x2 | Introduce hills |
+| 6 | Base 2 | Easy Aerobic x2, Easy + Strides, Hill Repeats, Long Run | General Strength B x2 | +10% volume |
+| 7 | Base 2 | Easy Aerobic x3, Easy + Strides, Long Run | General Strength B x2 | +10% volume; long run to 90min |
+| 8 | Recovery | Easy Aerobic x2, Recovery Jog | General Strength B x1 | -40% volume |
+| 9 | Base 3 | Easy Aerobic x2, Easy + Strides, Hill Repeats, Long Run | General Strength B x2 | Extended base |
+| 10 | Base 3 | Easy Aerobic x3, Easy + Strides, Long Run | General Strength B x2 | +10% volume; long run to 100min |
+| 11 | Recovery | Easy Aerobic x2, Recovery Jog | General Strength B x1 | -40% volume |
+| 12 | Build | Threshold Cruise Intervals, Easy Aerobic x2, Easy + Strides, Long Run | Maintenance Strength x1 | Introduce threshold |
+| 13 | Build | VO2max Intervals, Easy Aerobic x2, Long Run | Maintenance Strength x1 | Peak intensity |
+| 14 | Recovery | Easy Aerobic x2, Recovery Jog | — | -40% volume |
+| 15 | Build | Threshold Cruise Intervals, Easy Aerobic x2, Long Run | — | Race-specific; long run to 2hr |
+| 16 | Build | Race Pace Run, Easy Aerobic x2, Long Run | — | Marathon pace practice |
+| 17 | Recovery | Easy Aerobic x2, Recovery Jog | — | -40% volume |
+| 18 | Build | Race Pace Run, Easy Aerobic x2, Long Run | — | Long run to 2.5hr; peak volume |
+| 19 | Build | VO2max Intervals, Easy Aerobic x2, Long Run | — | Final quality session |
+| 20 | Build | Race Pace Run, Easy Aerobic x2, Long Run | — | Final race-pace long run |
+| 21 | Recovery | Easy Aerobic x2, Recovery Jog | — | -40% volume |
+| 22 | Peak | Race Pace Run, Easy Aerobic, Easy + Strides, Long Run | — | Sharpening; long run 100min |
+| 23 | Taper | Threshold Cruise Intervals, Easy Aerobic x2 | — | -30% volume |
+| 24 | Taper | Easy Aerobic, Easy + Strides, Recovery Jog | — | Race week |
