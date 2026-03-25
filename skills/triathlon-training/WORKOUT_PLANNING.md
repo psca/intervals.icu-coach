@@ -156,10 +156,13 @@ Each step starts with `- ` (dash + space):
 ### Distance
 `500mtr`, `2km`, `1mi`, `100y` — space between number and unit is allowed
 
+⚠️ **`m` = minutes, `mtr` = metres.** `10m` is 10 minutes. `10mtr` is 10 metres. Never use `m` for distance.
+
 ### Power Targets
 - FTP-relative: `75%`, `88-93%` (range)
 - Absolute: `220w`, `200-240w`
 - Zones: `Z2`, `Z3-Z4`
+- MMP-relative: `60% MMP 5m`
 
 ### Heart Rate Targets
 - Max HR: `70% HR`, `75-80% HR`
@@ -203,6 +206,13 @@ Main Set 4x
 Cooldown
 - 10m ramp 65-40%
 ```
+
+### Single Target Type Per Workout
+
+**Use one target metric throughout a workout — all LTHR, all pace, or all power.** Mixing target types (e.g. some steps pace, some LTHR) is supported by intervals.icu but requires the athlete to manually toggle the zone chart display between metrics. Sticking to one type produces accurate zone times, correct training load, and a clean chart without any manual intervention.
+
+- Running workouts: prefer `% LTHR` for load accuracy; use absolute pace when the athlete explicitly needs pacing targets
+- If pacing context is needed alongside HR targets, add it as a text cue on the step: `- Race effort 3m 92% LTHR`
 
 **Source:** [R2Tom's Quick Guide](https://forum.intervals.icu/t/workout-builder-syntax-quick-guide/123701), [Workout Builder thread](https://forum.intervals.icu/t/workout-builder/1163)
 
