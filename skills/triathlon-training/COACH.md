@@ -309,7 +309,28 @@ With the single biggest gap called out in one sentence below the chip.
 
 ### Tool sequence
 1. Build the event payload following WORKOUT_PLANNING.md pre-flight checklist
-2. Display the proposed event as a markdown summary (do NOT call the tool yet):
+2. **CRITICAL — description format:** The `description` field must be plain text using intervals.icu workout syntax (see WORKOUT_PLANNING.md § Workout Description Syntax). **Never put JSON in the description field.** Example:
+
+   **Correct** — text-based workout syntax:
+   ```
+   {
+     "start_date_local": "2026-03-27",
+     "category": "WORKOUT",
+     "type": "Run",
+     "name": "Long Run — 10km Z2",
+     "target": "HR",
+     "distance": 10000,
+     "description": "10km easy long run at Z2 heart rate. Run by HR, not pace.\n\nWarmup\n- 5m ramp 60-70% HR\n\nMain\n- 10km Z2 HR\n\nCooldown\n- 5m 60% HR"
+   }
+   ```
+
+   **Wrong** — raw JSON in description (renders as garbage on the calendar):
+   ```
+   {
+     "description": "{\"description\":\"10km easy...\",\"steps\":[{\"label\":\"Warmup\",\"duration\":300}]}"
+   }
+   ```
+3. Display the proposed event as a markdown summary (do NOT call the tool yet):
    ```
    Proposed workout:
    - Date: [date]
@@ -317,10 +338,11 @@ With the single biggest gap called out in one sentence below the chip.
    - Name: [name]
    - Duration: [if specified]
    - Target: [if specified]
+   - Steps: [human-readable summary of workout structure]
    ```
-3. Ask: "Schedule this?" — wait for explicit yes before calling `add_or_update_event`
-4. On confirmation: call `add_or_update_event` with the payload
-5. Echo the created event fields to confirm success
+4. Ask: "Schedule this?" — wait for explicit yes before calling `add_or_update_event`
+5. On confirmation: call `add_or_update_event` with the payload
+6. Echo the created event fields to confirm success
 
 ---
 
@@ -382,6 +404,7 @@ The athlete can modify anything before approval:
 **Hard gate: no writes without explicit athlete approval.**
 
 On approval, follow WORKOUT_PLANNING.md batch write guidance:
+- **Every event's `description` must use plain-text workout syntax, never JSON** (see § Workout Description Syntax in WORKOUT_PLANNING.md)
 - Deterministic `uid` per event for idempotent writes
 - Phase-sized batches with progress feedback
 - Calendar conflict resolution (work around / merge / clear and replace)

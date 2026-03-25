@@ -206,7 +206,7 @@ Cooldown
 
 **Source:** [R2Tom's Quick Guide](https://forum.intervals.icu/t/workout-builder-syntax-quick-guide/123701), [Workout Builder thread](https://forum.intervals.icu/t/workout-builder/1163)
 
-**Note on `workout_doc`:** Do not construct `workout_doc` JSON by hand. Use `description` text and let the server parse it. If cloning from an existing event, pass `workout_doc` through unmodified.
+**CRITICAL — `description` must be plain text, never JSON.** The `description` field is rendered directly on the calendar. If you put JSON in it, the athlete sees raw `{"steps":[...]}` garbage. Always use the text-based workout syntax above. Do not construct `workout_doc` JSON by hand — use `description` text and let the server parse it into structured steps. If cloning from an existing event, pass `workout_doc` through unmodified.
 
 ---
 
