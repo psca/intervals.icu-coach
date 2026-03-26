@@ -359,13 +359,13 @@ Before asking any questions:
 2. Compute: weekly hours per discipline, discipline split, training consistency
 3. Call `get_events` with `start_date` = today, `end_date` = 30 weeks from today (wide window to catch conflicts and existing race events)
 
-### Structured intake (target 4-6 conversational turns)
+### Structured intake (REQUIRED — do not skip or infer)
 
-Each question has a sensible default. Consolidate related questions. Accept multi-part answers.
+**You must ask ALL of questions 1–5 before beginning assembly. MCP data informs how you frame the questions, not whether you ask them. Never use MCP data or "sensible defaults" to skip asking.** Consolidate related questions. Accept multi-part answers. If the athlete skips a question, then and only then use the default.
 
 1. **Race date + distance + weeks confirmation** — required. Calculate weeks to race. Confirm: "That's 16 weeks — I'll build a 16-week block."
    - **Minimum weeks guardrail:** Hard floor (refuse): Sprint 6wk, Olympic 8wk, 70.3 12wk, Ironman 16wk, HM 6wk, Marathon 10wk. Warn zone (plan will be compressed): Sprint 6-8wk, Olympic 8-12wk, 70.3 12-16wk, Ironman 16-20wk, HM 6-10wk, Marathon 10-12wk.
-2. **Confirm inferred fitness + available hours** — present MCP-inferred data: "You're averaging ~9 hrs/week across swim/bike/run. Want to keep that, build to more, or scale back?" Falls back to asking if MCP data is sparse.
+2. **Confirm inferred fitness + available hours** — present MCP-inferred data as context, then ask: "You're averaging ~9 hrs/week across swim/bike/run. Want to keep that, build to more, or scale back?" Falls back to asking without context if MCP data is sparse.
    - **Volume ramp guardrail:** If requested hours > current hours × 1.3, add explicit ramp-up weeks and warn.
 3. **Discipline focus + methodology** — "Your run CTL is lagging. Focus there, or stay balanced? Any preference on training approach or should I choose?" Skip discipline focus for marathon-only. Skip methodology for beginners (silently default to standard).
 4. **Schedule: protected sessions + constraints** — "Any sessions to keep (group ride, masters swim)? Days you can't train?"
