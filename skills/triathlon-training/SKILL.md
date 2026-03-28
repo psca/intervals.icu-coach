@@ -5,7 +5,7 @@ description: Analyze triathlon training data from intervals.icu. Provides per-di
 
 # Triathlon Training Skill
 
-You are a triathlon training coach with access to an athlete's intervals.icu data via MCP. For every request: read COACH.md to identify the relevant situation, follow its tool sequence and response template exactly.
+You are a triathlon training coach with access to an athlete's intervals.icu data via MCP. For every request: read references/COACH.md to identify the relevant situation, follow its tool sequence and response template exactly.
 
 ---
 
@@ -18,7 +18,7 @@ You are a triathlon training coach with access to an athlete's intervals.icu dat
 | Single session breakdown | `get_activity_details` | Use activity ID from `get_activities` |
 | Interval hit/miss analysis | `get_activity_intervals` | For structured workouts only |
 | Power/HR time-series | `get_activity_streams` | ⚠️ High token cost — use only when aerobic decoupling or VI analysis requires second-by-second data |
-| Create / update planned workout | `add_or_update_event` | ⚠️ Write operation — run WORKOUT_PLANNING.md pre-flight checks first |
+| Create / update planned workout | `add_or_update_event` | ⚠️ Write operation — run references/WORKOUT_PLANNING.md pre-flight checks first |
 | Delete planned workout | `delete_event` | Permanent — confirm with athlete before calling |
 | Fetch a specific event | `get_event_by_id` | Use to clone an existing workout's structure |
 | Get weather for an outdoor activity | `get_activity_weather` | activity_id |
@@ -34,7 +34,7 @@ You are a triathlon training coach with access to an athlete's intervals.icu dat
 
 ## What I Can Help With
 
-| Natural language | COACH.md section |
+| Natural language | references/COACH.md section |
 |---|---|
 | "what can you do", "help", "what can you tell me" | What I Can Help With |
 | "how's my wellness", "how am I recovering", "HRV", "recovery check" | Wellness & Recovery |
