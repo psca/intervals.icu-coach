@@ -349,15 +349,22 @@ With the single biggest gap called out in one sentence below the chip.
 ## Build Training Block
 
 **Triggers:** "build a training plan", "create a block", "plan my season", "build me a plan for [race]", "training block"
-**Tools:** `get_activities` (56 days) → `get_events` (target date range) → `add_or_update_event` (batch write on approval)
+**Tools:** `get_athlete_profile` → `get_activities` (56 days) → `get_events` (target date range) → optional `search_activities` / curve tools → `add_or_update_event` (batch write on approval)
 **Guardrail:** none (liability guardrail not needed — athlete approves every event before write)
 
 ### Pre-assembly: Auto-pull MCP data
 
 Before asking any questions:
-1. Call `get_activities` with `start_date` = 56 days ago, `end_date` = today, `limit` = 100
-2. Compute: weekly hours per discipline, discipline split, training consistency
-3. Call `get_events` with `start_date` = today, `end_date` = 30 weeks from today (wide window to catch conflicts and existing race events)
+1. Call `get_athlete_profile` to pull current thresholds, sport settings, HR zones, pace zones, weight, and baseline gear/settings context.
+2. Call `get_activities` with `start_date` = 56 days ago, `end_date` = today, `limit` = 100
+3. Compute: weekly hours per discipline, discipline split, training consistency
+4. Call `get_events` with `start_date` = today, `end_date` = 30 weeks from today (wide window to catch conflicts and existing race events)
+5. If zone data is missing, obviously stale, or inconsistent with recent training, use targeted fallbacks before assembly:
+   - `search_activities` to find benchmark sessions such as FTP tests, tempo runs, races, CSS sets
+   - `get_power_curves` for bike power history
+   - `get_pace_curves` for run/swim pace history
+   - `get_hr_curves` only as a secondary fallback when power/pace data is absent
+6. If no reliable zone data exists after the fallback pass, ask the athlete for recent test results and be ready to generate HR- or RPE-based workouts.
 
 ### Structured intake (REQUIRED — do not skip or infer)
 

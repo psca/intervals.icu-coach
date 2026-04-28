@@ -105,7 +105,7 @@ Before asking any questions, the skill pulls:
 |------|----------|--------|
 | Last 8 weeks of activities | `get_activities` | Current weekly hours, discipline split, consistency, experience proxy |
 | Upcoming events | `get_events` | Existing calendar conflicts, possibly race date already entered |
-| Athlete zones | from activity data | FTP, threshold pace, HR zones for workout parameterization |
+| Athlete zones | `get_athlete_profile` first, then targeted search/curve tools if needed | FTP, threshold pace, HR zones, pace zones for workout parameterization |
 
 ### Step 1-6: Structured Intake
 

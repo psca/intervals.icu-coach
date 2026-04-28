@@ -15,10 +15,12 @@ Canonical workout archetypes for swim, bike, run, and strength. Each entry inclu
 
 Before writing workouts, verify zone data is available per discipline:
 
-- **Bike:** FTP from most recent ride with power data, or intervals.icu athlete settings
-- **Run:** threshold pace from most recent tempo/interval run, or ask athlete
-- **Swim:** CSS from most recent CSS test or interval set, or ask athlete
-- **Fallback chain:** power/pace zones → HR zones (`Z2 HR`) → RPE-based text cues. If no zone data exists for any discipline, ask the athlete directly for recent test results. If unavailable, generate RPE-only plans with a note that workouts can be updated once zones are established.
+- **Start with `get_athlete_profile`:** use current sport settings first for FTP, HR zones, pace zones, threshold pace, weight, and default discipline context.
+- **Bike:** if profile FTP or zones are missing/stale, use `get_power_curves`; optionally use `search_activities` to find recent FTP or benchmark rides.
+- **Run:** use profile threshold pace and pace zones first; if they are missing/stale, use `get_pace_curves` and optionally `search_activities` to find recent tempo/interval/race runs.
+- **Swim:** use profile swim pace settings first; if they are missing/stale, use `get_pace_curves` and optionally `search_activities` to find recent CSS tests or interval sets.
+- **HR fallback:** use profile HR zones first, then `get_hr_curves` only as a secondary fallback when pace/power data is absent.
+- **Last fallback:** power/pace zones → HR zones (`Z2 HR`) → RPE-based text cues. If no zone data exists for any discipline, ask the athlete directly for recent test results. If unavailable, generate RPE-only plans with a note that workouts can be updated once zones are established.
 
 ---
 
