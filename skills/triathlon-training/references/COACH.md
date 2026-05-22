@@ -233,11 +233,11 @@ One column per day. Each cell: HRV dot + Resting HR dot. Empty dot (grey outline
 *7-day calendar row (Mon–Sun):*
 Each day cell shows:
 - Completed activities: card with sport icon (inferred from `Type`), duration, and key metric (avg power for Ride, avg pace for Run, distance for Swim)
-- Planned sessions (from get_events): same card style but dashed border, lighter colour, name only (no sport icon — `Type` is always "Other" for planned events, cannot infer sport)
+- Planned sessions (from `get_events`): same card style but dashed border, lighter colour. Use event `type` to infer the sport icon when present; if the event type is absent or ambiguous, show the name only.
 - Empty days: blank cell
 
 *TSS bar chart by discipline (bottom):*
-One bar per discipline (Swim / Bike / Run): completed TSS = sum of `Training Load` values for that discipline this week. No planned target bars — `load_target` is not available from get_events.
+One bar per discipline (Swim / Bike / Run): completed TSS = sum of `Training Load` values for that discipline this week. Planned target bars are optional — only show them if `load_target` is present on planned events in the `get_events` response.
 
 **Markdown summary (2–3 sentences, below artifact):**
 - What got done this week (total sessions, disciplines covered)
@@ -314,7 +314,7 @@ With the single biggest gap called out in one sentence below the chip.
    **Correct** — text-based workout syntax:
    ```
    {
-     "start_date_local": "2026-03-27",
+     "start_date": "2026-03-27",
      "category": "WORKOUT",
      "type": "Run",
      "name": "Long Run — 10km Z2",
@@ -341,8 +341,8 @@ With the single biggest gap called out in one sentence below the chip.
    - Steps: [human-readable summary of workout structure]
    ```
 4. Ask: "Schedule this?" — wait for explicit yes before calling `add_or_update_event`
-5. On confirmation: call `add_or_update_event` with the payload
-6. Echo the created event fields to confirm success
+5. On confirmation: call `add_or_update_event` with the payload. Prefer the MCP input shape: `start_date`, `type` or legacy `workout_type`, plus optional planning fields.
+6. Echo the returned event fields to confirm success
 
 ---
 
@@ -412,11 +412,11 @@ The athlete can modify anything before approval:
 
 On approval, follow WORKOUT_PLANNING.md batch write guidance:
 - **Every event's `description` must use plain-text workout syntax, never JSON** (see § Workout Description Syntax in WORKOUT_PLANNING.md)
-- Deterministic `uid` per event for idempotent writes
 - Phase-sized batches with progress feedback
 - Calendar conflict resolution (work around / merge / clear and replace)
 - Create RACE_A event for race day if not already present
 - One `add_or_update_event` call per discipline per day — never aggregate
+- Do not assume idempotent upsert by `uid`. Before retries or rewrites, re-check the target range with `get_events` and de-duplicate deliberately.
 
 ### After writing
 

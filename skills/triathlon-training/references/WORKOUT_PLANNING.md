@@ -8,7 +8,7 @@ Guidance for creating planned workouts on the intervals.icu calendar via `add_or
 
 Run before constructing any event payload:
 
-- [ ] `start_date_local` provided in `YYYY-MM-DD` format?
+- [ ] `start_date` provided in `YYYY-MM-DD` format? (`add_or_update_event` maps this to the upstream API's `start_date_local`)
 - [ ] Sport type identified — `Ride`, `VirtualRide`, `Run`, `Swim`, `Walk`, etc.?
 - [ ] Appropriate `target` metric selected for this discipline? (see table below)
 - [ ] Duration (`moving_time`) or distance (`distance`) specified — at least one required for a meaningful planned workout?
@@ -18,11 +18,11 @@ Run before constructing any event payload:
 
 ## Minimal Required Payload
 
-Only these four fields are strictly required:
+Only these four MCP fields are strictly required:
 
 ```json
 {
-  "start_date_local": "YYYY-MM-DD",
+  "start_date": "YYYY-MM-DD",
   "category": "WORKOUT",
   "type": "Run",
   "name": "Easy aerobic run"
@@ -73,11 +73,10 @@ Add fields from the discipline-specific tables below to make the workout actiona
 These are the fields you may include. Do not include fields from the Excluded Fields section.
 
 **Calendar / Identity**
-- `start_date_local` — `YYYY-MM-DD` — **required**
-- `end_date_local` — `YYYY-MM-DD` — only for multi-day events (rarely needed)
-- `uid` — client-assigned string; enables upsert via `upsertOnUid=true` — useful for idempotent writes
-- `external_id` — string; used with OAuth upsert — omit unless integrating external system
-- `calendar_id` — int; omit to use athlete's default calendar
+- `start_date` — `YYYY-MM-DD` — **required** in the MCP tool; mapped to the upstream API date field
+- `event_id` — provide when updating an existing event
+- `external_id` — string; optional external reference
+- `calendar_id` — int; optional calendar target
 
 **Classification**
 - `category` — `WORKOUT` for planned sessions; `RACE_A/B/C` for races; `NOTE` for text-only entries — **required**
@@ -119,10 +118,8 @@ These are the fields you may include. Do not include fields from the Excluded Fi
 **Nutrition**
 - `carbs_per_hour` — planned carbohydrate intake (g/hr)
 
-**File Import (alternative to description)**
-- `file_contents` — raw workout file content (`.zwo`, `.mrc`, `.erg`, `.fit`)
-- `file_contents_base64` — base64-encoded version of the above
-- `filename` — filename including extension; required when using file import fields
+**Legacy Compatibility**
+- `workout_type` — legacy MCP input; equivalent to `type` and kept for backwards compatibility
 
 ---
 
@@ -227,8 +224,8 @@ Cooldown
 add_or_update_event(athlete_id, event_payload)
 ```
 
-**Upsert (create or update by uid):**
-Pass `uid` in the payload and use `upsertOnUid=true` if the MCP tool exposes that parameter. This allows idempotent re-scheduling without duplicate entries.
+**Update an existing event:**
+Pass `event_id` in the payload to update a known event. Do not assume `uid`-based upsert semantics.
 
 **Fetch an existing event to copy structure:**
 ```
@@ -242,9 +239,10 @@ Use this to clone a prior workout's `workout_doc` into a new planned event.
 
 When writing a multi-week training block to the calendar:
 
-**Idempotent writes:**
-- All events must include a deterministic `uid` (e.g., `block-{race-date}-w{week}-{day}-{discipline}`)
-- Use `upsertOnUid=true` on all calls — retries do not create duplicates
+**Retry-safe writes:**
+- Do not assume deterministic `uid` upserts are available
+- Before any retry, call `get_events` for the target range, compare by date + name + type, and update or skip intentionally
+- If rewriting an entire block, prefer explicit conflict resolution first: work around, merge, or clear and replace
 
 **Batch strategy:**
 - Write in phase-sized batches (base → build → peak/taper)
