@@ -38,12 +38,13 @@ Start from your chat application, not from this repository.
    ```
    https://intervals-mcp.anthonypoh1998.workers.dev/mcp
    ```
-3. Under `Skills`, create or upload the coach skill.
-4. Use the packaged skill ZIP:
+3. Package the skill from the `skills/triathlon-training/` folder.
+4. Under `Skills`, create or upload the coach skill.
+5. Use the ZIP you packaged from:
    ```
-   skills/triathlon-training.zip
+   skills/triathlon-training/
    ```
-5. Claude will begin the OAuth flow when it needs the connection.
+6. Claude will begin the OAuth flow when it needs the connection.
 
 Claude currently installs the connector and the skill separately for this setup.
 
@@ -80,7 +81,7 @@ To find your intervals.icu credentials:
 ## Artifacts in this repo
 
 - `skills/triathlon-training.zip`
-  - the packaged Claude skill artifact for upload in Claude
+  - a convenience artifact in the repo, but users should expect to package `skills/triathlon-training/` themselves for the normal Claude skill flow
 - `docs/chatgpt-projects/TRIATHLON_TRAINING_CHATGPT_PROJECT_SKILL.md`
   - the single-file Project source for ChatGPT
 - `desktop-extension.mcpb`
@@ -130,7 +131,7 @@ The desktop extension path still works, but it is not the recommended user-facin
    ```
 2. Use `desktop-extension.mcpb` only when that workflow is specifically what you need.
 3. For normal end-user docs, prefer:
-   - Claude connector + `skills/triathlon-training.zip`
+   - Claude connector + a user-packaged ZIP from `skills/triathlon-training/`
    - ChatGPT connector + Project source file
 
 ## Skill files
