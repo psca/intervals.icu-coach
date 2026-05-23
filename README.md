@@ -1,12 +1,97 @@
-# intervals.icu Triathlon Coach — Claude Skill
+# intervals.icu Triathlon Coach
 
-A Claude skill that acts as a triathlon coach, pulling live data from intervals.icu via MCP and delivering per-discipline analysis (swim / bike / run analysed separately — never aggregated).
+A triathlon coaching setup for Claude and ChatGPT that uses live intervals.icu data through MCP.
 
----
+## Table of Contents
 
-## Setup by Platform
+- [Quick start](#quick-start)
+- [Claude](#claude)
+- [ChatGPT](#chatgpt)
+- [What happens during sign-in](#what-happens-during-sign-in)
+- [Artifacts in this repo](#artifacts-in-this-repo)
+- [Developer setup](#developer-setup)
+- [Skill files](#skill-files)
+- [MCP server](#mcp-server)
+- [Weather analysis](#weather-analysis)
+- [Project structure](#project-structure)
 
-### Claude Code (Local stdio — recommended)
+## Quick start
+
+Start from your chat application, not from this repository.
+
+1. In `Claude` or `ChatGPT`, add the intervals.icu connector using:
+   ```
+   https://intervals-mcp.anthonypoh1998.workers.dev/mcp
+   ```
+2. Add the coaching layer for your app:
+   - `Claude`: upload the coach skill ZIP
+   - `ChatGPT`: add the Project source file
+3. Let the chat application begin the OAuth flow when it needs the connection.
+4. Sign in with GitHub or Google when prompted.
+5. On first setup, enter your intervals.icu `Athlete ID` and `API Key`.
+6. Return to the chat application and continue normally.
+
+## Claude
+
+1. Open Claude and go to `https://claude.ai/customize`.
+2. Under `Connectors`, add a custom connector with:
+   ```
+   https://intervals-mcp.anthonypoh1998.workers.dev/mcp
+   ```
+3. Under `Skills`, create or upload the coach skill.
+4. Use the packaged skill ZIP:
+   ```
+   skills/triathlon-training.zip
+   ```
+5. Claude will begin the OAuth flow when it needs the connection.
+
+Claude currently installs the connector and the skill separately for this setup.
+
+## ChatGPT
+
+1. Open ChatGPT and enable developer mode if your plan requires it for custom apps.
+2. In ChatGPT settings, open `Apps & Connectors`.
+3. Add this custom app URL:
+   ```
+   https://intervals-mcp.anthonypoh1998.workers.dev/mcp
+   ```
+4. Create or open the Project where you want the coaching instructions to live.
+5. Add [docs/chatgpt-projects/TRIATHLON_TRAINING_CHATGPT_PROJECT_SKILL.md](docs/chatgpt-projects/TRIATHLON_TRAINING_CHATGPT_PROJECT_SKILL.md) as a Project source.
+6. ChatGPT will begin the OAuth flow when it needs the connection.
+
+This repo does not ship a native ChatGPT skill/plugin package. For ChatGPT, the coaching layer is the Project source document.
+
+## What happens during sign-in
+
+The sign-in flow always begins from the chat application.
+
+1. ChatGPT or Claude asks to connect the intervals.icu app / connector.
+2. The app opens the hosted OAuth flow in the browser.
+3. You sign in with GitHub or Google.
+4. On first connection, the worker asks for your intervals.icu `Athlete ID` and `API Key`.
+5. After saving those credentials, the chat application returns to the conversation with live tool access.
+
+To find your intervals.icu credentials:
+
+1. Open `https://intervals.icu/settings`
+2. Scroll to `Developer Settings`
+3. Copy your `Athlete ID` and `API Key`
+
+## Artifacts in this repo
+
+- `skills/triathlon-training.zip`
+  - the packaged Claude skill artifact for upload in Claude
+- `docs/chatgpt-projects/TRIATHLON_TRAINING_CHATGPT_PROJECT_SKILL.md`
+  - the single-file Project source for ChatGPT
+- `desktop-extension.mcpb`
+  - still works, but it is no longer the primary end-user install path in this repo
+  - keep it in mind mainly for Claude Code / developer-oriented workflows
+
+## Developer setup
+
+This section is for local development, maintenance, and packaging work.
+
+### Claude Code (local stdio)
 
 1. Clone and install the MCP server:
    ```bash
@@ -30,40 +115,25 @@ A Claude skill that acts as a triathlon coach, pulling live data from intervals.
      }
    }
    ```
+3. Load the skill:
+   ```
+   /plugin install triathlon-training@intervals-icu-coach
+   ```
 
-Claude Code will spawn the server automatically. Then load the skill:
-```
-/plugin install triathlon-training@intervals-icu-coach
-```
+### Desktop extension and packaging
 
-### Claude Desktop (recommended for claude.ai + mobile)
+The desktop extension path still works, but it is not the recommended user-facing flow for this repo anymore.
 
-Skills added to Claude Desktop sync automatically to claude.ai web and appear on Claude mobile — this is the easiest path for cross-platform use.
-
-1. Build the extension:
+1. Pack the extension if you need to maintain it:
    ```bash
    npx @anthropic-ai/mcpb pack ./desktop-extension
    ```
-2. Double-click the generated `.mcpb` to install
-3. Enter your **intervals.icu API key** and **Athlete ID** in the install dialog
-4. Upload the skill files manually in Claude Desktop (Settings → Skills → Add skill), pointing at the `skills/triathlon-training/` folder
+2. Use `desktop-extension.mcpb` only when that workflow is specifically what you need.
+3. For normal end-user docs, prefer:
+   - Claude connector + `skills/triathlon-training.zip`
+   - ChatGPT connector + Project source file
 
-Once uploaded via Desktop, the skill will appear in claude.ai and Claude mobile automatically. Note: MCP (live data) is only available on Desktop and claude.ai web — mobile shows the skill but cannot call MCP tools.
-
-### claude.ai Web (standalone)
-
-If you don't use Claude Desktop, you can connect directly via web:
-
-1. Go to **Settings → Integrations → Add integration** and enter:
-   ```
-   https://intervals-mcp.anthonypoh1998.workers.dev/mcp
-   ```
-2. Authenticate via GitHub OAuth — you'll be prompted to enter your intervals.icu Athlete ID and API key on first connection
-3. Upload skill files manually via **Settings → Skills**
-
----
-
-## Skill Files
+## Skill files
 
 All skill files live in `skills/triathlon-training/`:
 
@@ -74,33 +144,34 @@ All skill files live in `skills/triathlon-training/`:
 | `METRICS_REFERENCE.md` | Thresholds: CTL ramp rates, TSB by race distance, decoupling, VI, EF, SWOLF |
 | `WORKOUT_PLANNING.md` | Write-operation guidance for add_or_update_event |
 
-## MCP Server
+## MCP server
 
-This skill requires the [psca/intervals.icu-server](https://github.com/psca/intervals.icu-server) MCP server — a TypeScript server that wraps the intervals.icu API and exposes it as MCP tools.
+This setup uses the [psca/intervals.icu-server](https://github.com/psca/intervals.icu-server) MCP server, a TypeScript server that wraps the intervals.icu API and exposes it as MCP tools.
 
 Notable tools beyond the standard intervals.icu API:
-- **`get_activity_weather`** — fetches GPS waypoints from the activity and queries Open-Meteo to return feels-like temperature, wind speed/direction, headwind/tailwind %, and precipitation. No API key required.
-- **`get_activity_route`** — GPS route data sampled at regular intervals, useful for route and elevation analysis.
 
-Two modes: local stdio (Claude Code / Claude Desktop) and remote Cloudflare Worker with GitHub OAuth (claude.ai Web) at `https://intervals-mcp.anthonypoh1998.workers.dev/mcp`.
+- `get_activity_weather` — fetches GPS waypoints from the activity and queries Open-Meteo to return feels-like temperature, wind speed/direction, headwind/tailwind %, and precipitation
+- `get_activity_route` — GPS route data sampled at regular intervals, useful for route and elevation analysis
 
----
+## Weather analysis
 
-## Weather Analysis
+Weather context is fetched automatically for outdoor bike and run activities via `get_activity_weather`. It samples GPS waypoints every 30 minutes and computes temperature, feels-like temperature, wind speed/direction, headwind %, and precipitation through Open-Meteo.
 
-Weather context is fetched automatically for every outdoor bike and run via the `get_activity_weather` MCP tool. It samples GPS waypoints every 30 minutes and computes temperature, feels-like, wind speed/direction, headwind %, and precipitation — all via Open-Meteo (free, no API key).
+## Project structure
 
-## Project Structure
-
-```
+```text
 intervals.icu-coach/
-├── skills/triathlon-training/
-│   ├── SKILL.md
-│   ├── COACH.md
-│   ├── METRICS_REFERENCE.md
-│   └── WORKOUT_PLANNING.md
-├── desktop-extension/         ← pre-built .mcpb (drag-and-drop install)
-├── .mcp.json                  ← Claude Code config (stdio, spawns npm run stdio)
+├── skills/
+│   ├── triathlon-training/
+│   │   ├── SKILL.md
+│   │   ├── COACH.md
+│   │   ├── METRICS_REFERENCE.md
+│   │   └── WORKOUT_PLANNING.md
+│   └── triathlon-training.zip
+├── docs/chatgpt-projects/
+│   └── TRIATHLON_TRAINING_CHATGPT_PROJECT_SKILL.md
+├── desktop-extension.mcpb
+├── .mcp.json
 └── .claude-plugin/
-    └── plugin.json            ← marketplace plugin manifest
+    └── plugin.json
 ```
