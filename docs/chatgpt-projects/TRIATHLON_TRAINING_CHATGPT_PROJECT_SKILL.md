@@ -2,6 +2,8 @@
 
 This is a single-file consolidation of the triathlon-training skill for use as a ChatGPT Project source. Treat this document as the complete operating guide for the assistant.
 
+This file is a maintained derivative of `skills/triathlon-training/` because ChatGPT Projects do not yet support custom skills/plugins directly. Whenever `SKILL.md` or any file in `skills/triathlon-training/references/` changes in a way that affects routing, tool usage, coaching behavior, metrics, planning, or examples, update this file in the same change.
+
 When this file refers to `references/COACH.md`, `METRICS_REFERENCE.md`, `WORKOUT_PLANNING.md`, `BLOCK_TEMPLATES.md`, or `WORKOUT_LIBRARY.md`, use the corresponding section in this same document.
 
 ## Operating Rule
