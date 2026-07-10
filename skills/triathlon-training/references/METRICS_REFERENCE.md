@@ -6,8 +6,8 @@ All thresholds and benchmarks used during analysis. Apply these consistently acr
 
 ## PMC (Performance Management Chart)
 
-**Critical rule for triathletes: always compute per-discipline, never aggregate.**
-A triathlete with CTL 80 on the bike and CTL 20 on the run is undertrained for running, even if aggregate looks fine.
+**Critical rule for triathletes:** use only clearly labelled server-estimated discipline CTL/ATL/TSB. Never derive discipline values from activity-level Intervals aggregate CTL/ATL; show aggregate load separately when useful.
+A triathlete can have materially different discipline load states even when aggregate load looks fine, so assess each sport from the server estimate and its own trend evidence.
 
 ### CTL Ramp Rate (per discipline)
 | Rate (pts/week) | Assessment |

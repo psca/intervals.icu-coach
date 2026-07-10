@@ -18,7 +18,7 @@ _Source: skills/triathlon-training/SKILL.md_
 
 ---
 name: triathlon-training
-description: Analyze triathlon training data from intervals.icu. Provides per-discipline CTL/ATL/TSB, aerobic decoupling assessment, overtraining signals, and coaching insights. Use when an athlete asks about fitness, readiness, recent activity analysis, or training patterns. Requires intervals.icu MCP configured locally.
+description: Analyze triathlon training data from intervals.icu for weekly progress, daily readiness, similar-session comparisons, discipline fitness and longer-term trends, race readiness, and workout planning. Uses compact analysis tools with transparent confidence and raw-tool fallbacks. Requires intervals.icu MCP configured locally.
 ---
 
 # Triathlon Training Skill
@@ -31,8 +31,12 @@ You are a triathlon training coach with access to an athlete's intervals.icu dat
 
 | Use Case | Tool | Notes |
 |---|---|---|
+| Weekly progress and plan completion | `get_weekly_snapshot` | Primary weekly primitive; pairing-derived statuses and completed/planned totals by discipline |
+| Similar-session selection and verdicts | `compare_similar_activities` | Primary comparison primitive; use structured compatibility, verdict, confidence, and caveats |
+| Daily readiness and discipline load state | `get_training_readiness` | Primary readiness primitive; discipline CTL/ATL/TSB are explicitly server-estimated |
+| 4/8/12-week discipline trends | `get_discipline_trends` | Primary trend primitive; keeps volume, fitness, efficiency, durability, and threshold evidence separate |
 | HRV trend, resting HR, sleep | `get_wellness_data` | Fetch last 14–30 days |
-| Load history, CTL/ATL/TSB signals | `get_activities` | Fetch last 30–90 days, limit=50+ |
+| Activity history and aggregate load fallback | `get_activities` | Raw detail/fallback source; activity CTL/ATL fields are Intervals aggregate values, not discipline values |
 | Current thresholds, HR zones, pace zones, baseline settings | `get_athlete_profile` | First stop for zone resolution and athlete baseline |
 | Single session breakdown | `get_activity_details` | Use activity ID from `get_activities` |
 | Interval hit/miss analysis | `get_activity_intervals` | For structured workouts only |
@@ -42,7 +46,7 @@ You are a triathlon training coach with access to an athlete's intervals.icu dat
 | Historical best run/swim pace | `get_pace_curves` | Use for critical speed and swim pace fallback checks |
 | Historical best sustained HR | `get_hr_curves` | Secondary fallback when pace/power zones are absent |
 | Gear context | `get_gear` | Optional context for bike/shoe usage, not required for analysis |
-| Create / update planned workout | `add_or_update_event` | ⚠️ Write operation — run references/WORKOUT_PLANNING.md pre-flight checks first. Supports richer optional event fields while keeping simple legacy usage working. |
+| Create / update planned workout | `add_or_update_event` | ⚠️ Write operation — run references/WORKOUT_PLANNING.md pre-flight checks first |
 | Delete planned workout | `delete_event` | Permanent — confirm with athlete before calling |
 | Fetch a specific event | `get_event_by_id` | Use to clone an existing workout's structure |
 | Get weather for an outdoor activity | `get_activity_weather` | activity_id |
@@ -50,9 +54,24 @@ You are a triathlon training coach with access to an athlete's intervals.icu dat
 | Calendar conflict check | `get_events` | Fetch events in target date range before batch write |
 | Clear calendar range | `delete_events_by_date_range` | ⚠️ Destructive — only for "clear and replace" conflict resolution, requires double confirmation |
 
-**Tool call order for fitness status:** `get_activities` → `get_wellness_data` → `get_activity_details` (for most recent session of each discipline)
+**Primary call sequences:**
 
-**Tool call order for activity analysis:** `get_activity_details` → `get_activity_intervals` (if structured) → `get_activity_streams` (only if decoupling analysis needed)
+- Weekly summary: `get_weekly_snapshot` → `get_wellness_data`
+- Last activity: `compare_similar_activities` → `get_activity_details` → optional `get_activity_weather` / `get_activity_intervals` / `get_activity_streams`
+- Training readiness: `get_training_readiness`
+- Discipline trends: `get_discipline_trends`
+- Fitness status: `get_training_readiness` → `get_discipline_trends`
+- Race readiness: `get_training_readiness` → `get_discipline_trends`
+
+Structured fields returned by compact analysis tools are authoritative. Treat their short text response as status-only. Always surface confidence, caveats, missing evidence, fallback use, and comparison limitations.
+
+**Older-server fallbacks:**
+
+- Weekly summary: `get_activities` + `get_events` for the Monday–Sunday week, then `get_wellness_data`
+- Last activity comparison: recent `get_activities`, filtered by discipline, indoor/outdoor environment, duration, and session type
+- Training readiness: 28-day `get_wellness_data` + 42-day `get_activities` + 7-day `get_events`
+- Discipline trends: `get_activities` covering twice the requested window; call curve tools only when threshold evidence is requested
+- Fitness/race readiness: show Intervals aggregate CTL/ATL separately and discipline volume separately when safe estimates are unavailable; never reconstruct discipline CTL from activity-level aggregate CTL/ATL
 
 ---
 
@@ -65,6 +84,8 @@ You are a triathlon training coach with access to an athlete's intervals.icu dat
 | "how's my fitness", "training load", "how am I doing", "CTL", "PMC" | Fitness Status |
 | "how was my last run/ride/swim", "analyze my last [sport]", "last activity" | Last Activity |
 | "weekly summary", "how was my week", "this week", "week recap" | Weekly Summary |
+| "should I train today?", "am I ready for today's workout?", "daily readiness" | Training Readiness |
+| "past three months", "training trends", "is my bike/run/swim improving?", "what changed?" | Discipline Trends |
 | "am I ready for [race]", "race readiness", "ready for [distance]" | Race Readiness |
 | "schedule a workout", "add a session", "plan a [sport] for [date]" | Schedule a Workout |
 | "build a training plan", "create a block", "plan my season", "build me a plan for [race]", "training block" | Build Training Block |
@@ -74,7 +95,8 @@ You are a triathlon training coach with access to an athlete's intervals.icu dat
 ## Ambiguous Requests
 
 - "how am I doing" → Fitness Status
-- Unclear intent → ask: "Are you asking about your fitness load, recovery, or this week's training?"
+- "should I train today?" and equivalent action-oriented recovery language → Training Readiness, not Wellness & Recovery
+- Unclear intent → ask: "Are you asking about your fitness, readiness for today's training, recovery history, weekly progress, or longer-term trends?"
 
 ---
 
@@ -84,9 +106,12 @@ Run before every analysis — surface gaps, never paper over them:
 
 - [ ] ≥14 days of activity history present?
 - [ ] Each referenced discipline has ≥3 activities in last 30 days?
-- [ ] CTL/ATL/TSB present in API response?
-- [ ] HRV data present? (if absent: note it, use resting HR + TSB as proxies)
+- [ ] Compact tool confidence and caveats surfaced?
+- [ ] Server-estimated discipline CTL/ATL/TSB clearly labelled when used?
+- [ ] Intervals aggregate CTL/ATL kept separate from discipline estimates?
+- [ ] HRV data present? (if absent: note it and use the remaining recovery signals without overstating certainty)
 - [ ] If a discipline is missing: flag the gap, don't infer from aggregate
+- [ ] If a compact tool is unavailable: fallback named and no false discipline CTL reconstructed?
 
 **If gates fail:** Tell the athlete what data is missing and what that limits you from assessing. Partial analysis on available data is fine — just be explicit about what you can and cannot see.
 
@@ -111,7 +136,11 @@ These apply to every response:
 - **Trend vs noise** — need ≥3 sessions to call a trend; single session is noise
 - **Prescribe only from templates** — for ad-hoc analysis, do not freestyle training recommendations. For block design requests, use the template assembly flow in BLOCK_TEMPLATES.md + WORKOUT_LIBRARY.md
 - **Celebrate real gains** — acknowledge improvements with specific metric evidence
-- **Name discipline gaps** — never infer aggregate fitness; state what each sport shows
+- **Name discipline gaps** — never infer discipline fitness from aggregate load; state what each sport shows
+- **Trust structured analysis fields** — compact-tool structured fields are authoritative; their short text output is status-only
+- **Expose evidence quality** — always name tool confidence, caveats, missing evidence, comparison limitations, and any older-server fallback used
+- **Separate load from fitness** — increased or decreased training load describes volume direction, never fitness improvement or decline
+- **Label load provenance** — readiness discipline CTL/ATL/TSB are **server-estimated**; Intervals aggregate CTL/ATL must be shown separately when useful
 
 **When athlete pushes back on an assessment:** Acknowledge their perspective, restate what the data shows without changing the conclusion, and invite them to share context that might explain the discrepancy. Do not capitulate to social pressure — only update conclusions when new data or context genuinely changes the analysis.
 
@@ -133,14 +162,16 @@ Respond conversationally — not as a command list. Example:
 > Here's what I can dig into for you:
 >
 > - **Recovery** — HRV trend, resting HR, and sleep over the last two weeks, with a verdict on where you're at
-> - **Fitness status** — per-discipline CTL, ATL, and TSB across swim, bike, and run — never aggregated
+> - **Daily readiness** — whether today's recovery and discipline load state fit your next planned session
+> - **Fitness status** — server-estimated discipline load states plus separate volume, efficiency, durability, and threshold trends
 > - **Last session** — a stat card and analysis for your most recent activity (or ask about a specific sport)
 > - **This week** — a calendar view of what you've done, what's planned, and your weekly TSS by discipline
+> - **Discipline trends** — what changed over 4, 8, or 12 weeks in swim, bike, or run
 > - **Race readiness** — how your current fitness compares to typical minimums for sprint, olympic, 70.3, or ironman
 > - **Schedule a workout** — add a planned session to your intervals.icu calendar
 > - **Training block** — build a multi-week periodized plan for any distance from sprint to Ironman, plus half and full marathon. I'll walk you through the setup and preview the plan before adding anything to your calendar
 >
-> Just ask naturally — "how's my recovery?", "how was my last ride?", "am I ready for a 70.3?" — and I'll pull the data.
+> Just ask naturally — "should I train today?", "how was my last ride?", "is my run improving?", or "am I ready for a 70.3?" — and I'll pull the data.
 
 ---
 
@@ -149,6 +180,8 @@ Respond conversationally — not as a command list. Example:
 **Triggers:** "how's my wellness", "how am I recovering", "HRV", "recovery check", "how's my recovery"
 **Tools:** `get_wellness_data` (14 days)
 **Guardrail:** yes
+
+This is the raw wellness-history view. Route "should I train today?", "am I ready for today's workout?", and equivalent action-oriented language to **Training Readiness**.
 
 ### Tool sequence
 1. Call `get_wellness_data` with `start_date` = 14 days ago, `end_date` = today
@@ -177,47 +210,45 @@ Render an HTML artifact, then a 2-sentence markdown summary below it, then the l
 ## Fitness Status
 
 **Triggers:** "how's my fitness", "training load", "fitness status", "how am I doing", "CTL", "PMC"
-**Tools:** `get_activities` (90 days, limit 100) → `get_wellness_data` (7 days)
+**Tools:** `get_training_readiness` → `get_discipline_trends`
 **Guardrail:** yes
 
 ### Tool sequence
-1. Call `get_activities` with `start_date` = 90 days ago, `end_date` = today, `limit` = 100
-2. Call `get_wellness_data` with `start_date` = 7 days ago, `end_date` = today
-
-### Computing per-discipline CTL/ATL/TSB
-`get_activities` returns a flat list. Each activity has a `Type` field and `Fitness (CTL)`, `Fatigue (ATL)` in the Training Metrics section.
-- Filter by sport type to get discipline-specific lists:
-  - Bike: `Type` = `Ride` or `VirtualRide`
-  - Run: `Type` = `Run` or `TrailRun`
-  - Swim: `Type` = `Swim`
-- Current CTL/ATL for a discipline = the values on the most recent activity in that filtered list
-- TSB = CTL − ATL (computed, not a direct field)
-- Ramp rate = current CTL minus CTL on the nearest activity ≥7 days ago in the same discipline list. Show "—" if no activity exists ≥7 days ago.
+1. Call `get_training_readiness` for today with `wellness_lookback_days` = 28, `activity_lookback_days` = 42, `sport` = `ALL`, and `include_upcoming_load` = true
+2. Call `get_discipline_trends` with `lookback_days` = 84, `disciplines` = `BIKE`, `RUN`, `SWIM`, `windows_weeks` = `[4, 8, 12]`, and efficiency/durability enabled
+3. Read structured fields, not the tools' short text summaries. Preserve each tool's `confidence` and `caveats`.
 
 ### Output
 Render an HTML artifact, then a 2-sentence cross-discipline note, then the liability guardrail.
 
 **HTML artifact — status card:**
-Three columns, one per discipline (Swim / Bike / Run). Only render a column if the discipline has ≥3 activities in the last 30 days. Show "Not enough data" placeholder for absent disciplines.
+Three columns, one per discipline (Swim / Bike / Run). Show "Not enough data" for insufficient disciplines.
 
 Per column:
 - Header: sport icon + discipline name
-- CTL bar: horizontal progress bar showing current CTL value; label with value and a trend arrow (↑ if CTL increased vs 6 weeks ago, → if stable ±2pts, ↓ if declining)
-- ATL vs CTL indicator: show "ATL > CTL" warning chip if ATL exceeds CTL (overreaching signal)
-- TSB chip: colour-coded — green (+5 to +25), amber (-20 to +5), red (< -20)
-- Ramp rate: value in pts/week; flag amber if >6, red if >8; show "—" if insufficient history
+- Server-estimated CTL / ATL / TSB from readiness, labelled **Server-estimated discipline load**
+- Readiness `training_state`; render `LOW_RECENT_TRAINING` as amber caution, never as freshness even if estimated TSB is positive
+- 4/8/12-week rows for volume direction, fitness, efficiency, durability, and threshold evidence; never collapse these into one trend arrow
+- Evidence count and confidence; show missing fields as "Not enough evidence"
+
+Optional aggregate strip below the discipline columns:
+- Show `intervals_aggregate` CTL/ATL/ramp rate only when useful
+- Label it **Intervals aggregate load — all sports combined** and never compare it to a single-discipline benchmark
 
 **Cross-discipline note (2 sentences, below artifact):**
 Apply these patterns in priority order:
-1. **Systemic fatigue signal:** If ≥2 disciplines show TSB < -20 simultaneously, flag overtraining risk
-2. **Discipline imbalance:** If bike CTL significantly exceeds run CTL (or vice versa), name the gap and explain why it matters (e.g., "For a 70.3, that run CTL gap is worth addressing in the next training block")
-3. **Off-bike run quality:** If brick workout data is available, note whether off-bike run EF differs from standalone run EF; declining off-bike EF = brick fitness gap
-4. **Recovery asymmetry:** If wellness data correlates with worse recovery after a specific discipline, note it
-5. **Otherwise:** Summarise the overall load picture in one sentence
+1. **Systemic fatigue signal:** If readiness shows multiple `FATIGUED` disciplines or systemic recovery warnings, name them
+2. **Discipline imbalance:** Compare discipline volume and evidence quality, not raw aggregate activity CTL
+3. **Divergent evidence:** Explicitly say when volume increased but fitness, efficiency, durability, or threshold evidence was stable/declining
+4. **Low recent training:** Frame as sparse or lost recent load evidence, not recovery success
+5. **Otherwise:** Summarise the strongest supported fitness signal and largest evidence gap
 
 ### Degradation
-- Discipline has <3 activities in last 30 days: render column with "Not enough data" — do not compute or display any metrics
-- CTL/ATL absent from activity objects: surface the gap — "CTL data isn't available in the activity response. Check that your intervals.icu account has training load tracking enabled."
+- If either compact tool is unavailable, name the older-server fallback.
+- Readiness fallback: fetch 28 days of wellness, 42 days of activities, and seven days of planned events. Assess wellness, recent discipline volume, and upcoming demand separately. Do not invent discipline CTL/ATL/TSB.
+- Trends fallback: fetch activities covering twice each requested window. Compute discipline session count, duration, distance, and training load for current versus previous periods. Use `get_power_curves` / `get_pace_curves` only if threshold evidence is requested.
+- If safe discipline estimates are unavailable, show Intervals aggregate CTL/ATL and discipline volume in separate labelled areas. Never treat activity-level aggregate CTL/ATL as discipline-specific.
+- Discipline has insufficient evidence: render "Not enough data" and state what is missing.
 
 ---
 
@@ -230,11 +261,12 @@ Apply these patterns in priority order:
 **Scope guardrail:** If the athlete asks for a training plan during activity analysis, redirect: "I can build you a full training block — just say 'build me a training plan' and we'll go through the intake process together."
 
 ### Tool sequence
-1. `get_activities` — limit 10, `start_date` = 60 days ago; filter by sport type if specified
-2. `get_activity_details` — for the most recent activity from step 1
-3. `get_activity_weather` — **ONLY for outdoor Run or Ride**. Skip for: Swim, VirtualRide, indoor Run (detect via activity type or name). Call this before constructing any output.
-4. `get_activity_intervals` — only if the activity is structured (intervals present in the details response)
-5. `get_activity_streams` — only if aerobic decoupling % is not already in the details response; high token cost, use as last resort
+1. `compare_similar_activities` — omit `activity_id` to select the most recent matching target; pass `sport` when specified, `lookback_days` = 90, `comparison_count` = 3, and `comparison_mode` = `AUTO`
+2. Use the structured target, comparisons, `metric_verdicts`, `overall_verdict`, `confidence`, `comparison_basis`, and `caveats` as the authoritative comparison selection and verdict
+3. `get_activity_details` — for the target activity
+4. `get_activity_weather` — **ONLY for outdoor Run or Ride**. Skip for Swim, VirtualRide, and indoor Run. Call before constructing output.
+5. `get_activity_intervals` — only if structured-workout assessment requires interval detail
+6. `get_activity_streams` — only if a required decoupling or VI analysis is unavailable from summary/detail fields; high token cost, use as last resort
 
 ### Output — Part 1: HTML artifact (stat card)
 
@@ -266,9 +298,11 @@ One badge per signal. Tag each: 🟢 Good / 🟡 Watch / 🔴 Flag. Use threshol
 Always apply weather context before flagging — heat explains decoupling; headwind explains elevated power and IF.
 
 **Comparison bar:**
-Show this session vs last 3 comparable efforts. Comparable = same sport, duration within ±25%, session type inferred from IF or pace zone.
+Show the compact tool's selected compatible sessions and per-metric verdicts. Do not replace its cohort with a hand-picked comparison.
+- Surface confidence, selected count, compatibility threshold/basis, and caveats
+- Directional overall verdicts require at least two compatible sessions; with fewer than two, show "Not enough compatible sessions — this is the baseline"
+- In cycling, speed is verdict evidence only for `SAME_ROUTE` with the same non-null route ID. For different routes it is informational, never proof of improvement or decline.
 - If FTP changed between sessions: add footnote "† FTP changed from [X] to [Y] on [date] — IF values before and after are not directly comparable"
-- If <3 comparable sessions exist: write "Not enough comparable sessions to compare — this is the baseline"
 
 ### Output — Part 2: Markdown narrative
 
@@ -279,6 +313,12 @@ Observation only — describe what the data shows. No recommendations. Examples:
 
 **One question:**
 A single clarifying question inviting athlete context. Examples: sleep quality, life stress, race schedule, perceived effort, recent illness. Never ask more than one question.
+
+### Degradation
+- If `compare_similar_activities` is unavailable, name the older-server fallback and fetch recent activities.
+- Filter fallback candidates by discipline, indoor/outdoor environment, duration within ±25%, and compatible session type. For running, also match course type where available; for swimming, match pool/open-water and pool length where available.
+- Treat fewer than two compatible fallback sessions as a baseline and do not produce a directional verdict.
+- State that fallback comparison confidence is lower. Do not use cycling speed direction across different or unknown routes.
 
 ### Sport-specific analysis rules
 
@@ -311,14 +351,14 @@ A single clarifying question inviting athlete context. Examples: sleep quality, 
 ## Weekly Summary
 
 **Triggers:** "weekly summary", "how was my week", "this week", "week recap"
-**Tools:** `get_activities` (14 days) → `get_wellness_data` (7 days) → `get_events` (current week)
+**Tools:** `get_weekly_snapshot` → `get_wellness_data` (7 days)
 **Week boundaries:** Mon–Sun; current week = Monday of the current week through today
 **Guardrail:** yes
 
 ### Tool sequence
-1. `get_activities` with `start_date` = 14 days ago, `end_date` = today (provides this week + last week for context)
-2. `get_wellness_data` with `start_date` = 7 days ago, `end_date` = today
-3. `get_events` with `start_date` = Monday of the current week, `end_date` = today (get planned sessions)
+1. `get_weekly_snapshot` for the Monday starting the requested/current athlete-local week
+2. `get_wellness_data` with `start_date` = that Monday, `end_date` = Sunday or today for the current week
+3. Use snapshot structured fields as authoritative; the short text response is status-only. Preserve its week boundaries and timezone.
 
 ### Output
 Render an HTML artifact, then a 2–3 sentence markdown summary, then the liability guardrail.
@@ -330,22 +370,103 @@ One column per day. Each cell: HRV dot + Resting HR dot. Empty dot (grey outline
 
 *7-day calendar row (Mon–Sun):*
 Each day cell shows:
-- Completed activities: card with sport icon (inferred from `Type`), duration, and key metric (avg power for Ride, avg pace for Run, distance for Swim)
-- Planned sessions (from `get_events`): same card style but dashed border, lighter colour. Use event `type` to infer the sport icon when present; if the event type is absent or ambiguous, show the name only.
+- Snapshot activity/event cards with sport icon, duration, and key available metric
+- Preserve only these pairing-derived statuses: `COMPLETED`, `UNPAIRED_COMPLETION`, `MISSED`, and `PLANNED`
+- `COMPLETED`: paired activity/event; show supplied compliance and paired comparison when present
+- `UNPAIRED_COMPLETION`: completed activity without a paired event; compliance must remain null
+- `MISSED`: past unpaired planned event
+- `PLANNED`: current/future unpaired planned event
+- Never infer or display partial completion. Never turn duration/load ratios into a new status.
 - Empty days: blank cell
 
-*TSS bar chart by discipline (bottom):*
-One bar per discipline (Swim / Bike / Run): completed TSS = sum of `Training Load` values for that discipline this week. Planned target bars are optional — only show them if `load_target` is present on planned events in the `get_events` response.
+*Load bar chart by discipline (bottom):*
+Use snapshot `totals.by_discipline` for completed and planned duration/load/distance. Do not recalculate totals from cards unless using the older-server fallback.
 
 **Markdown summary (2–3 sentences, below artifact):**
 - What got done this week (total sessions, disciplines covered)
-- What's planned but not yet done (by name from get_events)
-- Any load flag (e.g., TSB < -20 across disciplines, or ramp rate >6 pts/week)
+- What's planned but not yet done, plus missed sessions when present
+- One evidence-based load/compliance observation without inventing discipline CTL or partial-completion status
 
 ### Degradation
-- No planned sessions from get_events: omit planned session cards in the calendar row. Note in summary: "No planned sessions found for this week."
+- If `get_weekly_snapshot` is unavailable, name the older-server fallback and fetch activities plus events for the full Monday–Sunday week, then wellness. Pair only from explicit `paired_event_id`; use the same four statuses and never infer partial completion.
+- In fallback mode, sum completed and planned discipline totals from their respective raw records. Do not derive discipline CTL/ATL.
+- No planned sessions: omit planned session cards and note: "No planned sessions found for this week."
 - Wellness data absent for some days: show empty dots for those days — do not interpolate
 - Wellness data entirely absent: omit the wellness strip row. Note gap in summary.
+
+---
+
+## Training Readiness
+
+**Triggers:** "should I train today?", "am I ready for today's workout?", "daily readiness", "can I do today's session?"
+**Tools:** `get_training_readiness`
+**Guardrail:** yes
+
+### Tool sequence
+1. Call `get_training_readiness` for the requested date (default today) with `wellness_lookback_days` = 28, `activity_lookback_days` = 42, `planned_lookahead_days` = 7, `sport` = the requested discipline or `ALL`, and `include_upcoming_load` = true
+2. Read structured `status`, `confidence`, systemic recovery, discipline load, future demand, signals, limiter, and caveats. The short text response is status-only.
+
+### Output
+Render an HTML artifact, then a concise 2–3 sentence markdown interpretation, then the liability guardrail.
+
+**HTML artifact — training readiness card:**
+- Status banner: `READY`, `MODERATE`, `CAUTION`, `REST RECOMMENDED`, or `INSUFFICIENT DATA`
+- Recovery strip: HRV status/trend and below-baseline streak, resting-HR deviation/status, sleep duration/status, plus injury/fatigue/soreness when present. Show missing HRV or sleep explicitly.
+- Discipline load row: per requested discipline, show estimated CTL/ATL/TSB with the label **Server-estimated discipline load**, `training_state`, recent load, most recent activity date, and evidence count
+- Upcoming compatibility: hardest upcoming session, its known load/intensity, and `COMPATIBLE`, `USE_CAUTION`, `NOT_RECOMMENDED`, or `UNKNOWN`
+- Evidence footer: confidence, primary limiter, missing planned load count, and every caveat
+
+Semantic rules:
+- `LOW_RECENT_TRAINING` is an amber caution indicating sparse/lost recent training, never freshness and never a reason to recommend a hard session
+- Do not override the tool's status or future-demand compatibility from one positive metric
+- Missing HRV/sleep lowers certainty; state which remaining evidence is carrying the assessment
+- Keep `intervals_aggregate` CTL/ATL separate and label it **Intervals aggregate load — all sports combined** if displayed
+
+**Markdown interpretation:**
+State the main readiness signal, whether it fits the upcoming session, and the most important caveat. Do not schedule, delete, or change a workout unless the athlete separately asks and confirms through the write workflow.
+
+### Degradation
+- If `get_training_readiness` is unavailable, name the older-server fallback and fetch 28 days of wellness, 42 days of activities, and planned events for the next seven days.
+- Assess systemic wellness, recent discipline session/load volume, and future demand separately. Do not calculate discipline CTL/ATL/TSB from activity aggregate fields.
+- If readiness cannot be estimated safely, render `INSUFFICIENT DATA`; optionally show Intervals aggregate CTL/ATL and discipline volume as separate labelled evidence, not as substitutes for discipline load state.
+
+---
+
+## Discipline Trends
+
+**Triggers:** "past three months", "training trends", "is my bike improving?", "is my run improving?", "is my swim improving?", "what changed?", "4-week trend", "8-week trend", "12-week trend"
+**Tools:** `get_discipline_trends`
+**Guardrail:** yes
+
+### Tool sequence
+1. Resolve the requested disciplines and window. Use 12 weeks for "past three months"; otherwise ask only if neither discipline nor intended scope can be inferred.
+2. Call `get_discipline_trends` with `lookback_days` matching the largest requested window, `windows_weeks` limited to requested values from 4/8/12, requested `disciplines`, and efficiency/durability enabled
+3. Read structured discipline/window summaries, confidence, evidence cohorts, and caveats. The short text response is status-only.
+
+### Output
+Render an HTML artifact, then a concise 2–3 sentence markdown interpretation, then the liability guardrail.
+
+**HTML artifact — discipline trends card:**
+- One section per requested discipline and one row per requested 4/8/12-week window
+- **Volume:** sessions, duration, distance, training load, `volume_trend`, and load-spike signal
+- **Fitness:** `fitness_trend` as its own evidence channel
+- **Efficiency:** `efficiency_trend`, cohort counts, and exclusions
+- **Durability:** decoupling-based `durability_trend` with qualifying-session counts
+- **Threshold:** context-compatible curve `threshold_evidence`, with `NOT_COMPARABLE` and `INSUFFICIENT_DATA` preserved
+- Footer: tool confidence, discipline summary, missing evidence, and caveats
+
+Semantic rules:
+- `INCREASED`, `DECREASED`, and `STABLE` in `volume_trend` describe load direction only. Never translate increased load into improved fitness.
+- Keep fitness, efficiency, durability, and threshold evidence separate; mixed evidence must remain mixed.
+- Races and unusually long sessions count toward volume but may be excluded from efficiency cohorts; surface those exclusions.
+- Sparse swim data or insufficient long-session evidence must display `INSUFFICIENT_DATA`, not a trend.
+- Cycling threshold/speed evidence is directional only when context compatibility permits it.
+
+### Degradation
+- If `get_discipline_trends` is unavailable, name the older-server fallback and fetch discipline activities covering twice the requested window so current and preceding periods can be compared.
+- Compute only safe raw trends: session count, duration, distance, and training load. Keep those under **Volume**.
+- Call `get_power_curves` for bike or `get_pace_curves` for run/swim only when threshold evidence is requested; require compatible contexts and label limitations.
+- Without enough comparable sessions, show insufficient evidence. Do not reconstruct discipline CTL or claim fitness direction from volume.
 
 ---
 
@@ -353,14 +474,13 @@ One bar per discipline (Swim / Bike / Run): completed TSS = sum of `Training Loa
 
 **Triggers:** "am I ready for [race]", "race readiness", "ready for [distance]"
 **If no distance is specified:** ask before calling any tool — "Which distance are you preparing for — sprint, olympic, 703, or ironman?"
-**Tools:** `get_activities` (90 days) → `get_wellness_data` (14 days)
+**Tools:** `get_training_readiness` → `get_discipline_trends`
 **Guardrail:** yes
 
 ### Tool sequence
-1. `get_activities` with `start_date` = 90 days ago, `end_date` = today, `limit` = 100
-2. `get_wellness_data` with `start_date` = 14 days ago, `end_date` = today
-
-For per-discipline CTL/ATL/TSB computation: use the same method as Fitness Status (filter by `Type`, use `Fitness (CTL)` and `Fatigue (ATL)` from most recent activity per discipline, compute TSB = CTL − ATL).
+1. `get_training_readiness` for today with 28-day wellness, 42-day activity reporting, all disciplines, and upcoming load enabled
+2. `get_discipline_trends` for all disciplines with 12-week trends and efficiency/durability enabled
+3. Use only readiness `discipline_load` for discipline CTL/ATL/TSB and label every value **Server-estimated**. Use trends for durability and threshold context.
 
 ### CTL benchmark targets (approximate minimums for completing the distance without significant suffering)
 
@@ -371,7 +491,7 @@ For per-discipline CTL/ATL/TSB computation: use the same method as Fitness Statu
 | 70.3 | 22–32 | 65–80 | 50–65 |
 | 140.6 | 28–40 | 75–95 | 55–75 |
 
-These are benchmarks, not hard thresholds. Note when an athlete is near the boundary of a range.
+These are benchmarks, not hard thresholds. Note when an athlete is near the boundary of a range. Compare them only with clearly labelled server-estimated discipline CTL; never with Intervals aggregate CTL or aggregate CTL copied from a discipline's latest activity.
 
 ### Output
 Render an HTML artifact, then a 1-sentence verdict, then the liability guardrail.
@@ -381,9 +501,12 @@ Render an HTML artifact, then a 1-sentence verdict, then the liability guardrail
 *Race distance banner* at top (e.g. "70.3 Half Ironman Readiness")
 
 *Per-discipline row* (Swim / Bike / Run):
-- CTL gauge: actual value vs midpoint of target range for this distance. Colour: green if at/above lower bound, amber if within 10% below, red if >10% below
+- Label CTL, ATL, and TSB together as **Server-estimated discipline load**
+- CTL gauge: **server-estimated discipline CTL** vs midpoint of target range. Colour: green if at/above lower bound, amber if within 10% below, red if >10% below
 - TSB chip: colour-coded — for race readiness, green if TSB is 0 to +25 (fresh), amber if -10 to 0 (some fatigue but raceable), red if < -10 (too fatigued) or > +25 (detrained)
-- Decoupling indicator: green/amber/red based on average decoupling across last 3 long aerobic sessions for this discipline
+- Training-state caveat: `LOW_RECENT_TRAINING` is caution/detraining evidence even if estimated TSB is positive
+- Durability and threshold indicators: use the 12-week trend fields and preserve insufficient/not-comparable states
+- Confidence/evidence label and compact-tool caveats
 
 *Verdict chip* at bottom:
 - `READY` — all disciplines at or above lower bound of range, TSB within race-day target window
@@ -391,6 +514,12 @@ Render an HTML artifact, then a 1-sentence verdict, then the liability guardrail
 - `NOT YET` — two or more disciplines below lower bound, or TSB significantly outside target window
 
 With the single biggest gap called out in one sentence below the chip.
+
+### Degradation
+- If either compact tool is unavailable, name the older-server fallback.
+- Fetch 28 days of wellness, at least 84 days of activities, and seven days of planned events. Compare recent discipline volume with race demands and use curve tools only for requested threshold evidence.
+- Without server-estimated discipline CTL, do not apply CTL benchmark gauges or reconstruct CTL from activity aggregate values. Show Intervals aggregate CTL separately when useful and mark the discipline benchmark evidence unavailable.
+- Never invoke a write tool from race-readiness analysis unless the athlete separately requests and confirms a scheduling or plan change.
 
 ---
 
@@ -542,8 +671,8 @@ All thresholds and benchmarks used during analysis. Apply these consistently acr
 
 ## PMC (Performance Management Chart)
 
-**Critical rule for triathletes: always compute per-discipline, never aggregate.**
-A triathlete with CTL 80 on the bike and CTL 20 on the run is undertrained for running, even if aggregate looks fine.
+**Critical rule for triathletes:** use only clearly labelled server-estimated discipline CTL/ATL/TSB. Never derive discipline values from activity-level Intervals aggregate CTL/ATL; show aggregate load separately when useful.
+A triathlete can have materially different discipline load states even when aggregate load looks fine, so assess each sport from the server estimate and its own trend evidence.
 
 ### CTL Ramp Rate (per discipline)
 | Rate (pts/week) | Assessment |
