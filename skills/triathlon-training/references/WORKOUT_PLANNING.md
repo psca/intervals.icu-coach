@@ -235,6 +235,20 @@ Use this to clone a prior workout's `workout_doc` into a new planned event.
 
 ---
 
+## Post-Activity Split Reconciliation
+
+Use `preview_split_workout_reconciliation` when one planned workout is represented by multiple completed activities, such as a cafe ride saved as outbound and inbound files.
+
+- Preview first; it is read-only and defaults to a 90-minute maximum elapsed gap between same-sport, same-local-day activities.
+- Require the `EASY_CONTINUOUS_RIDE` classification: outdoor Ride, at least 60 planned minutes, sequential timed steps, every planned power target at or below 75% FTP, and every completed part at or below 80% intensity.
+- Treat `easy`, `cafe`, `endurance`, `recovery`, `social`, `long`, and `base` in names/tags as supporting cues only; they never override the hard eligibility limits.
+- Present the exact proportional five-minute allocation, replacement descriptions, names, ordered activity IDs, and warnings.
+- The allocation preserves the original planned duration. It does not resize the plan to make completed duration appear perfect.
+- The first and last replacement receive the original warmup and cooldown respectively; eligible main work is divided between them.
+- Require explicit approval before passing the preview fingerprint to `reconcile_split_workout` with `confirm: true`.
+- Treat unsupported-structure and stale-fingerprint responses as hard stops. Fetch a new preview rather than composing generic write tools.
+- Report upstream compliance after the write without promising a particular score.
+
 ## Batch Write Guidance (Training Blocks)
 
 When writing a multi-week training block to the calendar:
