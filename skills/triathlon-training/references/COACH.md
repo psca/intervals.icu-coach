@@ -459,10 +459,12 @@ With the single biggest gap called out in one sentence below the chip.
 ### Tool sequence
 1. Call `preview_split_workout_reconciliation` for the athlete-local activity date. Use the default 90-minute gap unless the athlete requests another window.
 2. If there are multiple candidates, identify each by original workout name and activity start times; never choose silently.
-3. If `supported` is false, report the returned warnings and stop. Do not improvise generic event/activity writes around the safety refusal.
-   - Only `EASY_CONTINUOUS_RIDE` candidates qualify: outdoor Ride, at least 60 planned minutes, sequential timed steps, all planned power targets at or below 75% FTP, and all completed parts at or below 80% intensity.
-   - Name/tag cues `easy`, `cafe`, `endurance`, `recovery`, `social`, `long`, and `base` support classification but do not override the structure and intensity gates.
-4. Show the proposed replacement names, activity IDs, allocated durations, and step summaries. Explain that planned duration is allocated by recorded moving-time share in five-minute units while preserving the original total.
+3. If `supported` is false, report the returned hard warnings and stop. Do not improvise generic event/activity writes around the safety refusal.
+   - `EASY_CONTINUOUS_RIDE` candidates may use planned or completed `Ride` and `VirtualRide` types in any combination.
+   - Hard limits remain: at least 60 planned minutes, sequential timed steps, all planned power targets at or below 75% FTP, and a five-minute-compatible planned total.
+   - Completed intensity above 80% or missing intensity is advisory only and never requires a separate override parameter.
+   - Name/tag cues `easy`, `cafe`, `endurance`, `recovery`, `social`, `long`, and `base` support classification but do not override hard plan and structure limits.
+4. Show the proposed replacement names, types, indoor states, activity IDs, allocated durations, step summaries, and every advisory. Explain that each replacement matches its completed activity type and that planned duration is allocated by recorded moving-time share in five-minute units while preserving the original total.
 5. State that Intervals.icu recalculates official compliance after pairing and that the result is not guaranteed to be 100%.
 6. Ask: "Apply this reconciliation?" and wait for explicit approval.
 7. On approval, call `reconcile_split_workout` with the exact event ID, ordered activity IDs, fingerprint, date, and gap from the preview, plus `confirm: true`.
@@ -474,6 +476,7 @@ With the single biggest gap called out in one sentence below the chip.
 - A stale fingerprint requires a fresh preview and renewed approval.
 - Do not merge or delete completed activity files.
 - The existing event becomes the first replacement; subsequent replacement events are new.
+- Never treat `advisories` as a refusal. Present them before approval; only `supported: false` and hard `warnings` stop the workflow.
 - Automatic splitting is limited to `EASY_CONTINUOUS_RIDE` workouts. Repeats, distance steps, mixed/ambiguous structures, hard workouts, and non-five-minute planned totals remain unchanged.
 
 ---

@@ -29,8 +29,8 @@ You are a triathlon training coach with access to an athlete's intervals.icu dat
 | Historical best sustained HR | `get_hr_curves` | Secondary fallback when pace/power zones are absent |
 | Gear context | `get_gear` | Optional context for bike/shoe usage, not required for analysis |
 | Create / update planned workout | `add_or_update_event` | ⚠️ Write operation — run references/WORKOUT_PLANNING.md pre-flight checks first |
-| Preview split-workout repair | `preview_split_workout_reconciliation` | Read-only; detects same-sport activity clusters and proposes a proportional split |
-| Apply split-workout repair | `reconcile_split_workout` | ⚠️ Write operation — requires the exact preview fingerprint and explicit athlete approval |
+| Preview split-workout repair | `preview_split_workout_reconciliation` | Read-only; matches `Ride` and `VirtualRide` as one cycling family, returns hard warnings and non-blocking intensity advisories |
+| Apply split-workout repair | `reconcile_split_workout` | ⚠️ Write operation — requires the exact preview fingerprint and explicit athlete approval; no override parameter |
 | Delete planned workout | `delete_event` | Permanent — confirm with athlete before calling |
 | Fetch a specific event | `get_event_by_id` | Use to clone an existing workout's structure |
 | Get weather for an outdoor activity | `get_activity_weather` | activity_id |
