@@ -165,7 +165,62 @@ Cooldown
 
 ## Bike
 
+### Beginner Easy Ride
+- **When:** Beginner Cycling Consistency / Cycling Endurance Base
+- **Duration range:** 30-120min
+- **Intensity:** Conversational RPE 2-4/10
+- **Beginner rule:** RPE and the talk test are primary. Power or HR may clarify effort only when current zones are reliable.
+
+Warmup
+- 5m very easy RPE 2
+
+Main
+- Xm conversational riding RPE 2-4
+
+Cooldown
+- 5m very easy RPE 2
+
+---
+
+### Optional Easy Spin
+- **When:** Beginner Cycling Consistency
+- **Duration range:** 20-45min
+- **Intensity:** Very easy RPE 2-3/10
+- **Beginner rule:** This session is optional and is never required for progression.
+
+Warmup
+- 5m very easy RPE 2
+
+Main
+- Xm easy spinning RPE 2-3
+
+Cooldown
+- 5m very easy RPE 2
+
+---
+
+### Controlled Tempo Ride
+- **When:** Cycling Endurance Base after at least four easy consistency weeks
+- **Duration range:** 50-90min
+- **Intensity:** Mostly easy with controlled tempo at RPE 5-6/10; never all-out
+
+Warmup
+- 10m easy RPE 2-3
+
+Main Set Nx
+- Xm controlled tempo RPE 5-6
+- Ym easy RPE 2-3
+
+Endurance
+- Zm conversational riding RPE 3-4
+
+Cooldown
+- 5m very easy RPE 2
+
+---
+
 ### Easy Endurance
+
 - **When:** Base / All phases
 - **Duration range:** 60-180min
 - **Intensity:** Z2, 55-75% FTP
@@ -297,7 +352,63 @@ Cooldown
 
 ## Run
 
+### Run/Walk Intervals
+- **When:** Couch to 5K
+- **Duration range:** 25-40min total
+- **Intensity:** Conversational running at RPE 3-4/10; easy walking recovery
+- **Beginner rule:** Parameterize run/walk repetitions from BLOCK_TEMPLATES.md. Do not replace RPE with a pace target.
+
+Warmup
+- 5m walk
+
+Main Set Nx
+- Xm run RPE 3-4
+- Ym walk
+
+Cooldown
+- 5m walk
+
+---
+
+### Easy Run with Optional Walks
+- **When:** Couch to 5K / 5K to 10K
+- **Duration range:** 20-75min
+- **Intensity:** Conversational RPE 3-4/10
+- **Beginner rule:** Walking breaks are always allowed. Parameterize duration from BLOCK_TEMPLATES.md.
+
+Warmup
+- 5m walk
+
+Main
+- Xm run RPE 3-4 — take short walking breaks whenever needed
+
+Cooldown
+- 5m walk
+
+---
+
+### Relaxed Strides
+- **When:** 5K to 10K after an easy running base
+- **Duration range:** 30-45min total
+- **Intensity:** Easy running plus relaxed, controlled accelerations; never sprinting
+
+Warmup
+- 10m run RPE 3
+
+Main
+- Xm run RPE 3-4
+
+Strides 4x
+- 20s relaxed acceleration RPE 6
+- 100s walk or easy jog
+
+Cooldown
+- 5m run or walk RPE 2
+
+---
+
 ### Easy Aerobic
+
 - **When:** Base / All phases
 - **Duration range:** 30-90min
 - **Intensity:** Z2 HR or 65-75% Pace
