@@ -1,8 +1,6 @@
 #!/bin/sh
 
 set -eu
-PATH="${PATH}:/opt/homebrew/bin:/usr/local/bin"
-
 
 SKILL="skills/triathlon-training/SKILL.md"
 COACH="skills/triathlon-training/references/COACH.md"
@@ -10,35 +8,15 @@ BLOCKS="skills/triathlon-training/references/BLOCK_TEMPLATES.md"
 LIBRARY="skills/triathlon-training/references/WORKOUT_LIBRARY.md"
 CHATGPT="docs/chatgpt-projects/TRIATHLON_TRAINING_CHATGPT_PROJECT_SKILL.md"
 
-has_text() {
-  pattern=$1
-  file=$2
-  if command -v rg >/dev/null 2>&1; then
-    rg -q --fixed-strings "$pattern" "$file"
-  else
-    grep -F -q "$pattern" "$file"
-  fi
-}
-
-match_regex() {
-  pattern=$1
-  if command -v rg >/dev/null 2>&1; then
-    rg -q "$pattern"
-  else
-    grep -E -q "$pattern"
-  fi
-}
-
 require_text() {
   pattern=$1
   file=$2
   label=$3
-  if ! has_text "$pattern" "$file"; then
+  if ! rg -q --fixed-strings "$pattern" "$file"; then
     echo "FAIL: $label"
     exit 1
   fi
 }
-
 
 for file in "$SKILL" "$COACH" "$BLOCKS" "$LIBRARY" "$CHATGPT"; do
   if [ ! -f "$file" ]; then
@@ -69,20 +47,19 @@ five_to_ten=$(sed -n '/^## 5K to 10K — 8 weeks$/,/^---$/p' "$BLOCKS")
 beginner_bike=$(sed -n '/^## Beginner Cycling Consistency — 8 weeks$/,/^---$/p' "$BLOCKS")
 endurance_bike=$(sed -n '/^## Cycling Endurance Base — 12 weeks$/,/^---$/p' "$BLOCKS")
 
-if printf '%s\n' "$five_to_ten" | match_regex 'Threshold|VO2max'; then
+if printf '%s\n' "$five_to_ten" | rg -q 'Threshold|VO2max'; then
   echo 'FAIL: 5K-to-10K contains threshold or VO2max work'
   exit 1
 fi
 
-if printf '%s\n' "$beginner_bike" | match_regex 'Tempo|Threshold|VO2max|Maximal'; then
+if printf '%s\n' "$beginner_bike" | rg -q 'Tempo|Threshold|VO2max|Maximal'; then
   echo 'FAIL: beginner cycling contains intensity'
   exit 1
 fi
 
-if printf '%s\n' "$endurance_bike" | match_regex 'VO2max|Maximal'; then
+if printf '%s\n' "$endurance_bike" | rg -q 'VO2max|Maximal'; then
   echo 'FAIL: cycling endurance contains maximal work'
   exit 1
 fi
-
 
 echo "Beginner block validation passed"

@@ -562,3 +562,107 @@ Weekly hours: 8-13hr
 | 22 | Peak | Race Pace Run, Easy Aerobic, Easy + Strides, Long Run | — | Sharpening; long run 100min |
 | 23 | Taper | Threshold Cruise Intervals, Easy Aerobic x2 | — | -30% volume |
 | 24 | Taper | Easy Aerobic, Easy + Strides, Recovery Jog | — | Race week |
+
+---
+
+## Beginner Single-Sport Blocks
+
+### Shared Beginner Rules
+- Completion and comfort matter more than speed, distance, power, or pace.
+- A session is successful when completed at the prescribed conversational effort.
+- Repeating a week is normal when a session cannot be completed comfortably, recovery is inadequate, or persistent soreness develops.
+- Do not progress through pain, active injury, illness, or unusual fatigue.
+- Progress only one primary demand at a time: duration before intensity for these beginner blocks.
+- Recovery weeks reduce duration while preserving routine.
+- Schedule running sessions with at least one non-running day between them.
+- Walking breaks remain permitted in all running blocks.
+
+---
+
+## Couch to 5K — 9 weeks
+
+Phases: Build aerobic running habit (9wk)
+Weekly runs: 3 run/walk sessions (with at least one rest day between runs)
+Intensity: Conversational RPE 3-4/10; easy walking recovery
+
+Note: Every session includes a 5-minute walking warmup and 5-minute walking cooldown. Completing 30 continuous minutes does not guarantee covering 5 km; completion and comfort matter more than pace or distance. Walking breaks remain valid.
+
+| Wk | Session 1 | Session 2 | Session 3 | Notes |
+|----|-----------|-----------|-----------|-------|
+| 1 | Run/Walk Intervals: 8 x 1min run / 90s walk | Run/Walk Intervals: 8 x 1min run / 90s walk | Run/Walk Intervals: 8 x 1min run / 90s walk | Build habit |
+| 2 | Run/Walk Intervals: 6 x 90s run / 2min walk | Run/Walk Intervals: 6 x 90s run / 2min walk | Run/Walk Intervals: 6 x 90s run / 2min walk | Extend run intervals |
+| 3 | Run/Walk Intervals: 2 rounds of 90s run, 90s walk, 3min run, 3min walk | Run/Walk Intervals: 2 rounds of 90s run, 90s walk, 3min run, 3min walk | Run/Walk Intervals: 2 rounds of 90s run, 90s walk, 3min run, 3min walk | Longer intervals |
+| 4 | Run/Walk Intervals: 3min run, 90s walk, 5min run, 2.5min walk, 3min run, 90s walk, 5min run | Run/Walk Intervals: 3min run, 90s walk, 5min run, 2.5min walk, 3min run, 90s walk, 5min run | Run/Walk Intervals: 3min run, 90s walk, 5min run, 2.5min walk, 3min run, 90s walk, 5min run | Extend to 5m run |
+| 5 | Run/Walk Intervals: 3 x 5min run / 3min walk | Run/Walk Intervals: 8min run / 5min walk / 8min run | Easy Run with Optional Walks: 20min | First continuous run |
+| 6 | Run/Walk Intervals: 5min run / 3min walk / 8min run / 3min walk / 5min run | Run/Walk Intervals: 10min run / 3min walk / 10min run | Easy Run with Optional Walks: 25min | Consolidate run |
+| 7 | Easy Run with Optional Walks: 25min | Easy Run with Optional Walks: 25min | Easy Run with Optional Walks: 25min | Continuous 25min |
+| 8 | Easy Run with Optional Walks: 28min | Easy Run with Optional Walks: 28min | Easy Run with Optional Walks: 28min | Continuous 28min |
+| 9 | Easy Run with Optional Walks: 30min | Easy Run with Optional Walks: 30min | Easy Run with Optional Walks: 30min | Goal: continuous 30min |
+
+---
+
+## 5K to 10K — 8 weeks
+
+Phases: Base / Extension (8wk)
+Weekly runs: 3 runs (easy, easy/strides, long easy)
+Intensity: Conversational RPE 3-4/10; relaxed strides RPE 6. No high-intensity intervals (no speed work above RPE 6, no race-effort repeats).
+
+| Wk | Easy | Easy / Strides | Long Easy | Notes |
+|----|------|----------------|-----------|-------|
+| 1 | Easy Run with Optional Walks: 25min | Easy Run with Optional Walks: 30min | Easy Run with Optional Walks: 40min | Establish base |
+| 2 | Easy Run with Optional Walks: 30min | Relaxed Strides: 30min | Easy Run with Optional Walks: 45min | Introduce strides |
+| 3 | Easy Run with Optional Walks: 30min | Easy Run with Optional Walks: 35min | Easy Run with Optional Walks: 50min | Extend long run |
+| 4 | Easy Run with Optional Walks: 25min | Easy Run with Optional Walks: 30min | Easy Run with Optional Walks: 40min | Recovery week |
+| 5 | Easy Run with Optional Walks: 35min | Relaxed Strides: 35min | Easy Run with Optional Walks: 55min | Volume build |
+| 6 | Easy Run with Optional Walks: 35min | Easy Run with Optional Walks: 40min | Easy Run with Optional Walks: 60min | Reach 60min long run |
+| 7 | Easy Run with Optional Walks: 30min | Relaxed Strides: 35min | Easy Run with Optional Walks: 70min | Peak long run |
+| 8 | Easy Run with Optional Walks: 25min | Easy Run with Optional Walks: 20min | Easy Run with Optional Walks: Complete 10 km easily with optional walking breaks | Goal 10K completion |
+
+---
+
+## Beginner Cycling Consistency — 8 weeks
+
+Phases: Consistency / Aerobic Base (8wk)
+Weekly rides: 2 required Beginner Easy Rides + 1 Optional Easy Spin
+Intensity: Conversational RPE 2-4/10. Easy aerobic riding only — no sustained efforts above RPE 4.
+
+Note: Omitting the optional spin session never blocks progression.
+
+| Wk | Required 1 | Required 2 | Optional | Notes |
+|----|------------|------------|----------|-------|
+| 1 | Beginner Easy Ride: 30min | Beginner Easy Ride: 40min | Optional Easy Spin: 20min | Build habit |
+| 2 | Beginner Easy Ride: 35min | Beginner Easy Ride: 45min | Optional Easy Spin: 25min | +10min total |
+| 3 | Beginner Easy Ride: 40min | Beginner Easy Ride: 50min | Optional Easy Spin: 30min | Base build |
+| 4 | Beginner Easy Ride: 30min | Beginner Easy Ride: 40min | Optional Easy Spin: 20min | Recovery week |
+| 5 | Beginner Easy Ride: 45min | Beginner Easy Ride: 60min | Optional Easy Spin: 30min | Extend long ride |
+| 6 | Beginner Easy Ride: 45min | Beginner Easy Ride: 70min | Optional Easy Spin: 35min | Build endurance |
+| 7 | Beginner Easy Ride: 50min | Beginner Easy Ride: 80min | Optional Easy Spin: 40min | Peak volume |
+| 8 | Beginner Easy Ride: 40min | Beginner Easy Ride: 60min | Optional Easy Spin: 30min | Consolidation |
+
+---
+
+## Cycling Endurance Base — 12 weeks
+
+Phases: Base 1 (4wk) → Base 2 / Tempo (4wk) → Base 3 / Extension (4wk)
+Weekly rides: 3 rides (two easy aerobic rides + one quality/easy ride)
+Intensity: Mostly RPE 2-4/10. Controlled Tempo (RPE 5-6/10) introduced only after Week 4. No all-out or maximal efforts.
+
+Entry criteria: Athlete can comfortably ride for 60 minutes.
+
+| Wk | Easy 1 | Quality / Easy | Long Easy | Tempo Prescription | Notes |
+|----|--------|----------------|-----------|--------------------|-------|
+| 1 | Beginner Easy Ride: 45min | Beginner Easy Ride: 60min | Beginner Easy Ride: 75min | none | Base 1 consistency |
+| 2 | Beginner Easy Ride: 50min | Beginner Easy Ride: 60min | Beginner Easy Ride: 90min | none | Extend long ride |
+| 3 | Beginner Easy Ride: 50min | Beginner Easy Ride: 65min | Beginner Easy Ride: 105min | none | Peak Base 1 volume |
+| 4 | Beginner Easy Ride: 40min | Beginner Easy Ride: 45min | Beginner Easy Ride: 75min | recovery | Recovery week |
+| 5 | Beginner Easy Ride: 50min | Controlled Tempo Ride: 60min | Beginner Easy Ride: 105min | 2 x 6min RPE 5 | Introduce controlled tempo |
+| 6 | Beginner Easy Ride: 55min | Controlled Tempo Ride: 65min | Beginner Easy Ride: 120min | 2 x 8min RPE 5 | 2hr long ride |
+| 7 | Beginner Easy Ride: 60min | Controlled Tempo Ride: 70min | Beginner Easy Ride: 135min | 3 x 8min RPE 5-6 | Peak Base 2 |
+| 8 | Beginner Easy Ride: 45min | Beginner Easy Ride: 50min | Beginner Easy Ride: 90min | recovery | Recovery week |
+| 9 | Beginner Easy Ride: 60min | Controlled Tempo Ride: 75min | Beginner Easy Ride: 135min | 2 x 12min RPE 5-6 | Extend tempo intervals |
+| 10 | Beginner Easy Ride: 60min | Controlled Tempo Ride: 80min | Beginner Easy Ride: 150min | 3 x 10min RPE 5-6 | 2.5hr long ride |
+| 11 | Beginner Easy Ride: 60min | Controlled Tempo Ride: 85min | Beginner Easy Ride: 165min | 2 x 15min RPE 5-6 | Peak endurance base |
+| 12 | Beginner Easy Ride: 45min | Beginner Easy Ride: 60min | Beginner Easy Ride: 105min | consolidation | Consolidation week |
+
+---
+
