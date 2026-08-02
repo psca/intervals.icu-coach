@@ -64,9 +64,9 @@ This is the raw wellness-history view. Route "should I train today?", "am I read
 1. Call `get_wellness_data` with `start_date` = 14 days ago, `end_date` = today
 
 ### Output
-Render an HTML artifact, then a 2-sentence markdown summary below it, then the liability guardrail.
+Use a visual artifact supported by the current harness when available. Otherwise, present this as a compact Markdown card or table. Do not emit raw HTML. Then provide a 2-sentence Markdown summary below it, followed by the liability guardrail.
 
-**HTML artifact — wellness card:**
+**Artifact or Markdown fallback — wellness card:**
 - HRV sparkline (7 days): plot daily `HRV` values with a horizontal baseline marker (7-day average)
 - Resting HR line (7 days): plot below the HRV sparkline, using the `Resting HR` value per day
 - Sleep score row (7 days): one dot per day using `Device Sleep Score` (out of 100). Omit this row silently if the field is absent or null for all days.
@@ -96,9 +96,9 @@ Render an HTML artifact, then a 2-sentence markdown summary below it, then the l
 3. Read structured fields, not the tools' short text summaries. Preserve each tool's `confidence` and `caveats`.
 
 ### Output
-Render an HTML artifact, then a 2-sentence cross-discipline note, then the liability guardrail.
+Use a visual artifact supported by the current harness when available. Otherwise, present this as a compact Markdown card or table. Do not emit raw HTML. Then provide a 2-sentence cross-discipline note, followed by the liability guardrail.
 
-**HTML artifact — status card:**
+**Artifact or Markdown fallback — status card:**
 Three columns, one per discipline (Swim / Bike / Run). Show "Not enough data" for insufficient disciplines.
 
 Per column:
@@ -145,7 +145,9 @@ Apply these patterns in priority order:
 5. `get_activity_intervals` — only if structured-workout assessment requires interval detail
 6. `get_activity_streams` — only if a required decoupling or VI analysis is unavailable from summary/detail fields; high token cost, use as last resort
 
-### Output — Part 1: HTML artifact (stat card)
+### Output — Part 1: Artifact or Markdown fallback (stat card)
+
+Use a visual artifact supported by the current harness when available. Otherwise, present this as a compact Markdown card or table. Do not emit raw HTML.
 
 **Weather strip (outdoor Run/Ride only):**
 Lead with: "{description} — {average_feels_like}°C feels-like, {average_wind_speed} km/h {prevailing_wind_cardinal}"
@@ -238,9 +240,9 @@ A single clarifying question inviting athlete context. Examples: sleep quality, 
 3. Use snapshot structured fields as authoritative; the short text response is status-only. Preserve its week boundaries and timezone.
 
 ### Output
-Render an HTML artifact, then a 2–3 sentence markdown summary, then the liability guardrail.
+Use a visual artifact supported by the current harness when available. Otherwise, present this as a compact Markdown card or table. Do not emit raw HTML. Then provide a 2–3 sentence Markdown summary, followed by the liability guardrail.
 
-**HTML artifact — weekly view:**
+**Artifact or Markdown fallback — weekly view:**
 
 *Wellness strip (Mon–Sun across top):*
 One column per day. Each cell: HRV dot + Resting HR dot. Empty dot (grey outline) for days with no wellness data — do not interpolate missing days. If wellness data is entirely absent for all 7 days: omit this row and note the gap in the markdown summary.
@@ -284,9 +286,9 @@ Use snapshot `totals.by_discipline` for completed and planned duration/load/dist
 2. Read structured `status`, `confidence`, systemic recovery, discipline load, future demand, signals, limiter, and caveats. The short text response is status-only.
 
 ### Output
-Render an HTML artifact, then a concise 2–3 sentence markdown interpretation, then the liability guardrail.
+Use a visual artifact supported by the current harness when available. Otherwise, present this as a compact Markdown card or table. Do not emit raw HTML. Then provide a concise 2–3 sentence Markdown interpretation, followed by the liability guardrail.
 
-**HTML artifact — training readiness card:**
+**Artifact or Markdown fallback — training readiness card:**
 - Status banner: `READY`, `MODERATE`, `CAUTION`, `REST RECOMMENDED`, or `INSUFFICIENT DATA`
 - Recovery strip: HRV status/trend and below-baseline streak, resting-HR deviation/status, sleep duration/status, plus injury/fatigue/soreness when present. Show missing HRV or sleep explicitly.
 - Discipline load row: per requested discipline, show estimated CTL/ATL/TSB with the label **Server-estimated discipline load**, `training_state`, recent load, most recent activity date, and evidence count
@@ -321,9 +323,9 @@ State the main readiness signal, whether it fits the upcoming session, and the m
 3. Read structured discipline/window summaries, confidence, evidence cohorts, and caveats. The short text response is status-only.
 
 ### Output
-Render an HTML artifact, then a concise 2–3 sentence markdown interpretation, then the liability guardrail.
+Use a visual artifact supported by the current harness when available. Otherwise, present this as a compact Markdown card or table. Do not emit raw HTML. Then provide a concise 2–3 sentence Markdown interpretation, followed by the liability guardrail.
 
-**HTML artifact — discipline trends card:**
+**Artifact or Markdown fallback — discipline trends card:**
 - One section per requested discipline and one row per requested 4/8/12-week window
 - **Volume:** sessions, duration, distance, training load, `volume_trend`, and load-spike signal
 - **Fitness:** `fitness_trend` as its own evidence channel
@@ -371,9 +373,9 @@ Semantic rules:
 These are benchmarks, not hard thresholds. Note when an athlete is near the boundary of a range. Compare them only with clearly labelled server-estimated discipline CTL; never with Intervals aggregate CTL or aggregate CTL copied from a discipline's latest activity.
 
 ### Output
-Render an HTML artifact, then a 1-sentence verdict, then the liability guardrail.
+Use a visual artifact supported by the current harness when available. Otherwise, present this as a compact Markdown card or table. Do not emit raw HTML. Then provide a 1-sentence verdict, followed by the liability guardrail.
 
-**HTML artifact — readiness card:**
+**Artifact or Markdown fallback — readiness card:**
 
 *Race distance banner* at top (e.g. "70.3 Half Ironman Readiness")
 
