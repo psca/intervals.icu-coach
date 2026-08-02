@@ -665,4 +665,3 @@ Entry criteria: Athlete can comfortably ride for 60 minutes.
 | 12 | Beginner Easy Ride: 45min | Beginner Easy Ride: 60min | Beginner Easy Ride: 105min | consolidation | Consolidation week |
 
 ---
-
