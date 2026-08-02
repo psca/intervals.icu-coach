@@ -2079,7 +2079,7 @@ Cooldown
 
 ### Beginner Easy Ride
 - **When:** Beginner Cycling Consistency / Cycling Endurance Base
-- **Duration range:** 30-120min
+- **Duration range:** 30-165min
 - **Intensity:** Conversational RPE 2-4/10
 - **Beginner rule:** RPE and the talk test are primary. Power or HR may clarify effort only when current zones are reliable.
 

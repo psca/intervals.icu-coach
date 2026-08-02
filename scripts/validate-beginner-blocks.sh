@@ -27,6 +27,7 @@ done
 
 require_text '### Run/Walk Intervals' "$LIBRARY" 'missing run/walk archetype'
 require_text '### Beginner Easy Ride' "$LIBRARY" 'missing beginner easy ride archetype'
+require_text '**Duration range:** 30-165min' "$LIBRARY" 'beginner easy ride does not cover template duration'
 require_text '### Optional Easy Spin' "$LIBRARY" 'missing optional ride archetype'
 require_text '### Controlled Tempo Ride' "$LIBRARY" 'missing controlled tempo archetype'
 require_text '## Couch to 5K — 9 weeks' "$BLOCKS" 'missing Couch to 5K block'
@@ -42,6 +43,7 @@ require_text 'Repeating a week is normal' "$COACH" 'missing repeat-week rule'
 require_text 'does not guarantee covering 5 km' "$COACH" 'missing 30-minute distance caveat'
 require_text '## Couch to 5K — 9 weeks' "$CHATGPT" 'ChatGPT source lacks Couch to 5K block'
 require_text '### Controlled Tempo Ride' "$CHATGPT" 'ChatGPT source lacks controlled tempo archetype'
+require_text '**Duration range:** 30-165min' "$CHATGPT" 'ChatGPT source lacks beginner easy ride duration'
 
 five_to_ten=$(sed -n '/^## 5K to 10K — 8 weeks$/,/^---$/p' "$BLOCKS")
 beginner_bike=$(sed -n '/^## Beginner Cycling Consistency — 8 weeks$/,/^---$/p' "$BLOCKS")
