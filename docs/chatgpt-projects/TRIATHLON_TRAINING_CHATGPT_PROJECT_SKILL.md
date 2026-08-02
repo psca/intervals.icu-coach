@@ -92,7 +92,7 @@ Structured fields returned by compact analysis tools are authoritative. Treat th
 | "am I ready for [race]", "race readiness", "ready for [distance]" | Race Readiness |
 | "schedule a workout", "add a session", "plan a [sport] for [date]" | Schedule a Workout |
 | "split activities", "cafe ride", "workout paired to only one activity", "fix compliance" | Reconcile a Split Workout |
-| "build a training plan", "create a block", "plan my season", "build me a plan for [race]", "training block" | Build Training Block |
+| "build a training plan", "create a block", "plan my season", "build me a plan for [race]", "training block", "couch to 5K", "5K to 10K", "beginner running", "beginner cycling", "cycling base", "cycling-only plan" | Build Training Block |
 
 ---
 
@@ -173,7 +173,7 @@ Respond conversationally — not as a command list. Example:
 > - **Discipline trends** — what changed over 4, 8, or 12 weeks in swim, bike, or run
 > - **Race readiness** — how your current fitness compares to typical minimums for sprint, olympic, 70.3, or ironman
 > - **Schedule a workout** — add a planned session to your intervals.icu calendar
-> - **Training block** — build a multi-week periodized plan for any distance from sprint to Ironman, plus half and full marathon. I'll walk you through the setup and preview the plan before adding anything to your calendar
+> - **Training block** — build a multi-week periodized plan for any distance from sprint to Ironman, plus half and full marathon. Beginner single-sport blocks are also available: couch to 5K (9 weeks), 5K to 10K (8 weeks), beginner cycling consistency (8 weeks), and cycling endurance base (12 weeks). I'll walk you through the setup and preview the plan before adding anything to your calendar
 >
 > Just ask naturally — "should I train today?", "how was my last ride?", "is my run improving?", or "am I ready for a 70.3?" — and I'll pull the data.
 
@@ -610,7 +610,7 @@ With the single biggest gap called out in one sentence below the chip.
 
 ## Build Training Block
 
-**Triggers:** "build a training plan", "create a block", "plan my season", "build me a plan for [race]", "training block"
+**Triggers:** "build a training plan", "create a block", "plan my season", "build me a plan for [race]", "training block", "couch to 5K", "5K to 10K", "beginner running", "beginner cycling", "cycling base", "cycling-only plan"
 **Tools:** `get_athlete_profile` → `get_activities` (56 days) → `get_events` (target date range) → optional `search_activities` / curve tools → `add_or_update_event` (batch write on approval)
 **Guardrail:** none (liability guardrail not needed — athlete approves every event before write)
 
@@ -628,7 +628,19 @@ Before asking any questions:
    - `get_hr_curves` only as a secondary fallback when power/pace data is absent
 6. If no reliable zone data exists after the fallback pass, ask the athlete for recent test results and be ready to generate HR- or RPE-based workouts.
 
-### Structured intake (REQUIRED — do not skip or infer)
+### Beginner / single-sport intake (REQUIRED for beginner requests — do not skip or infer)
+
+When the athlete's request is a beginner or single-sport block (couch to 5K, 5K to 10K, beginner running, beginner cycling, cycling base, cycling-only), ask ALL of the following before assembly:
+
+1. **Current baseline:** Ask what the athlete can comfortably do today: walking duration, continuous running duration, or comfortable cycling duration. Present MCP history as context, but require confirmation.
+2. **Training days:** Ask for the maximum number of days per week they can consistently commit, separate from available hours.
+3. **Goal:** Confirm complete 5K, progress from 5K to 10K, ride consistently, build cycling endurance, or prepare for a stated event.
+4. **Schedule constraints:** Unavailable days and protected activities.
+5. **Health context:** Current pain, injury, illness, or relevant medical restriction. If the athlete reports any of these, see **Safety degradation** below — do not proceed to plan assembly.
+
+Do not require a race date for general cycling consistency or cycling endurance; ask for one only when the athlete is preparing for a stated event.
+
+### Structured intake (REQUIRED for race-plan requests — do not skip or infer)
 
 **You must ask ALL of questions 1–5 before beginning assembly. MCP data informs how you frame the questions, not whether you ask them. Never use MCP data or "sensible defaults" to skip asking.** Consolidate related questions. Accept multi-part answers. If the athlete skips a question, then and only then use the default.
 
@@ -653,6 +665,17 @@ Before asking any questions:
    - Slot sessions into available days, respecting constraints and protected sessions
 5. For plans > 12 weeks: assemble and present one phase at a time
 
+**Beginner template selection mapping:**
+
+| Athlete baseline and goal | Template |
+|---|---|
+| Cannot yet run continuously for 20 minutes; wants to begin running or complete 5K | Couch to 5K (9 weeks) |
+| Can run continuously for about 30 minutes or has recently completed 5K; wants to complete 10K | 5K to 10K (8 weeks) |
+| New or returning cyclist; wants consistency or basic comfort on the bike | Beginner Cycling Consistency (8 weeks) |
+| Can comfortably ride 60 minutes; wants greater endurance or preparation for a longer recreational ride | Cycling Endurance Base (12 weeks) |
+
+If the athlete does not meet an entry criterion, explain the mismatch and select the safer earlier block. Never silently compress a beginner block.
+
 ### Preview format
 
 Present a scannable overview:
@@ -660,6 +683,15 @@ Present a scannable overview:
 - Week-by-week table: Wk | Phase | Mon-Sun sessions | Weekly hours
 - Key sessions callout (3-5 landmark workouts with week numbers)
 - Total hours breakdown by discipline
+
+**Beginner preview additionally shows:**
+- Baseline and goal used for template selection
+- Required versus optional sessions (clearly labelled)
+- RPE and talk-test explanation: "Conversational RPE 3-4/10 means you can speak full sentences while running or riding. If you can't, slow down."
+- Repeat-week rule: Repeating a week is normal when the athlete cannot complete the sessions comfortably, recovery is inadequate, or persistent soreness develops.
+- Pain warning: Do not progress through pain, illness, or unusual fatigue. Stop and seek appropriate guidance.
+
+Note for Couch to 5K previews: Completing 30 continuous minutes does not guarantee covering 5 km; completion and comfort matter more than pace or distance.
 
 ### Free customization
 
@@ -689,6 +721,7 @@ Tell the athlete: "Your training block is on your intervals.icu calendar. You ca
 - **Empty MCP data (new athlete):** Fall back to asking all intake questions explicitly. Use RPE-based workout descriptions if no zone data available.
 - **Sparse discipline data:** If <3 activities for a discipline, note: "I don't have much [swim/bike/run] data to work with. I'll use standard defaults — you can adjust after seeing the preview."
 - **Single-sport request (marathon/half marathon):** Skip discipline split/focus questions. Use run-only templates. No swim/bike columns in preview.
+- **Safety degradation:** If the athlete reports current pain, active injury, illness, or a relevant medical restriction, do not assemble a normal beginner block through the issue. State that this skill is not a rehabilitation plan and recommend qualified medical or coaching guidance as appropriate.
 
 ---
 
@@ -1772,6 +1805,107 @@ Weekly hours: 8-13hr
 
 ---
 
+## Beginner Single-Sport Blocks
+
+### Shared Beginner Rules
+- Completion and comfort matter more than speed, distance, power, or pace.
+- A session is successful when completed at the prescribed conversational effort.
+- Repeating a week is normal when a session cannot be completed comfortably, recovery is inadequate, or persistent soreness develops.
+- Do not progress through pain, active injury, illness, or unusual fatigue.
+- Progress only one primary demand at a time: duration before intensity for these beginner blocks.
+- Recovery weeks reduce duration while preserving routine.
+- Schedule running sessions with at least one non-running day between them.
+- Walking breaks remain permitted in all running blocks.
+
+---
+
+## Couch to 5K — 9 weeks
+
+Phases: Build aerobic running habit (9wk)
+Weekly runs: 3 run/walk sessions (with at least one rest day between runs)
+Intensity: Conversational RPE 3-4/10; easy walking recovery
+
+Note: Every session includes a 5-minute walking warmup and 5-minute walking cooldown. Completing 30 continuous minutes does not guarantee covering 5 km; completion and comfort matter more than pace or distance. Walking breaks remain valid.
+
+| Wk | Session 1 | Session 2 | Session 3 | Notes |
+|----|-----------|-----------|-----------|-------|
+| 1 | Run/Walk Intervals: 8 x 1min run / 90s walk | Run/Walk Intervals: 8 x 1min run / 90s walk | Run/Walk Intervals: 8 x 1min run / 90s walk | Build habit |
+| 2 | Run/Walk Intervals: 6 x 90s run / 2min walk | Run/Walk Intervals: 6 x 90s run / 2min walk | Run/Walk Intervals: 6 x 90s run / 2min walk | Extend run intervals |
+| 3 | Run/Walk Intervals: 2 rounds of 90s run, 90s walk, 3min run, 3min walk | Run/Walk Intervals: 2 rounds of 90s run, 90s walk, 3min run, 3min walk | Run/Walk Intervals: 2 rounds of 90s run, 90s walk, 3min run, 3min walk | Longer intervals |
+| 4 | Run/Walk Intervals: 3min run, 90s walk, 5min run, 2.5min walk, 3min run, 90s walk, 5min run | Run/Walk Intervals: 3min run, 90s walk, 5min run, 2.5min walk, 3min run, 90s walk, 5min run | Run/Walk Intervals: 3min run, 90s walk, 5min run, 2.5min walk, 3min run, 90s walk, 5min run | Extend to 5m run |
+| 5 | Run/Walk Intervals: 3 x 5min run / 3min walk | Run/Walk Intervals: 8min run / 5min walk / 8min run | Easy Run with Optional Walks: 20min | First continuous run |
+| 6 | Run/Walk Intervals: 5min run / 3min walk / 8min run / 3min walk / 5min run | Run/Walk Intervals: 10min run / 3min walk / 10min run | Easy Run with Optional Walks: 25min | Consolidate run |
+| 7 | Easy Run with Optional Walks: 25min | Easy Run with Optional Walks: 25min | Easy Run with Optional Walks: 25min | Continuous 25min |
+| 8 | Easy Run with Optional Walks: 28min | Easy Run with Optional Walks: 28min | Easy Run with Optional Walks: 28min | Continuous 28min |
+| 9 | Easy Run with Optional Walks: 30min | Easy Run with Optional Walks: 30min | Easy Run with Optional Walks: 30min | Goal: continuous 30min |
+
+---
+
+## 5K to 10K — 8 weeks
+
+Phases: Base / Extension (8wk)
+Weekly runs: 3 runs (easy, easy/strides, long easy)
+Intensity: Conversational RPE 3-4/10; relaxed strides RPE 6. No high-intensity intervals (no speed work above RPE 6, no race-effort repeats).
+
+| Wk | Easy | Easy / Strides | Long Easy | Notes |
+|----|------|----------------|-----------|-------|
+| 1 | Easy Run with Optional Walks: 25min | Easy Run with Optional Walks: 30min | Easy Run with Optional Walks: 40min | Establish base |
+| 2 | Easy Run with Optional Walks: 30min | Relaxed Strides: 30min | Easy Run with Optional Walks: 45min | Introduce strides |
+| 3 | Easy Run with Optional Walks: 30min | Easy Run with Optional Walks: 35min | Easy Run with Optional Walks: 50min | Extend long run |
+| 4 | Easy Run with Optional Walks: 25min | Easy Run with Optional Walks: 30min | Easy Run with Optional Walks: 40min | Recovery week |
+| 5 | Easy Run with Optional Walks: 35min | Relaxed Strides: 35min | Easy Run with Optional Walks: 55min | Volume build |
+| 6 | Easy Run with Optional Walks: 35min | Easy Run with Optional Walks: 40min | Easy Run with Optional Walks: 60min | Reach 60min long run |
+| 7 | Easy Run with Optional Walks: 30min | Relaxed Strides: 35min | Easy Run with Optional Walks: 70min | Peak long run |
+| 8 | Easy Run with Optional Walks: 25min | Easy Run with Optional Walks: 20min | Easy Run with Optional Walks: Complete 10 km easily with optional walking breaks | Goal 10K completion |
+
+---
+
+## Beginner Cycling Consistency — 8 weeks
+
+Phases: Consistency / Aerobic Base (8wk)
+Weekly rides: 2 required Beginner Easy Rides + 1 Optional Easy Spin
+Intensity: Conversational RPE 2-4/10. Easy aerobic riding only — no sustained efforts above RPE 4.
+
+Note: Omitting the optional spin session never blocks progression.
+
+| Wk | Required 1 | Required 2 | Optional | Notes |
+|----|------------|------------|----------|-------|
+| 1 | Beginner Easy Ride: 30min | Beginner Easy Ride: 40min | Optional Easy Spin: 20min | Build habit |
+| 2 | Beginner Easy Ride: 35min | Beginner Easy Ride: 45min | Optional Easy Spin: 25min | +10min total |
+| 3 | Beginner Easy Ride: 40min | Beginner Easy Ride: 50min | Optional Easy Spin: 30min | Base build |
+| 4 | Beginner Easy Ride: 30min | Beginner Easy Ride: 40min | Optional Easy Spin: 20min | Recovery week |
+| 5 | Beginner Easy Ride: 45min | Beginner Easy Ride: 60min | Optional Easy Spin: 30min | Extend long ride |
+| 6 | Beginner Easy Ride: 45min | Beginner Easy Ride: 70min | Optional Easy Spin: 35min | Build endurance |
+| 7 | Beginner Easy Ride: 50min | Beginner Easy Ride: 80min | Optional Easy Spin: 40min | Peak volume |
+| 8 | Beginner Easy Ride: 40min | Beginner Easy Ride: 60min | Optional Easy Spin: 30min | Consolidation |
+
+---
+
+## Cycling Endurance Base — 12 weeks
+
+Phases: Base 1 (4wk) → Base 2 / Tempo (4wk) → Base 3 / Extension (4wk)
+Weekly rides: 3 rides (two easy aerobic rides + one quality/easy ride)
+Intensity: Mostly RPE 2-4/10. Controlled Tempo (RPE 5-6/10) introduced only after Week 4. No all-out or maximal efforts.
+
+Entry criteria: Athlete can comfortably ride for 60 minutes.
+
+| Wk | Easy 1 | Quality / Easy | Long Easy | Tempo Prescription | Notes |
+|----|--------|----------------|-----------|--------------------|-------|
+| 1 | Beginner Easy Ride: 45min | Beginner Easy Ride: 60min | Beginner Easy Ride: 75min | none | Base 1 consistency |
+| 2 | Beginner Easy Ride: 50min | Beginner Easy Ride: 60min | Beginner Easy Ride: 90min | none | Extend long ride |
+| 3 | Beginner Easy Ride: 50min | Beginner Easy Ride: 65min | Beginner Easy Ride: 105min | none | Peak Base 1 volume |
+| 4 | Beginner Easy Ride: 40min | Beginner Easy Ride: 45min | Beginner Easy Ride: 75min | recovery | Recovery week |
+| 5 | Beginner Easy Ride: 50min | Controlled Tempo Ride: 60min | Beginner Easy Ride: 105min | 2 x 6min RPE 5 | Introduce controlled tempo |
+| 6 | Beginner Easy Ride: 55min | Controlled Tempo Ride: 65min | Beginner Easy Ride: 120min | 2 x 8min RPE 5 | 2hr long ride |
+| 7 | Beginner Easy Ride: 60min | Controlled Tempo Ride: 70min | Beginner Easy Ride: 135min | 3 x 8min RPE 5-6 | Peak Base 2 |
+| 8 | Beginner Easy Ride: 45min | Beginner Easy Ride: 50min | Beginner Easy Ride: 90min | recovery | Recovery week |
+| 9 | Beginner Easy Ride: 60min | Controlled Tempo Ride: 75min | Beginner Easy Ride: 135min | 2 x 12min RPE 5-6 | Extend tempo intervals |
+| 10 | Beginner Easy Ride: 60min | Controlled Tempo Ride: 80min | Beginner Easy Ride: 150min | 3 x 10min RPE 5-6 | 2.5hr long ride |
+| 11 | Beginner Easy Ride: 60min | Controlled Tempo Ride: 85min | Beginner Easy Ride: 165min | 2 x 15min RPE 5-6 | Peak endurance base |
+| 12 | Beginner Easy Ride: 45min | Beginner Easy Ride: 60min | Beginner Easy Ride: 105min | consolidation | Consolidation week |
+
+---
+
 # Workout Library
 
 _Source: skills/triathlon-training/references/WORKOUT_LIBRARY.md_
@@ -1943,6 +2077,60 @@ Cooldown
 
 ## Bike
 
+### Beginner Easy Ride
+- **When:** Beginner Cycling Consistency / Cycling Endurance Base
+- **Duration range:** 30-120min
+- **Intensity:** Conversational RPE 2-4/10
+- **Beginner rule:** RPE and the talk test are primary. Power or HR may clarify effort only when current zones are reliable.
+
+Warmup
+- 5m very easy RPE 2
+
+Main
+- Xm conversational riding RPE 2-4
+
+Cooldown
+- 5m very easy RPE 2
+
+---
+
+### Optional Easy Spin
+- **When:** Beginner Cycling Consistency
+- **Duration range:** 20-45min
+- **Intensity:** Very easy RPE 2-3/10
+- **Beginner rule:** This session is optional and is never required for progression.
+
+Warmup
+- 5m very easy RPE 2
+
+Main
+- Xm easy spinning RPE 2-3
+
+Cooldown
+- 5m very easy RPE 2
+
+---
+
+### Controlled Tempo Ride
+- **When:** Cycling Endurance Base after at least four easy consistency weeks
+- **Duration range:** 50-90min
+- **Intensity:** Mostly easy with controlled tempo at RPE 5-6/10; never all-out
+
+Warmup
+- 10m easy RPE 2-3
+
+Main Set Nx
+- Xm controlled tempo RPE 5-6
+- Ym easy RPE 2-3
+
+Endurance
+- Zm conversational riding RPE 3-4
+
+Cooldown
+- 5m very easy RPE 2
+
+---
+
 ### Easy Endurance
 - **When:** Base / All phases
 - **Duration range:** 60-180min
@@ -2074,6 +2262,61 @@ Cooldown
 ---
 
 ## Run
+
+### Run/Walk Intervals
+- **When:** Couch to 5K
+- **Duration range:** 25-40min total
+- **Intensity:** Conversational running at RPE 3-4/10; easy walking recovery
+- **Beginner rule:** Parameterize run/walk repetitions from BLOCK_TEMPLATES.md. Do not replace RPE with a pace target.
+
+Warmup
+- 5m walk
+
+Main Set Nx
+- Xm run RPE 3-4
+- Ym walk
+
+Cooldown
+- 5m walk
+
+---
+
+### Easy Run with Optional Walks
+- **When:** Couch to 5K / 5K to 10K
+- **Duration range:** 20-75min
+- **Intensity:** Conversational RPE 3-4/10
+- **Beginner rule:** Walking breaks are always allowed. Parameterize duration from BLOCK_TEMPLATES.md.
+
+Warmup
+- 5m walk
+
+Main
+- Xm run RPE 3-4 — take short walking breaks whenever needed
+
+Cooldown
+- 5m walk
+
+---
+
+### Relaxed Strides
+- **When:** 5K to 10K after an easy running base
+- **Duration range:** 30-45min total
+- **Intensity:** Easy running plus relaxed, controlled accelerations; never sprinting
+
+Warmup
+- 10m run RPE 3
+
+Main
+- Xm run RPE 3-4
+
+Strides 4x
+- 20s relaxed acceleration RPE 6
+- 100s walk or easy jog
+
+Cooldown
+- 5m run or walk RPE 2
+
+---
 
 ### Easy Aerobic
 - **When:** Base / All phases
