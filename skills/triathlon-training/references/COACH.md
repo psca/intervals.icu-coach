@@ -46,7 +46,7 @@ Respond conversationally — not as a command list. Example:
 > - **Discipline trends** — what changed over 4, 8, or 12 weeks in swim, bike, or run
 > - **Race readiness** — how your current fitness compares to typical minimums for sprint, olympic, 70.3, or ironman
 > - **Schedule a workout** — add a planned session to your intervals.icu calendar
-> - **Training block** — build a multi-week periodized plan for any distance from sprint to Ironman, plus half and full marathon. I'll walk you through the setup and preview the plan before adding anything to your calendar
+> - **Training block** — build a multi-week periodized plan for any distance from sprint to Ironman, plus half and full marathon. Beginner single-sport blocks are also available: couch to 5K (9 weeks), 5K to 10K (8 weeks), beginner cycling consistency (8 weeks), and cycling endurance base (12 weeks). I'll walk you through the setup and preview the plan before adding anything to your calendar
 >
 > Just ask naturally — "should I train today?", "how was my last ride?", "is my run improving?", or "am I ready for a 70.3?" — and I'll pull the data.
 
@@ -483,7 +483,7 @@ With the single biggest gap called out in one sentence below the chip.
 
 ## Build Training Block
 
-**Triggers:** "build a training plan", "create a block", "plan my season", "build me a plan for [race]", "training block"
+**Triggers:** "build a training plan", "create a block", "plan my season", "build me a plan for [race]", "training block", "couch to 5K", "5K to 10K", "beginner running", "beginner cycling", "cycling base", "cycling-only plan"
 **Tools:** `get_athlete_profile` → `get_activities` (56 days) → `get_events` (target date range) → optional `search_activities` / curve tools → `add_or_update_event` (batch write on approval)
 **Guardrail:** none (liability guardrail not needed — athlete approves every event before write)
 
@@ -501,7 +501,19 @@ Before asking any questions:
    - `get_hr_curves` only as a secondary fallback when power/pace data is absent
 6. If no reliable zone data exists after the fallback pass, ask the athlete for recent test results and be ready to generate HR- or RPE-based workouts.
 
-### Structured intake (REQUIRED — do not skip or infer)
+### Beginner / single-sport intake (REQUIRED for beginner requests — do not skip or infer)
+
+When the athlete's request is a beginner or single-sport block (couch to 5K, 5K to 10K, beginner running, beginner cycling, cycling base, cycling-only), ask ALL of the following before assembly:
+
+1. **Current baseline:** Ask what the athlete can comfortably do today: walking duration, continuous running duration, or comfortable cycling duration. Present MCP history as context, but require confirmation.
+2. **Training days:** Ask for the maximum number of days per week they can consistently commit, separate from available hours.
+3. **Goal:** Confirm complete 5K, progress from 5K to 10K, ride consistently, build cycling endurance, or prepare for a stated event.
+4. **Schedule constraints:** Unavailable days and protected activities.
+5. **Health context:** Current pain, injury, illness, or relevant medical restriction. If the athlete reports any of these, see **Safety degradation** below — do not proceed to plan assembly.
+
+Do not require a race date for general cycling consistency or cycling endurance; ask for one only when the athlete is preparing for a stated event.
+
+### Structured intake (REQUIRED for race-plan requests — do not skip or infer)
 
 **You must ask ALL of questions 1–5 before beginning assembly. MCP data informs how you frame the questions, not whether you ask them. Never use MCP data or "sensible defaults" to skip asking.** Consolidate related questions. Accept multi-part answers. If the athlete skips a question, then and only then use the default.
 
@@ -526,6 +538,17 @@ Before asking any questions:
    - Slot sessions into available days, respecting constraints and protected sessions
 5. For plans > 12 weeks: assemble and present one phase at a time
 
+**Beginner template selection mapping:**
+
+| Athlete baseline and goal | Template |
+|---|---|
+| Cannot yet run continuously for 20 minutes; wants to begin running or complete 5K | Couch to 5K (9 weeks) |
+| Can run continuously for about 30 minutes or has recently completed 5K; wants to complete 10K | 5K to 10K (8 weeks) |
+| New or returning cyclist; wants consistency or basic comfort on the bike | Beginner Cycling Consistency (8 weeks) |
+| Can comfortably ride 60 minutes; wants greater endurance or preparation for a longer recreational ride | Cycling Endurance Base (12 weeks) |
+
+If the athlete does not meet an entry criterion, explain the mismatch and select the safer earlier block. Never silently compress a beginner block.
+
 ### Preview format
 
 Present a scannable overview:
@@ -533,6 +556,15 @@ Present a scannable overview:
 - Week-by-week table: Wk | Phase | Mon-Sun sessions | Weekly hours
 - Key sessions callout (3-5 landmark workouts with week numbers)
 - Total hours breakdown by discipline
+
+**Beginner preview additionally shows:**
+- Baseline and goal used for template selection
+- Required versus optional sessions (clearly labelled)
+- RPE and talk-test explanation: "Conversational RPE 3-4/10 means you can speak full sentences while running or riding. If you can't, slow down."
+- Repeat-week rule: Repeating a week is normal when the athlete cannot complete the sessions comfortably, recovery is inadequate, or persistent soreness develops.
+- Pain warning: Do not progress through pain, illness, or unusual fatigue. Stop and seek appropriate guidance.
+
+Note for Couch to 5K previews: Completing 30 continuous minutes does not guarantee covering 5 km; completion and comfort matter more than pace or distance.
 
 ### Free customization
 
@@ -562,5 +594,6 @@ Tell the athlete: "Your training block is on your intervals.icu calendar. You ca
 - **Empty MCP data (new athlete):** Fall back to asking all intake questions explicitly. Use RPE-based workout descriptions if no zone data available.
 - **Sparse discipline data:** If <3 activities for a discipline, note: "I don't have much [swim/bike/run] data to work with. I'll use standard defaults — you can adjust after seeing the preview."
 - **Single-sport request (marathon/half marathon):** Skip discipline split/focus questions. Use run-only templates. No swim/bike columns in preview.
+- **Safety degradation:** If the athlete reports current pain, active injury, illness, or a relevant medical restriction, do not assemble a normal beginner block through the issue. State that this skill is not a rehabilitation plan and recommend qualified medical or coaching guidance as appropriate.
 
 ---

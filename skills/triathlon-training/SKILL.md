@@ -74,7 +74,7 @@ Structured fields returned by compact analysis tools are authoritative. Treat th
 | "am I ready for [race]", "race readiness", "ready for [distance]" | Race Readiness |
 | "schedule a workout", "add a session", "plan a [sport] for [date]" | Schedule a Workout |
 | "split activities", "cafe ride", "workout paired to only one activity", "fix compliance" | Reconcile a Split Workout |
-| "build a training plan", "create a block", "plan my season", "build me a plan for [race]", "training block" | Build Training Block |
+| "build a training plan", "create a block", "plan my season", "build me a plan for [race]", "training block", "couch to 5K", "5K to 10K", "beginner running", "beginner cycling", "cycling base", "cycling-only plan" | Build Training Block |
 
 ---
 
