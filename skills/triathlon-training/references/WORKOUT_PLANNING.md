@@ -1,6 +1,6 @@
 # Workout Planning — Triathlon Training Insights
 
-Guidance for creating planned workouts on the intervals.icu calendar via `add_or_update_event`. Follow this before every MCP write call.
+Guidance for creating planned workouts through direct calendar events and the private Intervals.icu workout library. Follow this before every MCP write call.
 
 ---
 
@@ -8,11 +8,37 @@ Guidance for creating planned workouts on the intervals.icu calendar via `add_or
 
 Run before constructing any event payload:
 
+- [ ] Chosen the route from the library decision table below?
 - [ ] `start_date` provided in `YYYY-MM-DD` format? (`add_or_update_event` maps this to the upstream API's `start_date_local`)
 - [ ] Sport type identified — `Ride`, `VirtualRide`, `Run`, `Swim`, `Walk`, etc.?
 - [ ] Appropriate `target` metric selected for this discipline? (see table below)
 - [ ] Duration (`moving_time`) or distance (`distance`) specified — at least one required for a meaningful planned workout?
+- [ ] `calendar_id` is an integer when supplied?
+- [ ] Checked calendar conflicts with `get_events` before scheduling?
+- [ ] Obtained explicit athlete approval before every write?
 - [ ] No server-computed fields included in the payload? (see Excluded Fields)
+- [ ] New authoring uses plain-text `description`, never a hand-built `workout_doc`?
+
+---
+
+## Library Write Decision
+
+| Situation | Preferred write |
+|---|---|
+| Existing reusable workout | `schedule_library` in `WORKOUTS` mode |
+| New bespoke one-off | `add_or_update_event` |
+| New reusable template | `save_library_workout` in a flat folder, then schedule after approval |
+| Existing reusable block | `schedule_library` in `PLAN` mode |
+| New progressive block | Create a `PLAN`, save workouts with zero-based `day`, then schedule |
+| Race, note, or direct event edit | `add_or_update_event` |
+
+### Library lookup and authoring
+
+- Library folders are flat; do not infer or create nested folders.
+- Compact `search_workout_library` workout results omit descriptions, `workout_doc`, and attachments. Container metadata may include the container description.
+- Call `get_library_workout` only when the selected workout description or steps are needed. It returns the selected description while omitting raw `workout_doc` and attachments.
+- Use plain-text `description` syntax for every new library workout or direct calendar event. Never construct `workout_doc` by hand.
+- A progressive `PLAN` uses zero-based, non-negative integer `day` offsets. Keep each discipline as a separate workout, including brick sessions.
 
 ---
 
@@ -252,17 +278,19 @@ Use `preview_split_workout_reconciliation` when one planned workout is represent
 
 ## Batch Write Guidance (Training Blocks)
 
-When writing a multi-week training block to the calendar:
+When writing approved reusable workouts or a multi-week plan to the calendar:
 
-**Retry-safe writes:**
-- Do not assume deterministic `uid` upserts are available
-- Before any retry, call `get_events` for the target range, compare by date + name + type, and update or skip intentionally
-- If rewriting an entire block, prefer explicit conflict resolution first: work around, merge, or clear and replace
+**Library scheduling:**
+- Use `schedule_library` in `WORKOUTS` mode for selected saved workouts and `PLAN` mode for a saved progressive plan.
+- A call schedules at most 100 workouts. Split a larger approved plan deliberately, and inspect the calendar between calls.
+- `calendar_id` must be an integer when supplied.
+- Check calendar conflicts with `get_events` and obtain explicit approval before the call.
+- The upstream bulk write is not documented as transactional. If it returns an unknown outcome, call `get_events` for the affected range before retrying; do not claim that no events were created.
+- If a new plan was saved but its scheduling outcome is unknown, report that the plan remains reusable while calendar state is inspected.
 
-**Batch strategy:**
-- Write in phase-sized batches (base → build → peak/taper)
-- Provide progress feedback after each phase: "Base phase written (weeks 1-5). Writing build phase..."
-- On partial failure: surface which events succeeded and which failed, offer retry
+**Direct-event exceptions:**
+- Use `add_or_update_event` for races, notes, direct event edits, and bespoke sessions that should not become reusable library content.
+- If rewriting an entire direct-event block, prefer explicit conflict resolution first: work around, merge, or clear and replace.
 
 **Calendar conflicts:**
 - Before writing, call `get_events` for the target date range
@@ -270,6 +298,11 @@ When writing a multi-week training block to the calendar:
 
 **Race day event:**
 - If the race date does not already have a `RACE_A` event, create one with `category: "RACE_A"`, the race name, and distance
+
+## Library Maintenance
+
+- Use `delete_library_item` only for explicit library maintenance, never to resolve calendar conflicts.
+- Deleting a folder or plan permanently deletes every contained workout. State the cascade and obtain explicit confirmation before the call.
 
 ---
 
