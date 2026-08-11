@@ -490,7 +490,7 @@ With the single biggest gap called out in one sentence below the chip.
 ## Build Training Block
 
 **Triggers:** "build a training plan", "create a block", "plan my season", "build me a plan for [race]", "training block", "couch to 5K", "5K to 10K", "beginner running", "beginner cycling", "cycling base", "cycling-only plan"
-**Tools:** `get_athlete_profile` → `get_activities` (56 days) → `get_events` (target date range) → optional `search_activities` / curve tools → `add_or_update_event` (batch write on approval)
+**Tools:** `get_athlete_profile` → `get_activities` (56 days) → `get_events` (target date range) → optional `search_activities` / curve tools → `search_workout_library` → after approval, `schedule_library` in `PLAN` mode or `save_library_container` + `save_library_workout` + `schedule_library`; `add_or_update_event` for race day and bespoke exceptions
 **Guardrail:** none (liability guardrail not needed — athlete approves every event before write)
 
 ### Pre-assembly: Auto-pull MCP data
@@ -543,6 +543,7 @@ Do not require a race date for general cycling consistency or cycling endurance;
    - Scale volume per tier (short 75%, standard 100%, long 125%)
    - Slot sessions into available days, respecting constraints and protected sessions
 5. For plans > 12 weeks: assemble and present one phase at a time
+6. Search the private workout library for a matching `PLAN`. A matching name alone is insufficient: its duration, discipline mix, workout sequence, progression, and recovery pattern must match the approved preview. Do not create a plan, container, or workout during intake, assembly, discovery, or preview. Keep separate disciplines as separate workouts, including same-day bricks.
 
 **Beginner template selection mapping:**
 
@@ -584,12 +585,13 @@ The athlete can modify anything before approval:
 **Hard gate: no writes without explicit athlete approval.**
 
 On approval, follow WORKOUT_PLANNING.md batch write guidance:
-- **Every event's `description` must use plain-text workout syntax, never JSON** (see § Workout Description Syntax in WORKOUT_PLANNING.md)
-- Phase-sized batches with progress feedback
 - Calendar conflict resolution (work around / merge / clear and replace)
-- Create RACE_A event for race day if not already present
-- One `add_or_update_event` call per discipline per day — never aggregate
-- Do not assume idempotent upsert by `uid`. Before retries or rewrites, re-check the target range with `get_events` and de-duplicate deliberately.
+- For a matching existing plan, call `schedule_library` in `PLAN` mode with the approved start date and optional integer `calendar_id`.
+- For a new progressive block, call `save_library_container` after approval to create a `PLAN`, save every approved workout with `save_library_workout` and a zero-based non-negative integer `day` offset, then call `schedule_library` in `PLAN` mode.
+- Create a race-day `RACE_A` event if absent, and write bespoke exceptions separately with `add_or_update_event` after approval. Every new description remains plain-text workout syntax, never JSON (see § Workout Description Syntax in WORKOUT_PLANNING.md).
+- Keep each discipline as a separate event; do not aggregate bricks.
+- One scheduling call supports at most 100 workouts. Split a larger approved plan deliberately and re-check calendar state between calls.
+- If plan creation succeeds but calendar scheduling has an ambiguous failure, the saved plan remains reusable. Call `get_events` for the affected range before deciding whether retry is safe; do not claim the bulk endpoint is transactional or that zero events were created.
 
 ### After writing
 
