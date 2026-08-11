@@ -405,17 +405,21 @@ With the single biggest gap called out in one sentence below the chip.
 ## Schedule a Workout
 
 **Triggers:** "schedule a workout", "add a session", "plan a [sport] for [date]"
-**Tools:** `add_or_update_event`
+**Tools:** `search_workout_library` → optional `get_library_workout` → `get_events` → `schedule_library` in `WORKOUTS` mode, or `add_or_update_event` for bespoke writes; optional `save_library_workout` after approval
 **Guardrail:** none
 
 ### Before fetching anything
 - If date is missing: ask "What date should I schedule this for?"
 - If sport is missing: ask "What sport — ride, run, or swim?"
-- Description is optional — generate a sensible default name if not provided (e.g. "Easy aerobic run", "Z2 long ride")
+- Decide whether the request is a reusable archetype or a bespoke/materially adjusted session. Description is optional — generate a sensible default name if not provided (e.g. "Easy aerobic run", "Z2 long ride").
 
 ### Tool sequence
-1. Build the event payload following WORKOUT_PLANNING.md pre-flight checklist
-2. **CRITICAL — description format:** The `description` field must be plain text using intervals.icu workout syntax (see WORKOUT_PLANNING.md § Workout Description Syntax). **Never put JSON in the description field.** Example:
+1. For a reusable archetype, call `search_workout_library` with sport plus useful name or tag terms. Search results are compact; do not retrieve every workout description.
+2. When one candidate is plausible, call `get_library_workout` only if its steps or full content must be verified. Do not force reuse when the saved workout differs materially from the approved session.
+3. If no suitable template exists, offer either a bespoke calendar event or, when the athlete requests it or reuse is genuinely useful, a new reusable workout saved in an appropriate flat library folder. Do not create a library workout during search or preview.
+4. Call `get_events` for the target date or range before any calendar write.
+5. For a saved workout, display a preview with its name, sport, duration, load, intensity, destination date/time, and human-readable steps when available. For a bespoke or new reusable workout, build its payload following WORKOUT_PLANNING.md pre-flight checks.
+6. **CRITICAL — description format for bespoke/new templates:** The `description` field must be plain text using intervals.icu workout syntax (see WORKOUT_PLANNING.md § Workout Description Syntax). **Never put JSON in the description field.** Example:
 
    **Correct** — text-based workout syntax:
    ```
@@ -436,7 +440,7 @@ With the single biggest gap called out in one sentence below the chip.
      "description": "{\"description\":\"10km easy...\",\"steps\":[{\"label\":\"Warmup\",\"duration\":300}]}"
    }
    ```
-3. Display the proposed event as a markdown summary (do NOT call the tool yet):
+7. Display the proposed placement as a markdown summary (do NOT call a write tool yet):
    ```
    Proposed workout:
    - Date: [date]
@@ -446,9 +450,9 @@ With the single biggest gap called out in one sentence below the chip.
    - Target: [if specified]
    - Steps: [human-readable summary of workout structure]
    ```
-4. Ask: "Schedule this?" — wait for explicit yes before calling `add_or_update_event`
-5. On confirmation: call `add_or_update_event` with the payload. Prefer the MCP input shape: `start_date`, `type` or legacy `workout_type`, plus optional planning fields.
-6. Echo the returned event fields to confirm success
+8. Ask: "Schedule this?" — wait for explicit yes before calling a write tool.
+9. On confirmation, call `schedule_library` in `WORKOUTS` mode for a saved workout. For a new reusable workout, call `save_library_workout` first and then schedule it. For a bespoke session, call `add_or_update_event` with the payload; prefer its MCP input shape: `start_date`, `type` or legacy `workout_type`, plus optional planning fields.
+10. Echo returned fields to confirm the reported result. Report template-save failure separately from calendar-scheduling failure. If bulk scheduling has an unknown outcome, call `get_events` for the affected date before retrying and do not claim that zero events were created.
 
 ---
 
