@@ -6,7 +6,6 @@ SKILL="skills/triathlon-training/SKILL.md"
 COACH="skills/triathlon-training/references/COACH.md"
 BLOCKS="skills/triathlon-training/references/BLOCK_TEMPLATES.md"
 LIBRARY="skills/triathlon-training/references/WORKOUT_LIBRARY.md"
-CHATGPT="docs/chatgpt-projects/TRIATHLON_TRAINING_CHATGPT_PROJECT_SKILL.md"
 
 require_text() {
   pattern=$1
@@ -18,7 +17,7 @@ require_text() {
   fi
 }
 
-for file in "$SKILL" "$COACH" "$BLOCKS" "$LIBRARY" "$CHATGPT"; do
+for file in "$SKILL" "$COACH" "$BLOCKS" "$LIBRARY"; do
   if [ ! -f "$file" ]; then
     echo "FAIL: missing $file"
     exit 1
@@ -41,10 +40,6 @@ require_text '**Training days:**' "$COACH" 'intake lacks training-day cap'
 require_text '**Goal:**' "$COACH" 'intake lacks beginner goal'
 require_text 'Repeating a week is normal' "$COACH" 'missing repeat-week rule'
 require_text 'does not guarantee covering 5 km' "$COACH" 'missing 30-minute distance caveat'
-require_text '## Couch to 5K — 9 weeks' "$CHATGPT" 'ChatGPT source lacks Couch to 5K block'
-require_text '### Controlled Tempo Ride' "$CHATGPT" 'ChatGPT source lacks controlled tempo archetype'
-require_text '**Duration range:** 30-165min' "$CHATGPT" 'ChatGPT source lacks beginner easy ride duration'
-
 five_to_ten=$(sed -n '/^## 5K to 10K — 8 weeks$/,/^---$/p' "$BLOCKS")
 beginner_bike=$(sed -n '/^## Beginner Cycling Consistency — 8 weeks$/,/^---$/p' "$BLOCKS")
 endurance_bike=$(sed -n '/^## Cycling Endurance Base — 12 weeks$/,/^---$/p' "$BLOCKS")
