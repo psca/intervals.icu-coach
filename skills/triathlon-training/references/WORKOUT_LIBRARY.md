@@ -2,7 +2,12 @@
 
 Canonical workout archetypes for swim, bike, run, and strength. Each entry includes metadata for the LLM to select the right workout, and the full intervals.icu structured description syntax to write to the calendar.
 
-**Usage:** Templates in BLOCK_TEMPLATES.md reference these workouts by name. The LLM looks up the archetype here and writes the `description` field content to `add_or_update_event`.
+**Usage:** Templates in BLOCK_TEMPLATES.md reference these archetypes by name. This file remains the canonical coach-approved workout structure.
+
+- Reuse a matching saved library workout as a persisted instance without retransmitting its description.
+- When a useful reusable variant is missing, build it from the archetype and save it only after athlete approval.
+- Write a bespoke or materially adjusted session directly with `add_or_update_event` unless the athlete wants it saved.
+- Continue to resolve athlete-specific zones before either saving or directly scheduling a newly authored workout.
 
 **Scaling by tier:**
 - **Short tier:** ~75% of standard volume (fewer sets / shorter duration)
