@@ -9,28 +9,13 @@ All thresholds and benchmarks used during analysis. Apply these consistently acr
 **Critical rule for triathletes:** use only clearly labelled server-estimated discipline CTL/ATL/TSB. Never derive discipline values from activity-level Intervals aggregate CTL/ATL; show aggregate load separately when useful.
 A triathlete can have materially different discipline load states even when aggregate load looks fine, so assess each sport from the server estimate and its own trend evidence.
 
-### CTL Ramp Rate (per discipline)
-| Rate (pts/week) | Assessment |
-|---|---|
-| 4–6 | Healthy base building |
-| 6–8 | Acceptable — monitor recovery signals |
-| >8 | Elevated injury/overtraining risk — flag immediately |
-| <2 | Detraining signal if sustained >3 weeks |
+### Load and recovery interpretation
 
-### TSB (Training Stress Balance) by Race Distance
-| Race Distance | Target TSB at Race Day |
-|---|---|
-| Sprint | +10 to +25 |
-| Olympic | +5 to +20 |
-| 70.3 (Half Ironman) | +5 to +15 |
-| 140.6 (Full Ironman) | +5 to +10 |
-
-**Note:** Higher TSB = more freshness. Lower TSB = more fatigue. Negative TSB is normal during training blocks but should trend toward target in the 10–14 days before race.
-
-### ATL/CTL Relationship
-- ATL > CTL sustained for >2 weeks = overreached — flag
-- ATL spike (single week) = normal hard training week — monitor
-- TSB < -20 = significant fatigue burden — note in analysis
+- CTL and ATL describe modeled training load. A flat CTL or low ramp rate does not establish detraining; a positive ramp does not establish fitness gain.
+- Review changes relative to that discipline’s recent load, training phase, data coverage, symptoms, and comparable performance. Abrupt changes warrant context rather than an automatic injury-risk label.
+- ATL above CTL and negative TSB can occur during planned overload. Neither their duration nor a universal numerical cutoff diagnoses overreaching.
+- Positive TSB can follow reduced training. Check `training_state` and recent history before describing freshness.
+- There is no universal race-day TSB target in this skill. Discuss current modeled load separately from preparation, and use the athlete’s own prior taper/race response when available. Do not forecast race-day freshness from today’s TSB.
 
 ---
 
@@ -86,9 +71,10 @@ For base-building phases, flag if >30% of weekly TSS comes from Z3 or higher. "P
 ## Running Metrics
 
 ### Efficiency Factor (EF — Running)
-- EF = Normalized Graded Pace / Average Heart Rate
-- Rising trend = aerobic adaptation — celebrate
-- Declining trend = fatigue signal or fitness plateau
+- EF = normalized graded **speed** / average HR. Convert pace to speed first: `speed_m_per_min = 1000 / pace_min_per_km`; then `EF = speed_m_per_min / HR_bpm`. Never divide min/km or sec/km directly by HR.
+- Example: at 140 bpm, 6:00/km gives EF 1.190 m/beat and 5:30/km gives 1.299 m/beat. Faster speed at unchanged HR increases EF. Compare only identical units and compatible conditions.
+- A rising trend in comparable aerobic sessions supports improved efficiency; preserve tool confidence and caveats.
+- A declining trend prompts review of conditions, sensor quality, effort, and recovery; it does not establish the cause.
 - Compare only efforts of similar distance, course profile, and weather
 
 ### Cadence
@@ -126,22 +112,18 @@ For base-building phases, flag if >30% of weekly TSS comes from Z3 or higher. "P
 
 ---
 
-## Overtraining Cascade
+## Recovery Concerns
 
-Check in this order — each level confirmed makes the case stronger:
+Review wellness changes, subjective fatigue/soreness, illness/injury context, training load, and sustained comparable performance changes together. Use `get_training_readiness` structured status, confidence, and caveats for its advisory assessment; preserve the result rather than replacing it with a signal count.
 
-1. **HRV downtrend ≥5 consecutive days** — most reliable single indicator
-2. **Resting HR elevated +7–10 bpm above baseline ≥5 days** — strong signal, especially combined with HRV
-3. **TSB < -20 with stalled CTL** — fatigue without adaptation
-4. **Aerobic decoupling deteriorating vs. prior 4-week average** — efficiency regression under same load
-5. **VI spike on normally smooth rides (>1.10 habitually)** — neuromuscular fatigue indicator
+- HRV changes depend on individual baseline, measurement conditions, and coverage. Do not call HRV the single most reliable diagnostic indicator.
+- Elevated resting HR or worsening comparable aerobic efficiency can justify a recovery conversation; neither establishes the cause.
+- High VI may reflect terrain or workout structure. It does not establish neuromuscular fatigue.
+- Stable CTL does not demonstrate a failure to adapt. Look for performance and athlete-reported evidence.
+- Describe persistent concerning patterns as recovery concerns requiring context. Do not diagnose overtraining syndrome, or define it by counting flags. Persistent unexplained underperformance or symptoms warrant qualified assessment.
+- State present, absent, and missing signals. Ask about subjective context when signals conflict; a reassuring metric does not erase reported symptoms.
 
-**Diagnosis threshold:**
-- 1 signal = "watch closely"
-- 2 signals = "flag for recovery week consideration"
-- 3+ signals = "strong overtraining signal — recommend recovery action"
-
-Always surface which signals are present and which are absent. Don't diagnose from a single data point.
+**Evidence:** The [ECSS/ACSM consensus](https://pubmed.ncbi.nlm.nih.gov/23247672/) distinguishes functional overload, nonfunctional overreaching, and overtraining syndrome through clinical course and exclusion of other explanations. The [TrainingPeaks running EF definition](https://www.trainingpeaks.com/blog/the-efficiency-factor-in-running/) converts graded pace to speed before dividing by HR. These sources do not validate universal CTL race-completion cutoffs.
 
 ---
 

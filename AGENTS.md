@@ -29,7 +29,7 @@ Never aggregate swim, bike, and run into a single training-load figure. Surface 
 
 ## Testing Guidelines
 
-Validation is manual. Load the skill in Claude Code or Claude Desktop with the intervals.icu MCP server configured, then exercise the major request types: wellness, fitness status, last activity, weekly summary, race readiness, scheduling, and training-block creation. For write operations, verify planned workouts use the `description` workout syntax and do not dump raw JSON into event descriptions.
+Run `python3 scripts/validate-workout-volumes.py` to check explicit default volumes, `sh scripts/validate-beginner-blocks.sh`, and `bash scripts/validate-workout-library-guidance.sh` for structural guidance checks. These do not prove coaching outcomes or live MCP writes. Load the skill in Claude Code or Claude Desktop with the intervals.icu MCP server configured, then exercise the major request types: wellness, fitness status, last activity, weekly summary, race readiness, scheduling, and training-block creation. For write operations, verify planned workouts use the `description` workout syntax and do not dump raw JSON into event descriptions.
 
 ## Commit & Pull Request Guidelines
 

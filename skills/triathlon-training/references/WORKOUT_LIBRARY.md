@@ -11,8 +11,10 @@ Canonical workout archetypes for swim, bike, run, and strength. Each entry inclu
 
 **Scaling by tier:**
 - **Short tier:** ~75% of standard volume (fewer sets / shorter duration)
-- **Standard tier:** as written below
+- **Standard tier:** use the written default only when it fits the approved weekly volume
 - **Long tier:** ~125% of standard volume (more sets / longer duration)
+
+**Volume accounting:** A default volume is the total of the written steps, not a promise about every scaled variant. Expand all repetitions, include warmup/cooldown and timed recoveries, and recompute totals after any change. Swim distance excludes timed rests; report rest time separately when estimating elapsed duration. Ranges indicate a parameterized family: choose explicit steps before reporting a total. Never fill a gap between metadata and steps with unapproved extra volume.
 
 ---
 
@@ -33,7 +35,7 @@ Before writing workouts, verify zone data is available per discipline:
 
 ### Aerobic Endurance
 - **When:** Base phase
-- **Duration range:** 2000-3000m
+- **Default distance:** 1600m
 - **Intensity:** Easy, Z2 effort
 
 Warmup
@@ -51,7 +53,7 @@ Cooldown
 
 ### Technique Drills
 - **When:** All phases
-- **Duration range:** 1500-2500m
+- **Default distance:** 1200m
 - **Intensity:** Easy, technique focus
 
 Warmup
@@ -72,7 +74,7 @@ Cooldown
 
 ### CSS Intervals
 - **When:** Base 2 / Build phase
-- **Duration range:** 3000-4000m
+- **Default distance:** 1800m
 - **Intensity:** Threshold pace
 
 Warmup
@@ -93,7 +95,7 @@ Cooldown
 
 ### VO2max Swim
 - **When:** Build / Peak phase
-- **Duration range:** 2500-3500m
+- **Default distance:** 1600m
 - **Intensity:** Above threshold
 
 Warmup
@@ -117,7 +119,7 @@ Cooldown
 
 ### Race Pace Set
 - **When:** Peak / Taper phase
-- **Duration range:** 2000-3000m
+- **Default distance:** 1500m
 - **Intensity:** Race pace
 
 Warmup
@@ -134,7 +136,7 @@ Cooldown
 
 ### Recovery Swim
 - **When:** All phases (recovery weeks)
-- **Duration range:** 1500-2000m
+- **Default distance:** 1200m
 - **Intensity:** Very easy
 
 Warmup
@@ -154,7 +156,7 @@ Cooldown
 
 ### Open Water Simulation
 - **When:** Build / Peak phase
-- **Duration range:** 2000-3000m
+- **Default distance:** 2100m
 - **Intensity:** Race effort, continuous
 
 Warmup
@@ -311,7 +313,7 @@ Cooldown
 
 ### Race Pace Ride
 - **When:** Peak phase
-- **Duration range:** 90-180min
+- **Default duration:** 85min
 - **Intensity:** Race IF (distance-dependent)
 
 Warmup
@@ -432,7 +434,7 @@ Easy Run
 - 40m Z2 HR
 
 Strides 6x
-- 20s 100% Pace
+- 20s relaxed acceleration — controlled, not a sprint
 - 60s freeride
 
 ---

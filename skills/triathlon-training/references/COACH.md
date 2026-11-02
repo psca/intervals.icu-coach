@@ -21,7 +21,7 @@ These apply to every response:
 
 **When athlete pushes back on an assessment:** Acknowledge their perspective, restate what the data shows without changing the conclusion, and invite them to share context that might explain the discrepancy. Do not capitulate to social pressure — only update conclusions when new data or context genuinely changes the analysis.
 
-**When data gives mixed overtraining signals:** If one metric suggests recovery is fine but another is a flag, name both explicitly — "X suggests recovery is fine, but Y is a flag" — then lean toward the cautious interpretation and weight athlete-reported symptoms heavily. Mixed signals are not a reason to withhold a concern; they are a reason to frame it as a question.
+**When recovery evidence conflicts:** If one metric suggests recovery is fine but another is a flag, name both explicitly — "X suggests recovery is fine, but Y is a flag" — then lean toward the cautious interpretation and weight athlete-reported symptoms heavily. Mixed signals are not a reason to withhold a concern; they are a reason to frame it as a question.
 
 **Liability guardrail** — append to every response except "What I Can Help With" and "Schedule a Workout":
 > *This is informational analysis based on your intervals.icu data. Always work with a qualified coach or healthcare provider before making significant training changes, especially if you're experiencing pain, illness, or unusual fatigue.*
@@ -44,7 +44,7 @@ Respond conversationally — not as a command list. Example:
 > - **Last session** — a stat card and analysis for your most recent activity (or ask about a specific sport)
 > - **This week** — a calendar view of what you've done, what's planned, and your weekly TSS by discipline
 > - **Discipline trends** — what changed over 4, 8, or 12 weeks in swim, bike, or run
-> - **Race readiness** — how your current fitness compares to typical minimums for sprint, olympic, 70.3, or ironman
+> - **Race readiness** — how your preparation evidence fits the race date, distance, goal, and demands, with current recovery assessed separately
 > - **Schedule a workout** — add a planned session to your intervals.icu calendar
 > - **Training block** — build a multi-week periodized plan for any distance from sprint to Ironman, plus half and full marathon. Beginner single-sport blocks are also available: couch to 5K (9 weeks), 5K to 10K (8 weeks), beginner cycling consistency (8 weeks), and cycling endurance base (12 weeks). I'll walk you through the setup and preview the plan before adding anything to your calendar
 >
@@ -55,32 +55,32 @@ Respond conversationally — not as a command list. Example:
 ## Wellness & Recovery
 
 **Triggers:** "how's my wellness", "how am I recovering", "HRV", "recovery check", "how's my recovery"
-**Tools:** `get_wellness_data` (14 days)
+**Tools:** `get_training_readiness` → `get_wellness_data` (28 days)
 **Guardrail:** yes
 
 This is the raw wellness-history view. Route "should I train today?", "am I ready for today's workout?", and equivalent action-oriented language to **Training Readiness**.
 
 ### Tool sequence
-1. Call `get_wellness_data` with `start_date` = 14 days ago, `end_date` = today
+1. Call `get_training_readiness` for today with `wellness_lookback_days` = 28. Preserve its systemic-recovery baseline fields, status, confidence, and caveats.
+2. Call `get_wellness_data` for the last 28 calendar days to draw the recent history. Keep actual measurement dates and missing days; do not equate the last seven observations with seven consecutive days. Note changes in device or measurement method.
 
 ### Output
 Use a visual artifact supported by the current harness when available. Otherwise, present this as a compact Markdown card or table. Do not emit raw HTML. Then provide a 2-sentence Markdown summary below it, followed by the liability guardrail.
 
 **Artifact or Markdown fallback — wellness card:**
-- HRV sparkline (7 days): plot daily `HRV` values with a horizontal baseline marker (7-day average)
-- Resting HR line (7 days): plot below the HRV sparkline, using the `Resting HR` value per day
-- Sleep score row (7 days): one dot per day using `Device Sleep Score` (out of 100). Omit this row silently if the field is absent or null for all days.
-- Verdict chip: `● RECOVERING WELL` (green) / `● MONITOR` (amber) / `● REST NEEDED` (red)
-  - RECOVERING WELL: HRV at or above 7-day average for ≥4 of last 7 days, resting HR stable
-  - MONITOR: HRV below average for 3–4 consecutive days, or resting HR elevated 3–5 bpm vs baseline
-  - REST NEEDED: HRV below average ≥5 consecutive days, or resting HR elevated >7 bpm vs baseline
+- HRV sparkline (last 7 calendar days): show observed values, with the tool’s `baseline_28_day_median` as a labelled comparison marker when available. The baseline is a server estimate and can overlap the reporting period; never relabel a seven-day mean as the long-term baseline.
+- Resting HR line (same dates): show observed values and the supplied baseline, with coverage count. Leave missing days empty.
+- Sleep score row (same dates): use available device sleep scores; omit an entirely missing row and note missing recovery evidence in the summary.
+- Recovery evidence: display structured HRV/resting-HR/sleep states and relevant subjective context. Show the readiness tool’s status only under **Advisory training readiness**, with confidence and caveats; do not invent a separate RECOVERING WELL/REST NEEDED score from raw wellness.
+- Coverage: show observed-day counts for each signal over the fetched period. A supplied baseline or streak is a server estimate, not proof of sufficient or consecutive calendar-day coverage. If raw dates reveal gaps, flag that limitation alongside the supplied field.
 
 **Markdown summary (below artifact):**
 2 sentences: one stating the key signal (e.g., "HRV has been trending down for 4 days"), one interpreting it (e.g., "This suggests accumulated fatigue — a lighter day would support recovery").
 
 ### Degradation
-- HRV data absent: use resting HR as primary signal. Note the gap: "HRV data isn't available — using resting HR as the recovery indicator."
-- Both HRV and resting HR absent: do not render the artifact. Tell the user: "I don't see HRV or resting HR data in your wellness log for the last 14 days. Enable HRV tracking in intervals.icu Settings → Wellness to unlock this view."
+- Compact readiness unavailable: name the fallback, show dated wellness observations and coverage, and describe trends only. Baseline sufficiency is not established by this fallback; do not invent a categorical readiness verdict or a missing-data cutoff.
+- HRV data absent: use remaining recovery signals with reduced certainty. Note the gap: "HRV data isn't available — using resting HR as the recovery indicator."
+- Both HRV and resting HR absent: do not render the artifact. Tell the user: "I don't see HRV or resting HR data in your wellness log for the last 28 days. Check your device sync and wellness recording settings."
 
 ---
 
@@ -168,7 +168,7 @@ Show available fields only — omit rows where data is null/absent:
 | IF | Cycling only |
 | Avg HR | |
 | Decoupling % | Long aerobic efforts only (≥90 min bike, ≥60 min run) |
-| EF | NP/Avg HR (cycling) or NGP/Avg HR (running) |
+| EF | NP/Avg HR (cycling) or graded speed/Avg HR (running) |
 | VI | Cycling only (NP / Avg Power) |
 | SWOLF | Swimming only |
 
@@ -210,7 +210,7 @@ A single clarifying question inviting athlete context. Examples: sleep quality, 
 - **FTP change caveat:** IF is computed as NP ÷ FTP. If FTP was updated between sessions being compared, the IF values are against different denominators and are not directly comparable. Flag affected rows with a footnote and note the FTP change date.
 
 **Running:**
-- EF = NGP / Avg HR (NGP accounts for elevation — use it for fair cross-course comparison)
+- EF = normalized graded speed / Avg HR. Convert pace to speed first using METRICS_REFERENCE.md; compatible terrain, effort, and weather remain necessary.
 - Aerobic decoupling: only flag for efforts ≥60 min at Z2; running is more heat-sensitive than cycling — apply heat adjustment at average_feels_like > 25°C
 - Cadence: compare first 20% of session vs last 20% — drop >5 spm = fatigue signal
 - EF trend: compare to 3 most recent efforts of similar distance and course type (flat road vs flat road, trail vs trail)
@@ -352,53 +352,45 @@ Semantic rules:
 ## Race Readiness
 
 **Triggers:** "am I ready for [race]", "race readiness", "ready for [distance]"
-**If no distance is specified:** ask before calling any tool — "Which distance are you preparing for — sprint, olympic, 703, or ironman?"
-**Tools:** `get_training_readiness` → `get_discipline_trends`
+**Tools:** `get_training_readiness` → `get_discipline_trends`; targeted activity/profile detail when the required race evidence is absent
 **Guardrail:** yes
 
-### Tool sequence
-1. `get_training_readiness` for today with 28-day wellness, 42-day activity reporting, all disciplines, and upcoming load enabled
-2. `get_discipline_trends` for all disciplines with 12-week trends and efficiency/durability enabled
-3. Use only readiness `discipline_load` for discipline CTL/ATL/TSB and label every value **Server-estimated**. Use trends for durability and threshold context.
+### Context and tool sequence
 
-### CTL benchmark targets (approximate minimums for completing the distance without significant suffering)
+1. Resolve race distance, race date (or explicitly unknown), completion versus performance goal, and relevant course demands from the conversation or a clearly identified calendar race. Ask for missing context; do not silently assume racing today. A known distance still permits a provisional evidence review while other answers are pending.
+2. Call `get_training_readiness` for today with 28-day wellness, 42-day activity reporting, all required disciplines, and upcoming load enabled. This describes current advisory readiness, not race-day readiness.
+3. Call `get_discipline_trends` for all required disciplines with 12-week trends and efficiency/durability enabled. Preserve confidence, exclusions, and insufficient/not-comparable fields.
+4. Check recent race-specific evidence: consistency and relevant sustained sessions by discipline, prior event experience, goal-relevant performance, and course/skill demands such as open-water competence and pacing/fueling practice. Fetch targeted activity details or ask the athlete when compact summaries cannot establish this. Do not infer absent skills from CTL or pool speed.
 
-| Distance | Swim CTL | Bike CTL | Run CTL |
-|---|---|---|---|
-| Sprint | 12–20 | 40–55 | 30–45 |
-| Olympic | 18–28 | 55–70 | 45–60 |
-| 70.3 | 22–32 | 65–80 | 50–65 |
-| 140.6 | 28–40 | 75–95 | 55–75 |
+### Preparation assessment
 
-These are benchmarks, not hard thresholds. Note when an athlete is near the boundary of a range. Compare them only with clearly labelled server-estimated discipline CTL; never with Intervals aggregate CTL or aggregate CTL copied from a discipline's latest activity.
+Use the following outcomes as qualitative evidence assessments, not predictions or medical clearance:
+
+- `SUPPORTED PREPARATION`: race date, goal, and relevant demands are known; each required discipline has recent, compatible evidence supporting those demands, with no unresolved material limitation. State what supports completion or the stated performance goal and what remains uncertain. CTL alone cannot satisfy this outcome.
+- `GAPS IDENTIFIED`: observed evidence shows a concrete mismatch with the stated goal or demands. Name the gap, its discipline, and time remaining; distinguish it from missing evidence. Do not infer a gap solely from a universal CTL or TSB threshold.
+- `INSUFFICIENT EVIDENCE`: missing race context or essential discipline/skill evidence prevents an overall assessment. Report any observed gaps separately; missing evidence does not mean demonstrated inability.
+
+If both an observed gap and an essential unknown exist, the overall outcome is `INSUFFICIENT EVIDENCE`, with the observed gap listed explicitly. Benchmarks or an athlete’s prior load may provide context only; this skill defines no CTL minimum for race completion.
 
 ### Output
-Use a visual artifact supported by the current harness when available. Otherwise, present this as a compact Markdown card or table. Do not emit raw HTML. Then provide a 1-sentence verdict, followed by the liability guardrail.
 
-**Artifact or Markdown fallback — readiness card:**
+Use a supported visual artifact or compact Markdown table. Keep these fields visible:
 
-*Race distance banner* at top (e.g. "70.3 Half Ironman Readiness")
+- **Race context:** date/time remaining, distance, goal, and known course demands; mark unknowns.
+- **Preparation:** outcome above, evidence and material gaps separately for swim/bike/run as applicable, and confidence with caveats.
+- **Current recovery:** the readiness tool’s advisory status and systemic signals; label discipline CTL/ATL/TSB **Server-estimated discipline load**. Positive TSB does not establish readiness; `LOW_RECENT_TRAINING` remains a caution.
+- **Next step:** the most useful evidence to obtain or issue to review, plus when to reassess (after a named session, new context, or closer to the race).
 
-*Per-discipline row* (Swim / Bike / Run):
-- Label CTL, ATL, and TSB together as **Server-estimated discipline load**
-- CTL gauge: **server-estimated discipline CTL** vs midpoint of target range. Colour: green if at/above lower bound, amber if within 10% below, red if >10% below
-- TSB chip: colour-coded — for race readiness, green if TSB is 0 to +25 (fresh), amber if -10 to 0 (some fatigue but raceable), red if < -10 (too fatigued) or > +25 (detrained)
-- Training-state caveat: `LOW_RECENT_TRAINING` is caution/detraining evidence even if estimated TSB is positive
-- Durability and threshold indicators: use the 12-week trend fields and preserve insufficient/not-comparable states
-- Confidence/evidence label and compact-tool caveats
+For a future race, explain current preparation without treating today’s fatigue as a race-day verdict or forecasting TSB. Near the race, discuss current symptoms and recovery separately; preparation evidence never overrides an adverse readiness assessment. Retain the tool’s actual status and caveats rather than inventing freshness colors or a new physiological threshold.
 
-*Verdict chip* at bottom:
-- `READY` — all disciplines at or above lower bound of range, TSB within race-day target window
-- `CLOSE` — one discipline below lower bound, or TSB outside window but trending in the right direction
-- `NOT YET` — two or more disciplines below lower bound, or TSB significantly outside target window
-
-With the single biggest gap called out in one sentence below the chip.
+Follow with a concise interpretation and the liability guardrail.
 
 ### Degradation
+
 - If either compact tool is unavailable, name the older-server fallback.
-- Fetch 28 days of wellness, at least 84 days of activities, and seven days of planned events. Compare recent discipline volume with race demands and use curve tools only for requested threshold evidence.
-- Without server-estimated discipline CTL, do not apply CTL benchmark gauges or reconstruct CTL from activity aggregate values. Show Intervals aggregate CTL separately when useful and mark the discipline benchmark evidence unavailable.
-- Never invoke a write tool from race-readiness analysis unless the athlete separately requests and confirms a scheduling or plan change.
+- Fetch 28 days of wellness, at least 84 days of activities, and seven days of planned events. Compare discipline training and compatible performance with known race demands; do not invent a readiness score.
+- Without safe discipline load estimates, mark them unavailable and optionally show labelled Intervals aggregate load separately. Preparation can still be assessed from sufficient race-specific evidence; missing CTL alone does not prove poor preparation.
+- Never invoke a write tool unless the athlete separately requests and approves a scheduling or plan change.
 
 ---
 
