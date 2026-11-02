@@ -56,11 +56,9 @@ Claude currently installs the connector and the skill separately for this setup.
    ```
    https://intervals-mcp.anthonypoh1998.workers.dev/mcp
    ```
-4. Create or open the Project where you want the coaching instructions to live.
-5. Add [docs/chatgpt-projects/TRIATHLON_TRAINING_CHATGPT_PROJECT_SKILL.md](docs/chatgpt-projects/TRIATHLON_TRAINING_CHATGPT_PROJECT_SKILL.md) as a Project source.
-6. ChatGPT will begin the OAuth flow when it needs the connection.
+4. ChatGPT will begin the OAuth flow when it needs the connection.
 
-This repo does not ship a native ChatGPT skill/plugin package. For ChatGPT, the coaching layer is the Project source document.
+The connector provides tool access. The former single-file ChatGPT Project source has been retired; this repo no longer maintains a ChatGPT coaching package. The canonical coaching instructions live in [skills/triathlon-training/](skills/triathlon-training/).
 
 ## What happens during sign-in
 
@@ -82,8 +80,6 @@ To find your intervals.icu credentials:
 
 - `skills/triathlon-training.zip`
   - a convenience artifact in the repo, but users should expect to package `skills/triathlon-training/` themselves for the normal Claude skill flow
-- `docs/chatgpt-projects/TRIATHLON_TRAINING_CHATGPT_PROJECT_SKILL.md`
-  - the single-file Project source for ChatGPT
 - `desktop-extension.mcpb`
   - still works, but it is no longer the primary end-user install path in this repo
   - keep it in mind mainly for Claude Code / developer-oriented workflows
@@ -169,8 +165,6 @@ intervals.icu-coach/
 │   │   ├── METRICS_REFERENCE.md
 │   │   └── WORKOUT_PLANNING.md
 │   └── triathlon-training.zip
-├── docs/chatgpt-projects/
-│   └── TRIATHLON_TRAINING_CHATGPT_PROJECT_SKILL.md
 ├── desktop-extension.mcpb
 ├── .mcp.json
 └── .claude-plugin/

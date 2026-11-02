@@ -28,13 +28,14 @@ Run before constructing any event payload:
 | Existing reusable workout | `schedule_library` in `WORKOUTS` mode |
 | New bespoke one-off | `add_or_update_event` |
 | New reusable template | `save_library_workout` in a flat folder, then schedule after approval |
-| Existing reusable block | `schedule_library` in `PLAN` mode |
-| New progressive block | Create a `PLAN`, save workouts with zero-based `day`, then schedule |
+| Existing reusable block | `schedule_library` in `PLAN` mode for at most 100 workouts; see § Plans over 100 workouts for larger plans |
+| New progressive block | Create phase plans of at most 100 workouts, save workouts with phase-relative zero-based `day`, then schedule each phase |
 | Race, note, or direct event edit | `add_or_update_event` |
 
 ### Library lookup and authoring
 
 - Library folders are flat; do not infer or create nested folders.
+- `search_workout_library.query` matches names only, not tags. For tag-based discovery, omit `query` and inspect returned tags locally. Searches return at most 100 items with no pagination; a result at the limit may be incomplete, and `total` is the returned count, not the full matching count.
 - Compact `search_workout_library` workout results omit descriptions, `workout_doc`, and attachments. Container metadata may include the container description.
 - Call `get_library_workout` only when the selected workout description or steps are needed. It returns the selected description while omitting raw `workout_doc` and attachments.
 - Use plain-text `description` syntax for every new library workout or direct calendar event. Never construct `workout_doc` by hand.
@@ -282,7 +283,7 @@ When writing approved reusable workouts or a multi-week plan to the calendar:
 
 **Library scheduling:**
 - Use `schedule_library` in `WORKOUTS` mode for selected saved workouts and `PLAN` mode for a saved progressive plan.
-- A call schedules at most 100 workouts. Split a larger approved plan deliberately, and inspect the calendar between calls.
+- A call schedules at most 100 workouts. `PLAN` mode schedules the entire container, rejects plans over 100 workouts, and has no subset selector. Follow § Plans over 100 workouts and inspect the calendar between calls.
 - `calendar_id` must be an integer when supplied.
 - Check calendar conflicts with `get_events` and obtain explicit approval before the call.
 - The upstream bulk write is not documented as transactional. If it returns an unknown outcome, call `get_events` for the affected range before retrying; do not claim that no events were created.
@@ -298,6 +299,14 @@ When writing approved reusable workouts or a multi-week plan to the calendar:
 
 **Race day event:**
 - If the race date does not already have a `RACE_A` event, create one with `category: "RACE_A"`, the race name, and distance
+
+### Plans over 100 workouts
+
+For a new block, partition the approved sessions into chronological phase plans of at most 100 workouts each before creating containers. Split a phase further if needed. Count each discipline-specific session separately. For a phase beginning on original block day `d`, save each workout with `day = original_day - d` and schedule that phase with `start_date = block_start_date + d` calendar days. Preserve rest days, workout times, and same-day sessions. For example, original day 35 in a phase starting on day 28 becomes `day: 7`; the phase starts 28 days after the block start. Check calendar conflicts between phase calls.
+
+For an existing oversized plan, use `WORKOUTS` batches of at most 100 only when the complete set of workout IDs, original day offsets, and times is available and matches the approved preview. Compact search results omit `day` and `time`; call `get_library_workout` for those fields when they are not already known. Set each `start_date_local` to the original block start date plus that workout’s original `day`, combined with its saved time or the approved default time (otherwise `00:00:00`). Do not rebase dates per batch. Supply the approved integer `calendar_id` on each workout when needed, and inspect the calendar between batches.
+
+Do not treat a capped library search as a complete plan inventory. Narrow searches by sport or name only if completeness can be verified against the approved plan. If the complete set cannot be established, stop before scheduling and explain the retrieval limit; offer to save the fully specified approved block as phase plans instead. Do not silently schedule only the first 100 workouts or delete the original plan.
 
 ## Library Maintenance
 

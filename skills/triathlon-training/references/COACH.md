@@ -414,7 +414,7 @@ With the single biggest gap called out in one sentence below the chip.
 - Decide whether the request is a reusable archetype or a bespoke/materially adjusted session. Description is optional — generate a sensible default name if not provided (e.g. "Easy aerobic run", "Z2 long ride").
 
 ### Tool sequence
-1. For a reusable archetype, call `search_workout_library` with sport plus useful name or tag terms. Search results are compact; do not retrieve every workout description.
+1. For a reusable archetype, call `search_workout_library` with sport plus useful name terms. The `query` parameter matches names only, not tags. For tag-based discovery, omit `query` and inspect tags in the returned compact workouts; a full result page may be incomplete. Do not retrieve every workout description.
 2. When one candidate is plausible, call `get_library_workout` only if its steps or full content must be verified. Do not force reuse when the saved workout differs materially from the approved session.
 3. If no suitable template exists, offer either a bespoke calendar event or, when the athlete requests it or reuse is genuinely useful, a new reusable workout saved in an appropriate flat library folder. Do not create a library workout during search or preview.
 4. Call `get_events` for the target date or range before any calendar write.
@@ -586,11 +586,11 @@ The athlete can modify anything before approval:
 
 On approval, follow WORKOUT_PLANNING.md batch write guidance:
 - Calendar conflict resolution (work around / merge / clear and replace)
-- For a matching existing plan, call `schedule_library` in `PLAN` mode with the approved start date and optional integer `calendar_id`.
-- For a new progressive block, call `save_library_container` after approval to create a `PLAN`, save every approved workout with `save_library_workout` and a zero-based non-negative integer `day` offset, then call `schedule_library` in `PLAN` mode.
+- For a matching existing plan of at most 100 workouts, call `schedule_library` in `PLAN` mode with the approved start date and optional integer `calendar_id`. For an existing larger plan, follow WORKOUT_PLANNING.md § Plans over 100 workouts before scheduling.
+- For a new progressive block, partition the approved sessions into chronological phase plans of at most 100 workouts each before saving. After approval, create each `PLAN` with `save_library_container` and save its sessions with `save_library_workout`. Rebase each zero-based non-negative integer `day` offset to that phase’s start date, then schedule each phase with `schedule_library` in `PLAN` mode using its own start date (see WORKOUT_PLANNING.md § Plans over 100 workouts). A block of at most 100 workouts needs only one plan.
 - Create a race-day `RACE_A` event if absent, and write bespoke exceptions separately with `add_or_update_event` after approval. Every new description remains plain-text workout syntax, never JSON (see § Workout Description Syntax in WORKOUT_PLANNING.md).
 - Keep each discipline as a separate event; do not aggregate bricks.
-- One scheduling call supports at most 100 workouts. Split a larger approved plan deliberately and re-check calendar state between calls.
+- `PLAN` mode schedules the entire container and rejects plans over 100 workouts; it cannot select a subset. Re-check calendar state between phase or `WORKOUTS` batch calls.
 - If plan creation succeeds but calendar scheduling has an ambiguous failure, the saved plan remains reusable. Call `get_events` for the affected range before deciding whether retry is safe; do not claim the bulk endpoint is transactional or that zero events were created.
 
 ### After writing
