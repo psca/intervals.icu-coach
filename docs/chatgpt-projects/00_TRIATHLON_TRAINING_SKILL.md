@@ -1,1 +1,0 @@
-../../skills/triathlon-training/SKILL.md
